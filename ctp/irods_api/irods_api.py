@@ -18,13 +18,13 @@ class IRODSAPI(object):
         self._zone = os.getenv("IRODS_ZONE")
         self._project_root = os.getenv("IRODS_COLLECTION_ROOT")
 
-    def download_dataset(self, dataset, save_dir=None):
+    def download_data(self, data, save_dir=None):
         with iRODSSession(host=self._host,
                               port=self._port,
                               user=self._user,
                               password=self._password,
                               zone=self._zone) as session:
-            dataset_path = self._project_root + '/' + dataset
+            dataset_path = self._project_root + '/' + data
             self._download_collection(session, dataset_path, save_dir=save_dir)
 
     def _download_collection(self, session, collection_path, save_dir):
