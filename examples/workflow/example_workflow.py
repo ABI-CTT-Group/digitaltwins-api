@@ -1,7 +1,6 @@
 import os
 import pymongo
 import shutil
-from pathlib import Path
 
 import workflow_manager as wm
 
@@ -21,7 +20,7 @@ def setup_workflow(project_name, root):
 
     project = wm.create_project(project_name, root_dir=root)
     project.import_script('scripts/pretend_import.py')
-    # project.import_script('scripts/pretend_segment.py')
+    project.import_script('scripts/pretend_segment.py')
     return project
 
 
