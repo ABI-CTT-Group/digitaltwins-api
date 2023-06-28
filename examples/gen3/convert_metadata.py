@@ -1,5 +1,5 @@
 from pathlib import Path
-from ctp.gen3.convertor import Gen3Convertor
+from dtp.gen3.convertor import Gen3Convertor
 
 if __name__ == '__main__':
     project = "gen3_project_name"

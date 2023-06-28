@@ -1,4 +1,4 @@
-from ctp.irods_api.irods_api import IRODSAPI
+from dtp.irods_api.irods_api import IRODSAPI
 
 if __name__ == '__main__':
     irods = IRODSAPI()
