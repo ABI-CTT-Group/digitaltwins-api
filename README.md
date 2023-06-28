@@ -1,4 +1,4 @@
-# digital-twin-platform Public
+# digital-twin-platform
 
 ![Python 3](https://img.shields.io/badge/Python->=3.8-blue)
 
