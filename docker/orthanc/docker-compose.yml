@@ -1,0 +1,26 @@
+version: "3.3"
+services:
+  orthanc:
+    image: osimis/orthanc
+    restart: always
+    ports: ["4242:4242", "8042:8042"]
+    volumes: ["orthanc-storage:/var/lib/orthanc/db:Z"]
+    environment:
+      ORTHANC__NAME: "My Orthanc"
+      ORTHANC__REGISTERED_USERS: |
+        {"admin": "admin"}
+      CONNECTIVITY_CHECKS_PLUGIN_ENABLED: "true"
+      ORTHANC_WEB_VIEWER_PLUGIN_ENABLED: "true"
+      OSIMIS_WEB_VIEWER1_PLUGIN_ENABLED: "true"
+      PYTHON_PLUGIN_ENABLED: "true"
+      WSI_PLUGIN_ENABLED: "true"
+      TCIA_PLUGIN_ENABLED: "true"
+      ORTHANC_JSON: |
+        {
+          "DicomModalities": {
+            "test_dicom_node": [ "test_dicom_node_AET", "localhost", 8104 ],
+          }
+        }
+
+volumes:
+  orthanc-storage:
