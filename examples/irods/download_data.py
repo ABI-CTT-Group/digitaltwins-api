@@ -1,6 +1,7 @@
 from dtp.irods_api.irods_api import IRODSAPI
 
 if __name__ == '__main__':
-    irods = IRODSAPI()
+    config_file = "../../configs/templates/irods.json"
+    irods = IRODSAPI(config_file)
     save_dir = "./"
     irods.download_data(data="dataset-12L_1-version-1", save_dir=save_dir)

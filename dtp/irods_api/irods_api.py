@@ -2,6 +2,8 @@ from dotenv import load_dotenv
 from pathlib import Path
 import os
 
+from dtp.utils.config_loader import ConfigLoader
+
 from irods.session import iRODSSession
 
 env_file = Path('../../.env')
@@ -9,14 +11,15 @@ load_dotenv(dotenv_path=env_file)
 
 
 class IRODSAPI(object):
-    def __init__(self):
-        self._url = os.getenv('IRODS_URL')
-        self._host = os.getenv("IRODS_HOST")
-        self._port = os.getenv("IRODS_PORT")
-        self._user = os.getenv("IRODS_USER")
-        self._password = os.getenv("IRODS_PASSWORD")
-        self._zone = os.getenv("IRODS_ZONE")
-        self._project_root = os.getenv("IRODS_COLLECTION_ROOT")
+    def __init__(self, config_file=None):
+        self._configs = ConfigLoader.load_from_json(config_file)
+
+        self._host = self._configs.get("irods_host")
+        self._port = self._configs.get("irods_port")
+        self._user = self._configs.get("irods_user")
+        self._password = self._configs.get("irods_password")
+        self._zone = self._configs.get("irods_zone")
+        self._project_root = self._configs.get("irods_project_root")
 
     def download_data(self, data, save_dir=None):
         with iRODSSession(host=self._host,
