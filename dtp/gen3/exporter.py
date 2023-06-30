@@ -34,7 +34,8 @@ class Exporter(object):
         :rtype: list
         """
         output = self._exporter.export_node(program, project, node_type, fileformat, filename)
-        return output
+        data = json.loads(output).get("data")
+        return data
 
     def export_record(self, program, project, uuid, fileformat, filename=None):
         """
@@ -54,7 +55,8 @@ class Exporter(object):
         :rtype: dict
         """
         output = self._exporter.export_record(program, project, uuid, fileformat, filename)
-        return output
+        data = json.loads(output)[0]
+        return data
 
     def save(self, data, fileformat, path):
         """
