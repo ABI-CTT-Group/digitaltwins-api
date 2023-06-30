@@ -8,6 +8,14 @@ import pypacs
 
 class Downloader(object):
     def __init__(self, data_storage_config, gen3_config=None):
+        """
+        Constructor
+
+        :param data_storage_config: Path to the data storage (PACS or iRods) configuration file (json)
+        :type data_storage_config: string
+        :param gen3_config: (Optional)
+        :type gen3_config: Path to the Gen3 configuration file (json)
+        """
         self._data_storage_configs = ConfigLoader.load_from_json(data_storage_config)
 
         self._data_storage = self._data_storage_configs.get("storage")
@@ -28,6 +36,14 @@ class Downloader(object):
             self._irods = IRODSAPI(data_storage_config)
 
     def download_dataset(self, dataset_id, dest):
+        """
+        Downloading dataset (including data from PACS/iRods & metadata from Gen3) in SDS format
+
+        :param dataset_id: Dataset id/name on Gen3
+        :type dataset_id: str
+        :param dest: Path to the save folder
+        :type dest: string
+        """
         if self._data_storage == "pacs":
             self._download(dataset_id)
         elif self._data_storage == "irods":

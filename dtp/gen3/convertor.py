@@ -9,9 +9,19 @@ import re
 
 class Gen3Convertor(object):
     """
-    Converting the SDS metadata to gen3 format
+    Converting the metadata from SPARC dataset structure (SDS) to Gen3 submittable structure in json format
     """
     def __init__(self, project, experiment, version="2.0.0"):
+        """
+        Constructor
+
+        :param project: Project name
+        :type project: str
+        :param experiment: Experiment/dataset name
+        :type experiment: str
+        :param version: SDS schema version
+        :type version: str
+        """
         self._version = version
         self._project = project
         self._experiment = experiment
@@ -29,13 +39,37 @@ class Gen3Convertor(object):
         self._validate_version(version)
 
     def set_schema_dir(self, path):
+        """
+        Setting the SDS schema directory
+
+        :param path: Path to the SDS schema directory
+        :type path: str
+        :return:
+        :rtype:
+        """
         self._schema_dir = Path(path)
 
     def _validate_version(self, version):
+        """
+        Checking if the SDS version is supported
+
+        :param version: SDS version
+        :type version: str
+        :return:
+        :rtype:
+        """
         if version not in self._supported_versions:
             raise Exception("Dataset version not supported")
 
     def _init_data(self, category):
+        """
+        Initialising the Gen3 data structure
+
+        :param category: SDS metadata category
+        :type category: str
+        :return: Gen3 data structure
+        :rtype: dict
+        """
         if category == "subjects":
             type = "case"
         else:
@@ -58,6 +92,16 @@ class Gen3Convertor(object):
         return data
 
     def execute(self, source_dir, dest_dir):
+        """
+        Converting metadata
+
+        :param source_dir: Path to the source (SDS) directory
+        :type source_dir: str or  pathlib.Path object
+        :param dest_dir: Path to the destination (Gen3) directory
+        :type dest_dir: str or pathlib.Path object
+        :return:
+        :rtype:
+        """
         for category in self._categories:
             data = self._init_data(category)
             if category == "experiment":
@@ -145,6 +189,16 @@ class Gen3Convertor(object):
             self._save(data, dest)
 
     def _get_files(self, source, category):
+        """
+        Getting all files from a directory filtered by Gen3 category. e.g. manifest
+
+        :param source: path to the source directory
+        :type source: str or pathlib.Path object
+        :param category: SDS category
+        :type category: str
+        :return: List of files
+        :rtype: list
+        """
         files = list()
         if source.is_file():
             files.append(source)
@@ -158,6 +212,16 @@ class Gen3Convertor(object):
 
     @staticmethod
     def read_excel(path, sheet_name=None):
+        """
+        Reading Excel data as a python dataframe object
+
+        :param path: Path to the Excel file
+        :type path: str or pathlib.Path object
+        :param sheet_name: Excel sheet name
+        :type sheet_name: str
+        :return: Data in dataframe object format
+        :rtype: object
+        """
         try:
             # the read_excel method return dict when sheet name is passed. otherwise a dataframe will be returned
             if sheet_name:
@@ -173,6 +237,16 @@ class Gen3Convertor(object):
         return metadata
 
     def _get_mappings(self, version, category):
+        """
+        Getting the mapping between SDS and Gen3 variables
+
+        :param version: SDS version
+        :type version: str
+        :param category: SDS category
+        :type category: str
+        :return: The mapping between SDS and Gen3 variables in dataframe
+        :rtype: object
+        """
         version = version.replace(".", "_")
         version = "version_" + version
         version_dir = self._resources_dir / version
@@ -183,12 +257,30 @@ class Gen3Convertor(object):
         return mappings
 
     def _save(self, data, dest):
+        """
+        Saving the converted Gen3 submission file
+
+        :param data: Converted data in Gen3 submission structure
+        :type data: dict
+        :param dest: Path to the save file
+        :type dest: str or pathlib.Path object
+        :return:
+        :rtype:
+        """
         os.makedirs(dest.parent, exist_ok=True)
         with open(dest, 'w') as f:
             json.dump(data, f, indent=4)
         print("Saved to " + str(dest))
 
     def _get_schema(self, category):
+        """
+        Getting the SDS schema
+
+        :param category: SDS category
+        :type category: str
+        :return: SDS schema
+        :rtype: dict
+        """
         if category == "subjects":
             category = "case"
         schema_file = category + ".yaml"
@@ -201,6 +293,14 @@ class Gen3Convertor(object):
         return schema
 
     def _get_sparc_metadata(self, source):
+        """
+        Getting the SDS metadata from a file (Excel)
+
+        :param source: Path to the metadata file
+        :type source: str
+        :return:
+        :rtype:
+        """
         metadata_sparc = self.read_excel(source)
         if source.stem == "dataset_description":
             # combine values
@@ -215,6 +315,20 @@ class Gen3Convertor(object):
         return metadata_sparc
 
     def _map_fields(self, category, metadata_sparc, mappings, target_version):
+        """
+        Mapping/changing the SDS fields' names to Gen3 fields' names
+
+        :param category: SDS category
+        :type category: str
+        :param metadata_sparc: SDS metadata in Dataframe
+        :type metadata_sparc: object
+        :param mappings: Mapping in Dataframe
+        :type mappings: object
+        :param target_version: SDS version
+        :type target_version: str
+        :return: New SDS metadata in Dataframe
+        :rtype: object
+        """
         if category == "dataset_description":
             nums_of_records = len(metadata_sparc)
             column_idx = 0
@@ -244,6 +358,18 @@ class Gen3Convertor(object):
         return metadata_sparc
 
     def _convert(self, category, records, data):
+        """
+        Converting SDS data to Gen3 submission structure
+
+        :param category: SDS category
+        :type category: str
+        :param records: SDS data. List of dictionary
+        :type records: list
+        :param data: Initial data in Gen3 structure
+        :type data: dict
+        :return: New data in Gen3 structure
+        :rtype: dict
+        """
         metadata_dict = dict()
 
         if category == "dataset_description":
