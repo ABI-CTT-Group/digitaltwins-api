@@ -1,5 +1,3 @@
-from dotenv import load_dotenv
-from pathlib import Path
 import os
 
 from dtp.utils.config_loader import ConfigLoader
