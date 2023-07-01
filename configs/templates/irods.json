@@ -1,0 +1,8 @@
+{
+        "irods_host": null,
+        "irods_port": null,
+        "irods_user": null,
+        "irods_password": null,
+        "irods_zone": null,
+        "irods_project_root": null
+}

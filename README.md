@@ -1,4 +1,4 @@
-# clinical-translation-platform
+# digital-twin-platform
 
 ![Python 3](https://img.shields.io/badge/Python->=3.8-blue)
 
@@ -8,14 +8,14 @@
 1. Clone the repository:
 
 ```commandline
-git clone https://github.com/LIN810116/clinical-translation-platform.git
+git clone https://github.com/ABI-CTT-Group/digital-twin-platform.git
 ```
 
 2. Update your .bashrc file
-add the path to the ctp module to your Python path environment variable. 
+add the path to the dtp module to your Python path environment variable. 
 This can done by adding the following line to your ~/.bashrc file.
 ```
-export PYTHONPATH=$PYTHONPATH:~/path/to/clinical-translation-platform/repo/ctp
+export PYTHONPATH=$PYTHONPATH:~/path/to/digital-twin-platform/repo/dtp
 ```
 then, run
 ```commandline

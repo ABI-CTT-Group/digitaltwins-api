@@ -1,4 +1,4 @@
-from ctp.gen3.submitter import Gen3Submitter
+from dtp.gen3.submitter import Gen3Submitter
 from pathlib import Path
 
 if __name__ == '__main__':
