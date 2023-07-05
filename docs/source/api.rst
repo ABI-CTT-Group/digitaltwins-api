@@ -27,7 +27,7 @@ Interacting with metadata
    :members:
    :undoc-members:
 
-.. autoclass:: Queryer
+.. autoclass:: Querier
    :members:
    :undoc-members:
 
