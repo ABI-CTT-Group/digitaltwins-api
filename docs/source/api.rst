@@ -3,16 +3,16 @@ API
 
 .. automodule:: dtp
 
-Cores
------
+Downloading dataset
+-------------------
 
 .. autoclass:: Downloader
    :members:
    :undoc-members:
 
 
-Gen3
-----
+Interacting with metadata
+-------------------------
 
 .. autoclass:: Auth
    :members:
@@ -32,13 +32,6 @@ Gen3
    :undoc-members:
 
 .. autoclass:: Gen3Submitter
-   :members:
-   :undoc-members:
-
-iRods
-------
-
-.. autoclass:: IRODSAPI
    :members:
    :undoc-members:
 
