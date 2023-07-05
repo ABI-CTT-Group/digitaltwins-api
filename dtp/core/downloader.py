@@ -1,7 +1,7 @@
 from dtp.utils.config_loader import ConfigLoader
 from dtp.irods_api.irods_api import IRODSAPI
 from dtp.gen3.auth import Auth
-from dtp.gen3.queryer import Queryer
+from dtp.gen3.querier import Querier
 
 import pypacs
 
@@ -34,7 +34,7 @@ class Downloader(object):
             self._gen3_endpoint = self._gen3_config.get("gen3_endpoint")
             self._gen3_cred_file = self._gen3_config.get("gen3_cred_file")
             self._gen3_auth = Auth(self._gen3_endpoint, self._gen3_cred_file)
-            self._gen3_queryer = Queryer(self._gen3_auth)
+            self._gen3_queryer = Querier(self._gen3_auth)
 
         elif self._data_storage == "irods":
             self._irods = IRODSAPI(data_storage_config)

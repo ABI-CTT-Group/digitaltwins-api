@@ -1,5 +1,5 @@
 from dtp.gen3.auth import Auth
-from dtp.gen3.queryer import Queryer
+from dtp.gen3.querier import Querier
 from dtp.gen3.exporter import Exporter
 
 from dtp.utils.config_loader import ConfigLoader
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     cred_file = config_file.get("gen3_cred_file")
 
     auth = Auth(endpoint, cred_file)
-    queryer = Queryer(auth)
+    queryer = Querier(auth)
 
     programs = queryer.get_programs()
     print("Programs:" + str(programs))
