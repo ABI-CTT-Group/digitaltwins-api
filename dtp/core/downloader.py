@@ -7,7 +7,7 @@ import pypacs
 
 
 class Downloader(object):
-    def __init__(self, data_storage_config, gen3_config=None):
+    def __init__(self, data_storage_config, gen3_config=None, data_storage_type="pacs"):
         """
         Constructor
 
@@ -19,6 +19,10 @@ class Downloader(object):
         self._data_storage_configs = ConfigLoader.load_from_json(data_storage_config)
 
         self._data_storage = self._data_storage_configs.get("storage")
+        if data_storage_type:
+            self._data_storage = data_storage_type
+        else:
+            self._data_storage = self._data_storage_configs.get("storage")
 
         if self._data_storage == "pacs":
             self._pacs_ip = self._data_storage_configs.get("pacs_ip")

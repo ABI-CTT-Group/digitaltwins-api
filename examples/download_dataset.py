@@ -1,4 +1,4 @@
-from dtp.cores.downloader import Downloader
+from dtp.core.downloader import Downloader
 
 if __name__ == '__main__':
     data_storage_config = "../configs/templates/pacs.json"
