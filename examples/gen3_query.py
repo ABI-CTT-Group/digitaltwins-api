@@ -1,6 +1,6 @@
 from dtp.gen3.auth import Auth
 from dtp.gen3.querier import Querier
-from dtp.gen3.exporter import Exporter
+from dtp.gen3.metadata_exporter import MetadataExporter
 
 from dtp.utils.config_loader import ConfigLoader
 
@@ -49,5 +49,5 @@ if __name__ == '__main__':
     print(results)
 
     # Save
-    exporter = Exporter(auth)
+    exporter = MetadataExporter(auth)
     exporter.save(results, "json", path=save_path)
