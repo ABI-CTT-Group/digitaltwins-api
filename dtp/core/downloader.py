@@ -1,5 +1,5 @@
 from dtp.utils.config_loader import ConfigLoader
-from dtp.irods.irods import IRODSAPI
+from dtp.irods.irods import IRODS
 from dtp.gen3.auth import Auth
 from dtp.gen3.querier import Querier
 
@@ -37,7 +37,7 @@ class Downloader(object):
             self._gen3_queryer = Querier(self._gen3_auth)
 
         elif self._data_storage == "irods":
-            self._irods = IRODSAPI(data_storage_config)
+            self._irods = IRODS(data_storage_config)
 
     def download_dataset(self, dataset_id, dest):
         """
