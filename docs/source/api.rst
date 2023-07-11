@@ -23,15 +23,15 @@ Interacting with metadata
    :members:
    :undoc-members:
 
-.. autoclass:: Exporter
+.. autoclass:: MetadataExporter
    :members:
    :undoc-members:
 
-.. autoclass:: Querier
+.. autoclass:: MetadataQuerier
    :members:
    :undoc-members:
 
-.. autoclass:: Gen3Submitter
+.. autoclass:: MetadataUploader
    :members:
    :undoc-members:
 
