@@ -1,5 +1,5 @@
 from dtp.gen3.auth import Auth
-from dtp.gen3.querier import Querier
+from dtp.gen3.metadata_querier import MetadataQuerier
 from dtp.gen3.metadata_exporter import MetadataExporter
 
 from dtp.utils.config_loader import ConfigLoader
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     cred_file = config_file.get("gen3_cred_file")
 
     auth = Auth(endpoint, cred_file)
-    queryer = Querier(auth)
+    queryer = MetadataQuerier(auth)
 
     programs = queryer.get_programs()
     print("Programs:" + str(programs))
