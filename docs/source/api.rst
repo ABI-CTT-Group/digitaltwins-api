@@ -3,6 +3,14 @@ API
 
 .. automodule:: dtp
 
+Authentication
+--------------
+
+.. autoclass:: Auth
+   :members:
+   :undoc-members:
+   :inherited-members:
+
 Downloading dataset
 -------------------
 
@@ -13,11 +21,6 @@ Downloading dataset
 
 Interacting with metadata
 -------------------------
-
-.. autoclass:: Auth
-   :members:
-   :undoc-members:
-   :inherited-members:
 
 .. autoclass:: MetadataConvertor
    :members:
