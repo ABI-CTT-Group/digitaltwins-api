@@ -11,6 +11,14 @@ Authentication
    :undoc-members:
    :inherited-members:
 
+Uploading dataset
+-----------------
+
+.. autoclass:: Uploader
+   :members:
+   :undoc-members:
+
+
 Downloading dataset
 -------------------
 

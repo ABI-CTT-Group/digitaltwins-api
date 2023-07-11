@@ -1,4 +1,5 @@
 from dtp.core.downloader import Downloader
+from dtp.core.uploader import Uploader
 from dtp.gen3.auth import Auth
 from dtp.gen3.metadata_convertor import MetadataConvertor
 from dtp.gen3.metadata_exporter import MetadataExporter
