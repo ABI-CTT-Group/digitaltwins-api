@@ -1,5 +1,5 @@
 from dtp.utils.config_loader import ConfigLoader
-from dtp.irods_api.irods_api import IRODSAPI
+from dtp.irods.irods import IRODSAPI
 from dtp.gen3.auth import Auth
 from dtp.gen3.querier import Querier
 

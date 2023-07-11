@@ -1,4 +1,4 @@
-from dtp.irods_api.irods_api import IRODSAPI
+from dtp.irods.irods import IRODSAPI
 
 if __name__ == '__main__':
     config_file = "../../configs/templates/irods.json"

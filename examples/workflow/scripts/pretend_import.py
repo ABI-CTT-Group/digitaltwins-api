@@ -2,7 +2,7 @@ import os
 import shutil
 
 import workflow_manager as wm
-from dtp.irods_api.irods_api import IRODSAPI
+from dtp.irods.irods import IRODSAPI
 
 script_id = 'pretend_import'
 run_program = 'python3'
