@@ -7,7 +7,7 @@ import yaml
 import re
 
 
-class Gen3Convertor(object):
+class MetadataConvertor(object):
     """
     Converting the metadata from SPARC dataset structure (SDS) to Gen3 submittable structure in json format
     """

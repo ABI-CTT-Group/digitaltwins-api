@@ -19,7 +19,7 @@ Interacting with metadata
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: Gen3Convertor
+.. autoclass:: MetadataConvertor
    :members:
    :undoc-members:
 
