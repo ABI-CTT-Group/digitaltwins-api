@@ -1,7 +1,5 @@
 from dtp.utils.config_loader import ConfigLoader
-from dtp.irods.irods import IRODS
-from dtp.gen3.auth import Auth
-from dtp.gen3.metadata_querier import MetadataQuerier
+from dtp import Auth, IRODS, MetadataQuerier
 
 import pypacs
 
