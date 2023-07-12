@@ -8,6 +8,5 @@ if __name__ == '__main__':
     dest_dir = Path(r"/path/to/output/ge3/metadata/folder")
     sds_schema_dir = Path(r"/path/to/sds/dictionary/folder")
 
-    convertor = MetadataConvertor(project=project, experiment=experiment, version="2.0.0")
-    convertor.set_schema_dir(sds_schema_dir)
+    convertor = MetadataConvertor(project=project, experiment=experiment, schema_dir=sds_schema_dir, version="2.0.0")
     convertor.execute(source_dir=source_dir, dest_dir=dest_dir,)

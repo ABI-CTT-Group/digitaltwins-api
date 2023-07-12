@@ -11,7 +11,7 @@ class MetadataConvertor(object):
     """
     Converting the metadata from SPARC dataset structure (SDS) to Gen3 submittable structure in json format
     """
-    def __init__(self, project, experiment, version="2.0.0"):
+    def __init__(self, project, experiment, schema_dir=None, version="2.0.0"):
         """
         Constructor
 
@@ -25,11 +25,11 @@ class MetadataConvertor(object):
         self._version = version
         self._project = project
         self._experiment = experiment
+        self._schema_dir = schema_dir
 
         self._supported_versions = ["1.2.3", "2.0.0"]
         self._current_dir = Path(__file__).parent.resolve()
         self._resources_dir = self._current_dir / "resources"
-        self._schema_dir = None
         self._special_chars = ['/', '_']
 
         self._categories = ["experiment", "dataset_description", "subjects", "manifest"]
