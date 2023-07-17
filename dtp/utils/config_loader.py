@@ -10,5 +10,5 @@ class ConfigLoader(object):
     @staticmethod
     def load_from_json(file):
         with open(file) as f:
-            configs = json.loads(f)
+            configs = json.load(f)
         return configs
