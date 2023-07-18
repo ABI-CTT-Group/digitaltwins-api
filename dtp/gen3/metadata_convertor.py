@@ -157,6 +157,7 @@ class MetadataConvertor(object):
                         # Update submitter_id
                         if key in ["subject_id", "filename"]:
                             data["submitter_id"] = data["submitter_id"] + '-' + value
+                            data["submitter_id"] = data["submitter_id"].replace('./', '')
                             data["submitter_id"] = re.sub(str(self._special_chars), '-', data["submitter_id"])
 
                         # check if value exists and if value equals to nan (nan variable does not equal to itself)
