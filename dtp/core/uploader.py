@@ -1,5 +1,11 @@
+from pathlib import Path
+
 from dtp.utils.config_loader import ConfigLoader
-from dtp import Auth, IRODS, MetadataQuerier
+from dtp.gen3.auth import Auth
+from dtp.irods.irods import IRODS
+from dtp.gen3.metadata_querier import MetadataQuerier
+from dtp.gen3.metadata_convertor import MetadataConvertor
+from dtp.gen3.metadata_uploader import MetadataUploader
 
 import pypacs
 
