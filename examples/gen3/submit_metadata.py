@@ -1,4 +1,4 @@
-from dtp.gen3.metadata_uploader import MetadataUploader
+from dtp import Auth, MetadataUploader
 from pathlib import Path
 
 if __name__ == '__main__':
