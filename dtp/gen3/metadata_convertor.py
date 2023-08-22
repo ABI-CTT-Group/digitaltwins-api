@@ -25,7 +25,11 @@ class MetadataConvertor(object):
         self._version = version
         self._project = project
         self._experiment = experiment
-        self._schema_dir = schema_dir
+        if schema_dir:
+            self._schema_dir = schema_dir
+        else:
+            version_dirname = "version_" + version.replace('.', '_')
+            self._schema_dir = Path.cwd().joinpath("resources/" + version_dirname + "gen3_sds_dictionary")
 
         self._supported_versions = ["1.2.3", "2.0.0"]
         self._current_dir = Path(__file__).parent.resolve()
