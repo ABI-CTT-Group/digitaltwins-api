@@ -67,6 +67,13 @@ class Uploader(object):
         # TODO
         pass
 
-    def upload_files(self):
-        # TODO
+    def _verify_dataset(self, dataset_dir, project):
+        if dataset_dir.is_dir():
+            dataset_name = dataset_dir.name
+        else:
+            raise NotADirectoryError("Dataset directory not found")
+
+        # check if dataset exists
+        # todo
         pass
+
