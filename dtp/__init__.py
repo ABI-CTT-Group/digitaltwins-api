@@ -3,6 +3,6 @@ from .gen3.metadata_convertor import MetadataConvertor
 from .gen3.metadata_exporter import MetadataExporter
 from .gen3.metadata_querier import MetadataQuerier
 from .gen3.metadata_uploader import MetadataUploader
-from .irods.irods_wrapper import IRODSWrapper
+from .irods.irods import IRODSWrapper
 from .core.downloader import Downloader
 from .core.uploader import Uploader
