@@ -63,7 +63,7 @@ class Uploader(object):
         MetadataUploader
         pass
 
-    def upload_metadata(self):
+    def upload_files(self, dataset_dir):
         # TODO
         pass
 
