@@ -96,10 +96,7 @@ def set_subject_metadata(subject):
         "sex": "F",
         "species": "human",
         "strain": "tissue",
-        "RRID for strain": "NA",
-        "age category": "middle adulthood",
-        "also in dataset": "NA",
-        "member of": "NA"
+        "age category": "middle adulthood"
     }
 
     return subject_metadata
@@ -109,12 +106,9 @@ def set_sample_metadata(subject, sample):
     sample_metadata = {
         "sample id": sample,
         "subject id": subject,
-        "wasDerivedFromSample": "NA",
         "sample experimental group": "experimental",
         "sample type": "tissue",
         "sample anatomical location": "breast tissue",
-        "also in dataset": "NA",
-        "member of": "NA"
     }
     return sample_metadata
 
