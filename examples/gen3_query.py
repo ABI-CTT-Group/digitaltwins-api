@@ -1,6 +1,6 @@
 from dtp.gen3.auth import Auth
-from dtp.gen3.queryer import Queryer
-from dtp.gen3.exporter import Exporter
+from dtp.gen3.metadata_querier import MetadataQuerier
+from dtp.gen3.metadata_exporter import MetadataExporter
 
 from dtp.utils.config_loader import ConfigLoader
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     cred_file = config_file.get("gen3_cred_file")
 
     auth = Auth(endpoint, cred_file)
-    queryer = Queryer(auth)
+    queryer = MetadataQuerier(auth)
 
     programs = queryer.get_programs()
     print("Programs:" + str(programs))
@@ -49,5 +49,5 @@ if __name__ == '__main__':
     print(results)
 
     # Save
-    exporter = Exporter(auth)
+    exporter = MetadataExporter(auth)
     exporter.save(results, "json", path=save_path)

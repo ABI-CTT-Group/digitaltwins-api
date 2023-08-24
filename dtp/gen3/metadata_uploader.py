@@ -2,7 +2,7 @@ from gen3.auth import Gen3Auth
 from gen3.submission import Gen3Submission
 
 
-class Gen3Submitter(object):
+class MetadataUploader(object):
     """
     Class for Gen3 submission
     """

@@ -5,7 +5,7 @@ from dtp.utils.config_loader import ConfigLoader
 from irods.session import iRODSSession
 
 
-class IRODSAPI(object):
+class IRODS(object):
     """
     Class for interacting with iRODS server
     """

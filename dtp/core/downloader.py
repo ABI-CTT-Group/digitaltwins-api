@@ -1,13 +1,13 @@
+from dtp import Auth
+from dtp import IRODS
+from dtp import MetadataQuerier
 from dtp.utils.config_loader import ConfigLoader
-from dtp.irods_api.irods_api import IRODSAPI
-from dtp.gen3.auth import Auth
-from dtp.gen3.queryer import Queryer
 
 import pypacs
 
 
 class Downloader(object):
-    def __init__(self, data_storage_config, gen3_config=None):
+    def __init__(self, data_storage_config, gen3_config=None, data_storage_type="pacs"):
         """
         Constructor
 
@@ -19,6 +19,17 @@ class Downloader(object):
         self._data_storage_configs = ConfigLoader.load_from_json(data_storage_config)
 
         self._data_storage = self._data_storage_configs.get("storage")
+        if data_storage_type:
+            self._data_storage = data_storage_type
+        else:
+            self._data_storage = self._data_storage_configs.get("storage")
+
+        if gen3_config:
+            self._gen3_config = ConfigLoader.load_from_json(gen3_config)
+            self._gen3_endpoint = self._gen3_config.get("gen3_endpoint")
+            self._gen3_cred_file = self._gen3_config.get("gen3_cred_file")
+            self._gen3_auth = Auth(self._gen3_endpoint, self._gen3_cred_file)
+            self._gen3_queryer = MetadataQuerier(self._gen3_auth)
 
         if self._data_storage == "pacs":
             self._pacs_ip = self._data_storage_configs.get("pacs_ip")
@@ -26,14 +37,8 @@ class Downloader(object):
             self._pacs_aec = self._data_storage_configs.get("pacs_aec")
             self._pacs_aet = self._data_storage_configs.get("pacs_aet")
 
-            self._gen3_config = ConfigLoader.load_from_json(gen3_config)
-            self._gen3_endpoint = self._gen3_config.get("gen3_endpoint")
-            self._gen3_cred_file = self._gen3_config.get("gen3_cred_file")
-            self._gen3_auth = Auth(self._gen3_endpoint, self._gen3_cred_file)
-            self._gen3_queryer = Queryer(self._gen3_auth)
-
         elif self._data_storage == "irods":
-            self._irods = IRODSAPI(data_storage_config)
+            self._irods = IRODS(data_storage_config)
 
     def download_dataset(self, dataset_id, dest):
         """

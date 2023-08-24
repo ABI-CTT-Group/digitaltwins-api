@@ -7,11 +7,11 @@ import yaml
 import re
 
 
-class Gen3Convertor(object):
+class MetadataConvertor(object):
     """
     Converting the metadata from SPARC dataset structure (SDS) to Gen3 submittable structure in json format
     """
-    def __init__(self, project, experiment, version="2.0.0"):
+    def __init__(self, project, experiment, schema_dir=None, version="2.0.0"):
         """
         Constructor
 
@@ -25,11 +25,15 @@ class Gen3Convertor(object):
         self._version = version
         self._project = project
         self._experiment = experiment
+        if schema_dir:
+            self._schema_dir = schema_dir
+        else:
+            version_dirname = "version_" + version.replace('.', '_')
+            self._schema_dir = Path.cwd().joinpath("resources/" + version_dirname + "gen3_sds_dictionary")
 
         self._supported_versions = ["1.2.3", "2.0.0"]
         self._current_dir = Path(__file__).parent.resolve()
         self._resources_dir = self._current_dir / "resources"
-        self._schema_dir = None
         self._special_chars = ['/', '_']
 
         self._categories = ["experiment", "dataset_description", "subjects", "manifest"]
@@ -157,6 +161,7 @@ class Gen3Convertor(object):
                         # Update submitter_id
                         if key in ["subject_id", "filename"]:
                             data["submitter_id"] = data["submitter_id"] + '-' + value
+                            data["submitter_id"] = data["submitter_id"].replace('./', '')
                             data["submitter_id"] = re.sub(str(self._special_chars), '-', data["submitter_id"])
 
                         # check if value exists and if value equals to nan (nan variable does not equal to itself)

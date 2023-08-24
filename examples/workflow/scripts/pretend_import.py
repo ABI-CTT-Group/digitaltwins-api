@@ -2,7 +2,7 @@ import os
 import shutil
 
 import workflow_manager as wm
-from dtp.irods_api.irods_api import IRODSAPI
+from dtp.irods.irods import IRODS
 
 script_id = 'pretend_import'
 run_program = 'python3'
@@ -25,7 +25,7 @@ def run(process):
     workspace = process.get_workspace('pretend_import', True)
     print("Workspace: " + str(workspace.path()))
 
-    irods = IRODSAPI()
+    irods = IRODS()
     data = dataset + '/' + data_type + '/' + subject + '/' + sample
     irods.download_data(data=data, save_dir=workspace)
 

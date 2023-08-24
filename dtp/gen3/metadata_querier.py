@@ -1,7 +1,7 @@
 from gen3.submission import Gen3Submission
 
 
-class Queryer(object):
+class MetadataQuerier(object):
     """
     Class for querying Gen3.
     Also accepts queries in GraphQL syntax.

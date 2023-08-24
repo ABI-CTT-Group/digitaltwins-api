@@ -2,7 +2,7 @@ from gen3.submission import Gen3Submission
 import json
 
 
-class Exporter(object):
+class MetadataExporter(object):
     """
     Class for exporting Gen3 metadata
     """

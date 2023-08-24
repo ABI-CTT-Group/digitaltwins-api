@@ -3,42 +3,46 @@ API
 
 .. automodule:: dtp
 
-Cores
------
-
-.. autoclass:: Downloader
-   :members:
-   :undoc-members:
-
-
-Gen3
-----
+Authentication
+--------------
 
 .. autoclass:: Auth
    :members:
    :undoc-members:
    :inherited-members:
 
-.. autoclass:: Gen3Convertor
+Uploading dataset
+-----------------
+
+.. autoclass:: Uploader
    :members:
    :undoc-members:
 
-.. autoclass:: Exporter
+
+Downloading dataset
+-------------------
+
+.. autoclass:: Downloader
    :members:
    :undoc-members:
 
-.. autoclass:: Queryer
+
+Interacting with metadata
+-------------------------
+
+.. autoclass:: MetadataConvertor
    :members:
    :undoc-members:
 
-.. autoclass:: Gen3Submitter
+.. autoclass:: MetadataExporter
    :members:
    :undoc-members:
 
-iRods
-------
+.. autoclass:: MetadataQuerier
+   :members:
+   :undoc-members:
 
-.. autoclass:: IRODSAPI
+.. autoclass:: MetadataUploader
    :members:
    :undoc-members:
 

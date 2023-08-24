@@ -1,5 +1,5 @@
 from dtp.gen3.auth import Auth
-from dtp.gen3.exporter import Exporter
+from dtp.gen3.metadata_exporter import MetadataExporter
 from dtp.utils.config_loader import ConfigLoader
 
 if __name__ == '__main__':
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     cred_file = configs.get("gen3_cred_file")
     auth = Auth(endpoint, cred_file)
 
-    exporter = Exporter(auth)
+    exporter = MetadataExporter(auth)
 
     experiments = exporter.export_node(program=program, project=project, node_type=node_type, fileformat="json", filename="metadata_node.json")
     print(experiments)
