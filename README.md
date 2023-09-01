@@ -1,4 +1,5 @@
-# digital-twin-platform
+# 12 LABOURS DigitalTWINS (Digital Translational Workflows for Integrating Systems)
+Provides tools for deploying and using a platform for creating digital twins.
 
 ![Python 3](https://img.shields.io/badge/Python->=3.8-blue)
 
