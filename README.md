@@ -22,7 +22,28 @@ A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translat
 [lines-of-code-shield]: https://img.shields.io/tokei/lines/github/ABI-CTT-Group/digital-twin-platform
 [lines-of-code-url]: #
 
-## Setting up the digital-twin-platform API
+## Table of contents
+* [Introduction](#introduction)
+<!--* * [The problem](#the-problem) -->
+<!--* * [Our solution - XXXXXX](#our-solution---XXXXX) -->
+<!--* * [Impact and vision](#impact-and-vision) -->
+<!--* * [Future developments](#future-developments) -->
+* [Setting up the digital twin platform API](#setting-up-the-digital-twin-platform-API)
+<!--* * [Using XXXX](#using-XXXX) -->
+* [Reporting issues](#reporting-issues)
+* [Contributing](#contributing)
+<!--* * [Cite us](#cite-us) -->
+<!--* * [FAIR practices](#fair-practices) -->
+* [License](#license)
+<!--* * * [Team](#team) -->
+<!--* * * [Acknowledgements](#acknowledgements) -->
+
+## Introduction
+The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling to link information that is encoded in the genome to organism-wide physiological function and dysfunction in disease. The 12 Labours project aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications.
+
+**If you find sparc-flow useful, please add a GitHub Star to support developments!**
+
+## Setting up the digital twin platform API
 
 ### Pre-requisites 
 - [Git](https://git-scm.com/)
@@ -69,3 +90,12 @@ git clone https://github.com/ABI-CTT-Group/digital-twin-platform.git
     ```
     pip install -r requirements.txt
     ```
+    
+## Reporting issues 
+To report an issue or suggest a new feature, please use the [issues page](https://github.com/ABI-CTT-Group/digital-twin-platform/issues). Issue templates are provided to allow users to report bugs, and documentation or feature requests. Please check existing issues before submitting a new one.
+
+## Contributing
+Fork this repository and submit a pull request to contribute. Before doing so, please read our [Code of Conduct](https://github.com/ABI-CTT-Group/digital-twin-platform/blob/master/CODE_OF_CONDUCT.md) and [Contributing Guidelines](https://github.com/ABI-CTT-Group/digital-twin-platform/blob/master/CONTRIBUTING.md). Pull request templates are provided to help guide developers in describing their contribution, mentioning the issues related to the pull request and describing their testing environment. 
+
+## License
+sparc-flow is fully open source and distributed under the very permissive Apache License 2.0. See [LICENSE](https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/LICENSE) for more information.
