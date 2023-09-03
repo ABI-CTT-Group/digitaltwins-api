@@ -29,7 +29,7 @@ A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translat
 <!--* * [Impact and vision](#impact-and-vision) -->
 <!--* * [Future developments](#future-developments) -->
 * [Setting up the digital twin platform API](#setting-up-the-digital-twin-platform-API)
-<!--* * [Using XXXX](#using-XXXX) -->
+* [Using the Digital Twin Platform API](#using-the-digital-twin-platform-api)
 * [Reporting issues](#reporting-issues)
 * [Contributing](#contributing)
 <!--* * [Cite us](#cite-us) -->
@@ -113,6 +113,68 @@ git clone https://github.com/ABI-CTT-Group/digital-twin-platform.git
     pip install -r requirements.txt
     ```
     
+## Using the Digital Twin Platform API
+
+### Running tutorials
+
+Guided Jupyter Notebook tutorials have been developed describing how to use the Digital Twin Platform API in different scenarios:
+
+<table>
+<thead>
+  <tr>
+    <th> Tutorial</th>
+    <th> Description</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_1_getting_started.ipynb">
+    1
+    </a></td>
+    <td> Getting started with the Digital Twin Platform (including getting access to the API).</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_2_create_datasets_and_description.ipynb">
+    2
+    </a></td>
+    <td> Creating and describing datasets in a standardised format (SPARC Dataset Structure).</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_3_submit_datasets.ipynb">
+    3
+    </a></td>
+    <td> Submitting datasets to the platform.</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_4_update_existing_datasets.ipynb">
+    4
+    </a></td>
+    <td> Updating existing datasets in the platform (version controlling datasets).</td>
+  </tr> 
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_5_query_existing_datasets.ipynb">
+    5
+    </a></td>
+    <td> Accessing metadata for existing datasets in the platform.</td>
+  </tr>
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_6_download_existing_datasets.ipynb">
+    6
+    </a></td>
+    <td> Downloading existing datasets in the platform.</td>
+  </tr>   
+  <tr>
+    <td><a href="https://github.com/ABI-CTT-Group/digital-twin-platform/blob/main/tutorials/tutorial_7_delete_datasets.ipynb">
+    7
+    </td>
+    <td> Deleting existing datasets in the platform.</td>
+  </tr>
+</tbody>
+</table>
+<p align="center">
+</p>
+<br/>
+
 ## Reporting issues 
 To report an issue or suggest a new feature, please use the [issues page](https://github.com/ABI-CTT-Group/digital-twin-platform/issues). Issue templates are provided to allow users to report bugs, and documentation or feature requests. Please check existing issues before submitting a new one.
 
