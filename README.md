@@ -50,15 +50,16 @@ As part of the 12 LABOURS project, we are building a Digital Twin Platform to pr
 * A portal to enable different researchers, including researchers, clinicians, patients, industry, and the public to interact with the platform.
 * Guidelines for clinical data management.
 * Guidelines for clinical translation of computational physiology workflows and digital twins via commercialisation
-* Unified ethics application templates that aim to maxmise provide consistent ____ to enable the vision for creating 
+* Unified ethics application templates that aim to maxmise data reuseablity and linking to enable our vision for creating integrated and personalised digital twins.
 
-For more information in the current capabilities of the platform, please see the User Documentation.
+Please see the User Documentation for the Digital Twin Platform for more information in the current capabilities of the platform.
 
 These efforts are aimed at supporting an ecosystem to:
 * Make research outcomes Findable, Accessible, Interoperable, and Reuseable (FAIR).
 * Support reproducible science.
 * Meet data sovereignty requirements.
-* Enable researchers conduct clinical trials more effcienty 
+* Support clinical translation via commercialisation by enabling researchers to conduct clinical trials more effcienty to demonstrate the efficacy of their computational physiology workflows. 
+* Provide a foundation for integrating research developements across different research groups for assembling more comprehensive workflows for digital twins.
 
 This code respository provides a python API tool to enable users to programatically connect to and interact with the Digital Twin Platform.
 
