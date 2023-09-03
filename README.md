@@ -52,7 +52,7 @@ As part of the 12 LABOURS project, we are **building a Digital Twin Platform to 
 * **Guidelines for clinical translation of computational physiology workflows** and digital twins via commercialisation
 * **Unified ethics application templates** that aim to maxmise data reuseablity and linking to enable our vision for creating integrated and personalised digital twins.
 
-Please see the User Documentation for the Digital Twin Platform for more information in the current capabilities of the platform.
+Please see the [User Documentation for the Digital Twin Platform](https://docs.google.com/document/d/10dQ0Cyq0NQ1JlxPYCVtGCIY2umZrYzhAltsyRd9QhgY/edit) for more information in the current capabilities of the platform.
 
 These efforts are aimed at **supporting an ecosystem** to:
 * **Make research outcomes FAIR** (Findable, Accessible, Interoperable, and Reuseable).
