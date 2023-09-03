@@ -39,7 +39,11 @@ A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translat
 <!--* * * [Acknowledgements](#acknowledgements) -->
 
 ## Introduction
-The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling to link information that is encoded in the genome to organism-wide physiological function and dysfunction in disease. The 12 Labours project aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications.
+The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling to link information that is encoded in the genome to organism-wide physiological function and dysfunction in disease. The [12 LABOURS project](https://www.auckland.ac.nz/en/abi/our-research/research-groups-themes/12-Labours.html) aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications.
+
+As part of the 12 LABOURS project, we are building a Digital Twin Platform to provide common infrastructure that provides:
+
+Support an ecosystem 
 
 **If you find sparc-flow useful, please add a GitHub Star to support developments!**
 
