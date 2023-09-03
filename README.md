@@ -39,27 +39,27 @@ A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translat
 <!--* * * [Acknowledgements](#acknowledgements) -->
 
 ## Introduction
-The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling to link information that is encoded in the genome to organism-wide physiological function and dysfunction in disease. The [12 LABOURS project](https://www.auckland.ac.nz/en/abi/our-research/research-groups-themes/12-Labours.html) aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications.
+The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led **Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling** to link information encoded in the genome to organism-wide physiological function and dysfunction in disease. The **[12 LABOURS project](https://www.auckland.ac.nz/en/abi/our-research/research-groups-themes/12-Labours.html) aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications**.
 
-As part of the 12 LABOURS project, we are building a Digital Twin Platform to provide common infrastructure that provides:
-* A data catalogue that describes what data is available, what it can be used for, and how to request it.
-* A harmonised data repository that provides access control to primary and derived data (waveforms, medical images, electronic health records, measurements from remote monitoring devices such as wearables and implantables etc), tools, and workflows that are stored with a standardised dataset description.
-* Ability to describe computational physiology workfkows in a standardised language (including workflows for knowledge discovery, clinical translation, or eductation, etc), and run and monitor their progress.
-* Ability to securely access electronic health records from health systems (WIP).
-* Ability to securely link data from remote monitoring devices such as wearables and implantables into computational physiology workflows.
-* A portal to enable different researchers, including researchers, clinicians, patients, industry, and the public to interact with the platform.
-* Guidelines for clinical data management.
-* Guidelines for clinical translation of computational physiology workflows and digital twins via commercialisation
-* Unified ethics application templates that aim to maxmise data reuseablity and linking to enable our vision for creating integrated and personalised digital twins.
+As part of the 12 LABOURS project, we are **building a Digital Twin Platform to provide common infrastructure**:
+* A **data catalogue** that describes what data is available, what it can be used for, and how to request it.
+* A **harmonised data repository** that provides access control to primary and derived data (waveforms, medical images, electronic health records, measurements from remote monitoring devices such as wearables and implantables etc), tools, and workflows that are stored with a standardised dataset description.
+* **Describe computational physiology workfkows in a standardised language** (including workflows for knowledge discovery, clinical translation, or eductation, etc), and **run and monitor their progress**.
+* **Securely access electronic health records from health systems** (WIP).
+* **Securely link data from remote monitoring devices** such as wearables and implantables into computational physiology workflows.
+* A **web-portal** to enable different researchers, including researchers, clinicians, patients, industry, and the public to interact with the platform.
+* **Guidelines for data management**.
+* **Guidelines for clinical translation of computational physiology workflows** and digital twins via commercialisation
+* **Unified ethics application templates** that aim to maxmise data reuseablity and linking to enable our vision for creating integrated and personalised digital twins.
 
 Please see the User Documentation for the Digital Twin Platform for more information in the current capabilities of the platform.
 
-These efforts are aimed at supporting an ecosystem to:
-* Make research outcomes Findable, Accessible, Interoperable, and Reuseable (FAIR).
-* Support reproducible science.
-* Meet data sovereignty requirements.
-* Support clinical translation via commercialisation by enabling researchers to conduct clinical trials more effcienty to demonstrate the efficacy of their computational physiology workflows. 
-* Provide a foundation for integrating research developements across different research groups for assembling more comprehensive workflows for digital twins.
+These efforts are aimed at **supporting an ecosystem** to:
+* **Make research outcomes FAIR** (Findable, Accessible, Interoperable, and Reuseable).
+* Enable **reproducible science**.
+* **Meet data sovereignty requirements**.
+* **Support clinical translation via commercialisation** by enabling researchers to conduct clinical trials more effcienty to demonstrate the efficacy of their computational physiology workflows. 
+* Provide a **foundation for integrating research developements** across different research groups for assembling more comprehensive workflows for digital twins.
 
 This code respository provides a python API tool to enable users to programatically connect to and interact with the Digital Twin Platform.
 
