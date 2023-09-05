@@ -7,7 +7,7 @@ from dtp.gen3.metadata_querier import MetadataQuerier
 from dtp.gen3.metadata_convertor import MetadataConvertor
 from dtp.gen3.metadata_uploader import MetadataUploader
 
-import pypacs
+# import pypacs
 
 
 class Uploader(object):

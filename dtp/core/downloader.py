@@ -3,7 +3,7 @@ from dtp import IRODS
 from dtp import MetadataQuerier
 from dtp.utils.config_loader import ConfigLoader
 
-import pypacs
+# import pypacs
 
 
 class Downloader(object):
@@ -50,40 +50,41 @@ class Downloader(object):
         :type dest: string
         """
         if self._data_storage == "pacs":
-            self._download(dataset_id)
+            # self._download(dataset_id)
+            raise NotImplementedError("PACS: Storage location not implemented!")
         elif self._data_storage == "irods":
             self._irods.download_data(data=dataset_id, save_dir=dest)
 
-    def _download(self, dataset_id):
-        gen3_query_string = """
-        {
-            experiment(submitter_id: "%s"){
-                cases{
-                    id
-                    submitter_id,
-                    subject_id,
-                }
-            }
-        }
-        """ % dataset_id
-
-        results = self._queryer.graphql_query(gen3_query_string)
-        datasets = results.get("experiment")
-
-        study_uuids = list()
-        for dataset in datasets:
-            studies = dataset.get("cases")
-            for study in studies:
-                study_id = study.get("subject_id")
-                study_uuid = study_id.replace("sub-", '')
-                study_uuids.append(study_uuid)
-
-        for study_uuid in study_uuids:
-            pacs_query_settings = {
-                "StudyInstanceUID": study_uuid
-            }
-            pypacs.move_files(server_ip=self._pacs_ip,
-                              server_port=self._pacs_port,
-                              aec=self._pacs_aec,
-                              aet=self._pacs_aet,
-                              query_settings=pacs_query_settings)
+    # def _download(self, dataset_id):
+    #     gen3_query_string = """
+    #     {
+    #         experiment(submitter_id: "%s"){
+    #             cases{
+    #                 id
+    #                 submitter_id,
+    #                 subject_id,
+    #             }
+    #         }
+    #     }
+    #     """ % dataset_id
+    #
+    #     results = self._queryer.graphql_query(gen3_query_string)
+    #     datasets = results.get("experiment")
+    #
+    #     study_uuids = list()
+    #     for dataset in datasets:
+    #         studies = dataset.get("cases")
+    #         for study in studies:
+    #             study_id = study.get("subject_id")
+    #             study_uuid = study_id.replace("sub-", '')
+    #             study_uuids.append(study_uuid)
+    #
+    #     for study_uuid in study_uuids:
+    #         pacs_query_settings = {
+    #             "StudyInstanceUID": study_uuid
+    #         }
+    #         pypacs.move_files(server_ip=self._pacs_ip,
+    #                           server_port=self._pacs_port,
+    #                           aec=self._pacs_aec,
+    #                           aet=self._pacs_aet,
+    #                           query_settings=pacs_query_settings)
