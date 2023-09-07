@@ -33,6 +33,12 @@ class MetadataQuerier(object):
 
         self._querier = Gen3Submission(self._auth)
 
+    def get_program(self):
+        return self._program
+
+    def get_project(self):
+        return self._project
+
     def graphql_query(self, query_string, variables=None):
         """
         Sending a GraphQL query to Gen3
