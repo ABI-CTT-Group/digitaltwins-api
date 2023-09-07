@@ -54,7 +54,7 @@ class MetadataQuerier(object):
 
         return response
 
-    def get_programs(self):
+    def get_programs_all(self):
         """
         Getting all programs that the user have access to
 
@@ -70,7 +70,7 @@ class MetadataQuerier(object):
 
         return programs
 
-    def get_projects(self, program):
+    def get_projects_by_program(self, program):
         """
         Getting the projects by program name
 
