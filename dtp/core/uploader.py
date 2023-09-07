@@ -2,12 +2,9 @@ import configparser
 
 from pathlib import Path
 
-from dtp.utils.config_loader import ConfigLoader
-from dtp.gen3.auth import Auth
+from dtp import MetadataConvertor
+from dtp import MetadataUploader
 from dtp.irods.irods import IRODS
-from dtp.gen3.metadata_querier import MetadataQuerier
-from dtp.gen3.metadata_convertor import MetadataConvertor
-from dtp.gen3.metadata_uploader import MetadataUploader
 
 
 class Uploader(object):
