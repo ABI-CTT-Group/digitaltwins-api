@@ -46,7 +46,7 @@ class IRODS(object):
                         # Upload the file to iRODS
                         session.data_objects.put(local_file_path, irods_file_path, force=True)
 
-                        print(f"Uploaded '{local_file_path}' to '{irods_file_path}'")
+                        print(f"File uploaded: '{local_file_path}'")
             except Exception as e:
                 print(f"Error uploading local directory: {e}")
 
