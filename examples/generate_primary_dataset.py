@@ -84,7 +84,7 @@ def add_dataset_description(dataset, save_dir):
     dataset.set_field(category="dataset_description", row_index=29, header="Value", value="1")
     dataset.set_field(category="dataset_description", row_index=30, header="Value", value="1")
 
-    dataset.save(save_dir)
+    dataset.save_metadata(save_dir)
     return dataset
 
 
