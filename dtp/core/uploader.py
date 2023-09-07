@@ -39,9 +39,9 @@ class Uploader(object):
             file = meta_dir.join(filename)
             meta_uploader.execute(program=program, project=project, file=str(file))
 
-    def upload_files(self, dataset_dir):
-        # TODO
-        pass
+        # delete the temporary metadata dir
+        if meta_dir.is_dir:
+            shutil.rmtree(meta_dir)
 
     def upload_dataset(self, dataset_dir):
         irods = IRODS(self._configs)
@@ -56,4 +56,3 @@ class Uploader(object):
         # check if dataset exists
         # todo
         pass
-
