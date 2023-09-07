@@ -14,7 +14,7 @@ class MetadataQuerier(object):
         :type auth: object
         """
         self._auth = auth
-        self._queryer = Gen3Submission(self._auth)
+        self._querier = Gen3Submission(self._auth)
 
     def graphql_query(self, query_string, variables=None):
         """
@@ -27,7 +27,7 @@ class MetadataQuerier(object):
         :return: query response
         :rtype: dict
         """
-        response = self._queryer.query(query_string, variables).get("data")
+        response = self._querier.query(query_string, variables).get("data")
 
         return response
 
@@ -38,7 +38,7 @@ class MetadataQuerier(object):
         :return: List of programs
         :rtype: list
         """
-        response = self._queryer.get_programs()
+        response = self._querier.get_programs()
 
         programs = list()
         for resp in response.get("links"):
@@ -56,7 +56,7 @@ class MetadataQuerier(object):
         :return: List of projects
         :rtype: list
         """
-        response = self._queryer.get_projects(program)
+        response = self._querier.get_projects(program)
 
         projects = list()
         for resp in response.get("links"):
@@ -78,6 +78,6 @@ class MetadataQuerier(object):
         :return: A list of records in dictionary format
         :rtype: list
         """
-        response = self._queryer.export_node(program, project, node, "json")
+        response = self._querier.export_node(program, project, node, "json")
         data = response.get("data")
         return data
