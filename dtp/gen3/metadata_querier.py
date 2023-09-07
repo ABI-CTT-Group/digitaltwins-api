@@ -88,6 +88,119 @@ class MetadataQuerier(object):
 
         return projects
 
+    def get_datasets(self, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = get_project_id(program, project)
+
+        query_string = f"""
+        {{
+          experiment (project_id: "{project_id}"){{
+              id,
+              submitter_id
+          }}
+        }}
+        """
+        response = self.graphql_query(query_string).get("experiment")
+
+        return response
+
+    def get_subjects(self, dataset_id, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = get_project_id(program, project)
+
+        query_string = f"""
+        {{
+          experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
+            cases{{
+              subject_id
+            }}
+          }}
+        }}
+        """
+        response = self.graphql_query(query_string)
+        experiment = response.get("experiment")[0]
+        cases = experiment.get("cases")
+        return cases
+
+    def get_dataset_descriptions(self, dataset_id, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = get_project_id(program, project)
+        query_string = f"""
+        {{
+          experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
+            dataset_descriptions{{
+              metadata_version,
+              dataset_type,
+              title,
+              subtitle,
+              keywords,
+              funding,
+              acknowledgments,
+              study_purpose,
+              study_data_collection,
+              study_primary_conclusion,
+              study_organ_system,
+              study_approach,
+              study_technique,
+              study_collection_title,
+              contributor_name,
+              contributor_orcid,
+              contributor_affiliation,
+              contributor_role,
+              identifier_description,
+              relation_type,
+              identifier,
+              identifier_type,
+              number_of_subjects,
+              number_of_samples,
+              dataset_type,
+              title,
+              subtitle,
+              keywords,
+              funding,
+              acknowledgments,
+              study_purpose,
+              study_data_collection,
+              study_primary_conclusion,
+              study_organ_system,
+              study_approach,
+              study_technique,
+              study_collection_title,
+              contributor_name,
+              contributor_orcid,
+              contributor_affiliation,
+              contributor_role,
+              identifier_description,
+              relation_type,
+              identifier,
+              identifier_type,
+              number_of_subjects,
+              number_of_samples
+            }}
+          }}
+        }}
+        """
+
+        response = self.graphql_query(query_string)
+        dataset = response.get("experiment")[0]
+        dataset_descriptions = dataset.get("dataset_descriptions")
+
+        return dataset_descriptions
+
+
+
     def get_node_records(self, node, program, project):
         """
         Getting all the records in a Gen3 node
@@ -104,3 +217,5 @@ class MetadataQuerier(object):
         response = self._querier.export_node(program, project, node, "json")
         data = response.get("data")
         return data
+
+
