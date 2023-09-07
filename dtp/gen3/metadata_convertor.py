@@ -110,6 +110,8 @@ class MetadataConvertor(object):
         :return:
         :rtype:
         """
+        source_dir = Path(source_dir)
+        dest_dir = Path(dest_dir)
         for category in self._categories:
             data = self._init_data(category)
             if category == "experiment":
