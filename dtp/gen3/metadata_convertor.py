@@ -296,10 +296,15 @@ class MetadataConvertor(object):
             category = "case"
         schema_file = category + ".yaml"
         schema_file = self._schema_dir / schema_file
-        with open(schema_file, 'r') as stream:
-            schema = yaml.safe_load(stream)
 
-            # encoding = "utf8"
+        try:
+            # Linux
+            with open(schema_file, 'r') as yml:
+                schema = yaml.safe_load(yml)
+        except Exception as e:
+            # Windows
+            with open(schema_file, 'rt', encoding='utf8') as yml:
+                schema = yaml.safe_load(yml)
 
         return schema
 
