@@ -1,3 +1,5 @@
+import configparser
+
 from gen3.submission import Gen3Submission
 
 
@@ -11,14 +13,23 @@ class MetadataQuerier(object):
     Class for querying Gen3.
     Also accepts queries in GraphQL syntax.
     """
-    def __init__(self, auth):
+    def __init__(self, config_file):
         """
         Constructor
 
         :param auth: Gen3 authentication object created by the Auth class
         :type auth: object
         """
-        self._auth = auth
+        self._configs = configparser.ConfigParser()
+        self._configs.read(config_file)
+
+        self._endpoint = self._configs["gen3"].get("endpoint")
+        self._cred_file = self._configs["gen3"].get("cred_file")
+        self._program = self._configs["gen3"].get("program")
+        self._project = self._configs["gen3"].get("project")
+
+        self._auth = Gen3Auth(self._endpoint, self._cred_file)
+
         self._querier = Gen3Submission(self._auth)
 
     def graphql_query(self, query_string, variables=None):
