@@ -88,7 +88,7 @@ class MetadataConvertor(object):
                 "type": type,
                 "submitter_id": self._experiment,
                 "projects": [{
-                    "code": str(self._program + '-' + self._project)
+                    "code": self._project
                 }],
             }
         else:
