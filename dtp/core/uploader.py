@@ -1,3 +1,5 @@
+import configparser
+
 from pathlib import Path
 
 from dtp.utils.config_loader import ConfigLoader
@@ -9,16 +11,9 @@ from dtp.gen3.metadata_uploader import MetadataUploader
 
 
 class Uploader(object):
-    def __init__(self, data_storage_config, gen3_config=None, data_storage_type="pacs"):
-        """
-        Constructor
-
-        :param data_storage_config: Path to the data storage (PACS or iRods) configuration file (json)
-        :type data_storage_config: string
-        :param gen3_config: (Optional)
-        :type gen3_config: Path to the Gen3 configuration file (json)
-        """
-        self._supported_sds_categories = ["dataset_description", "manifest", "subjects"]
+    def __init__(self, config_file):
+        self._configs = configparser.ConfigParser()
+        self._configs.read(config_file)
 
         self._data_storage_configs = ConfigLoader.load_from_json(data_storage_config)
 
@@ -52,7 +47,10 @@ class Uploader(object):
         self.upload_metadata(dataset_dir, project)
         self.upload_files(dataset_dir)
 
-    def upload_metadata(self, dataset_dir, project):
+    def upload_metadata(self, dataset_dir):
+        program = self._configs["gen3"].get("program")
+        project = self._configs["gen3"].get("project")
+        meta_dir = dataset_dir.joinpath(self._tmp_meta_dir)
         # convert sds metadata to gen3
         convertor = MetadataConvertor(project=project, experiment=dataset_dir.name)
         convertor.execute(source_dir=dataset_dir, dest_dir="./")
