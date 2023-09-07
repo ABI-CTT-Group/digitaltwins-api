@@ -1,6 +1,7 @@
 import configparser
 
 from pathlib import Path
+import shutil
 
 from dtp import MetadataConvertor
 from dtp import MetadataUploader
