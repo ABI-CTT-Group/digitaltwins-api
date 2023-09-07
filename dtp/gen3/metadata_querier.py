@@ -1,6 +1,7 @@
 import configparser
 
 from gen3.submission import Gen3Submission
+from gen3.auth import Gen3Auth
 
 
 def get_project_id(program, project):
