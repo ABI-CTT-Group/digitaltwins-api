@@ -11,4 +11,4 @@ if __name__ == '__main__':
     auth = Auth(endpoint, cred_file)
 
     submitter = MetadataUploader(auth)
-    submitter.submit_record(program, project, str(file))
+    submitter.execute(program, project, str(file))
