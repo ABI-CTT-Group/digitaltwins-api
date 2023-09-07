@@ -1,6 +1,11 @@
 from gen3.submission import Gen3Submission
 
 
+def get_project_id(program, project):
+    project_id = program + '-' + project
+    return project_id
+
+
 class MetadataQuerier(object):
     """
     Class for querying Gen3.
