@@ -25,6 +25,8 @@ class Uploader(object):
         # Upload the actual files to iRODS
         self.upload_dataset(dataset_dir)
 
+        print("Dataset uploaded")
+
     def upload_metadata(self, dataset_dir):
         program = self._configs["gen3"].get("program")
         project = self._configs["gen3"].get("project")
@@ -37,7 +39,7 @@ class Uploader(object):
         meta_uploader = MetadataUploader(self._configs["gen3"].get("endpoint"), (self._configs["gen3"].get("cred_file")))
 
         for filename in self._meta_files:
-            file = meta_dir.join(filename)
+            file = meta_dir.joinpath(filename)
             meta_uploader.execute(program=program, project=project, file=str(file))
 
         # delete the temporary metadata dir
