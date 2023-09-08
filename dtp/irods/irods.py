@@ -63,12 +63,12 @@ class IRODS(object):
                     session.collections.create(collection_path, recurse=True)
 
 
-    def download_data(self, data, save_dir=None):
+    def download(self, collection_name, save_dir=None):
         """
         Downloading data from iRODS
 
-        :param data: iRODS collection/Dataset name in the iRODS zone
-        :type data: str
+        :param collection_name: iRODS collection/Dataset name in the iRODS zone
+        :type collection_name: str
         :param save_dir: path to the save directory
         :type save_dir: str
         :return:
@@ -79,8 +79,8 @@ class IRODS(object):
                           user=self._user,
                           password=self._password,
                           zone=self._zone) as session:
-            dataset_path = self._project_root + '/' + data
-            self._download_collection(session, dataset_path, save_dir=save_dir)
+            collection_path = self._project_root + '/' + collection_name
+            self._download_collection(session, collection_path, save_dir=save_dir)
 
     def _download_collection(self, session, collection_path, save_dir):
         """
@@ -95,16 +95,16 @@ class IRODS(object):
         :return:
         :rtype:
         """
-        dataset = session.collections.get(collection_path)
+        collection = session.collections.get(collection_path)
         save_dir = Path(save_dir)
-        save_dir = save_dir.joinpath(dataset.name)
+        save_dir = save_dir.joinpath(collection.name)
         os.makedirs(save_dir, exist_ok=True)
 
-        for dobj in (dataset.data_objects):
+        for dobj in (collection.data_objects):
             session.data_objects.get(dobj.path, os.path.join(save_dir,dobj.name))
 
-        if dataset.subcollections:
-           for subcollection in dataset.subcollections:
+        if collection.subcollections:
+           for subcollection in collection.subcollections:
                self._download_collection(session, subcollection.path, save_dir)
         else:
             return
