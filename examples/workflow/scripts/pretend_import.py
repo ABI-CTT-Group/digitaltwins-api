@@ -27,7 +27,7 @@ def run(process):
 
     irods = IRODS()
     data = dataset + '/' + data_type + '/' + subject + '/' + sample
-    irods.download_data(data=data, save_dir=workspace)
+    irods.download(collection_name=data, save_dir=workspace)
 
     process.completed()
 
