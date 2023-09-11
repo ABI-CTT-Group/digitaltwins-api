@@ -11,10 +11,12 @@ class MetadataConvertor(object):
     """
     Converting the metadata from SPARC dataset structure (SDS) to Gen3 submittable structure in json format
     """
-    def __init__(self, project, experiment, schema_dir=None, version="2.0.0"):
+    def __init__(self, program, project, experiment, schema_dir=None, version="2.0.0"):
         """
         Constructor
 
+        :param program: Program name
+        :type program: str
         :param project: Project name
         :type project: str
         :param experiment: Experiment/dataset name
@@ -23,13 +25,15 @@ class MetadataConvertor(object):
         :type version: str
         """
         self._version = version
+        self._program = program
         self._project = project
         self._experiment = experiment
         if schema_dir:
             self._schema_dir = schema_dir
         else:
             version_dirname = "version_" + version.replace('.', '_')
-            self._schema_dir = Path.cwd().joinpath("resources/" + version_dirname + "gen3_sds_dictionary")
+            # self._schema_dir = Path.cwd().joinpath("resources", version_dirname, "sds_dictionary")
+            self._schema_dir = Path(__file__).parent.resolve().joinpath("resources", version_dirname, "sds_dictionary")
 
         self._supported_versions = ["1.2.3", "2.0.0"]
         self._current_dir = Path(__file__).parent.resolve()
@@ -106,6 +110,8 @@ class MetadataConvertor(object):
         :return:
         :rtype:
         """
+        source_dir = Path(source_dir)
+        dest_dir = Path(dest_dir)
         for category in self._categories:
             data = self._init_data(category)
             if category == "experiment":
@@ -290,10 +296,15 @@ class MetadataConvertor(object):
             category = "case"
         schema_file = category + ".yaml"
         schema_file = self._schema_dir / schema_file
-        with open(schema_file, 'r') as stream:
-            schema = yaml.safe_load(stream)
 
-            # encoding = "utf8"
+        try:
+            # Linux
+            with open(schema_file, 'r') as yml:
+                schema = yaml.safe_load(yml)
+        except Exception as e:
+            # Windows
+            with open(schema_file, 'rt', encoding='utf8') as yml:
+                schema = yaml.safe_load(yml)
 
         return schema
 

@@ -1,10 +1,13 @@
-from dtp.core.downloader import Downloader
+from dtp import Downloader
+
+from pathlib import Path
 
 if __name__ == '__main__':
-    data_storage_config = "../configs/templates/pacs.json"
-    gen3_config = "../configs/templates/gen3.json"
-    dataset_id = None
-    dest = "./"
+    dataset_name = None
+    config_file = Path(r"../configs/templates/config.ini")
 
-    downloader = Downloader(data_storage_config=data_storage_config)
-    downloader.download_dataset(dataset_id=dataset_id, dest=dest)
+    downloader = Downloader(config_file)
+
+    downloader.execute(dataset_name, save_dir="./tmp")
+
+    print("done")

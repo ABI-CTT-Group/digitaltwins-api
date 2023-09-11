@@ -1,4 +1,12 @@
+import configparser
+
 from gen3.submission import Gen3Submission
+from gen3.auth import Gen3Auth
+
+
+def get_project_id(program, project):
+    project_id = program + '-' + project
+    return project_id
 
 
 class MetadataQuerier(object):
@@ -6,15 +14,30 @@ class MetadataQuerier(object):
     Class for querying Gen3.
     Also accepts queries in GraphQL syntax.
     """
-    def __init__(self, auth):
+    def __init__(self, config_file):
         """
         Constructor
 
         :param auth: Gen3 authentication object created by the Auth class
         :type auth: object
         """
-        self._auth = auth
-        self._queryer = Gen3Submission(self._auth)
+        self._configs = configparser.ConfigParser()
+        self._configs.read(config_file)
+
+        self._endpoint = self._configs["gen3"].get("endpoint")
+        self._cred_file = self._configs["gen3"].get("cred_file")
+        self._program = self._configs["gen3"].get("program")
+        self._project = self._configs["gen3"].get("project")
+
+        self._auth = Gen3Auth(self._endpoint, self._cred_file)
+
+        self._querier = Gen3Submission(self._auth)
+
+    def get_program(self):
+        return self._program
+
+    def get_project(self):
+        return self._project
 
     def graphql_query(self, query_string, variables=None):
         """
@@ -27,18 +50,18 @@ class MetadataQuerier(object):
         :return: query response
         :rtype: dict
         """
-        response = self._queryer.query(query_string, variables).get("data")
+        response = self._querier.query(query_string, variables).get("data")
 
         return response
 
-    def get_programs(self):
+    def get_programs_all(self):
         """
         Getting all programs that the user have access to
 
         :return: List of programs
         :rtype: list
         """
-        response = self._queryer.get_programs()
+        response = self._querier.get_programs()
 
         programs = list()
         for resp in response.get("links"):
@@ -47,7 +70,7 @@ class MetadataQuerier(object):
 
         return programs
 
-    def get_projects(self, program):
+    def get_projects_by_program(self, program):
         """
         Getting the projects by program name
 
@@ -56,7 +79,7 @@ class MetadataQuerier(object):
         :return: List of projects
         :rtype: list
         """
-        response = self._queryer.get_projects(program)
+        response = self._querier.get_projects(program)
 
         projects = list()
         for resp in response.get("links"):
@@ -64,6 +87,119 @@ class MetadataQuerier(object):
             projects.append(project)
 
         return projects
+
+    def get_datasets(self, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = get_project_id(program, project)
+
+        query_string = f"""
+        {{
+          experiment (project_id: "{project_id}"){{
+              id,
+              submitter_id
+          }}
+        }}
+        """
+        response = self.graphql_query(query_string).get("experiment")
+
+        return response
+
+    def get_subjects(self, dataset_id, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = get_project_id(program, project)
+
+        query_string = f"""
+        {{
+          experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
+            cases{{
+              subject_id
+            }}
+          }}
+        }}
+        """
+        response = self.graphql_query(query_string)
+        experiment = response.get("experiment")[0]
+        cases = experiment.get("cases")
+        return cases
+
+    def get_dataset_descriptions(self, dataset_id, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = get_project_id(program, project)
+        query_string = f"""
+        {{
+          experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
+            dataset_descriptions{{
+              metadata_version,
+              dataset_type,
+              title,
+              subtitle,
+              keywords,
+              funding,
+              acknowledgments,
+              study_purpose,
+              study_data_collection,
+              study_primary_conclusion,
+              study_organ_system,
+              study_approach,
+              study_technique,
+              study_collection_title,
+              contributor_name,
+              contributor_orcid,
+              contributor_affiliation,
+              contributor_role,
+              identifier_description,
+              relation_type,
+              identifier,
+              identifier_type,
+              number_of_subjects,
+              number_of_samples,
+              dataset_type,
+              title,
+              subtitle,
+              keywords,
+              funding,
+              acknowledgments,
+              study_purpose,
+              study_data_collection,
+              study_primary_conclusion,
+              study_organ_system,
+              study_approach,
+              study_technique,
+              study_collection_title,
+              contributor_name,
+              contributor_orcid,
+              contributor_affiliation,
+              contributor_role,
+              identifier_description,
+              relation_type,
+              identifier,
+              identifier_type,
+              number_of_subjects,
+              number_of_samples
+            }}
+          }}
+        }}
+        """
+
+        response = self.graphql_query(query_string)
+        dataset = response.get("experiment")[0]
+        dataset_descriptions = dataset.get("dataset_descriptions")
+
+        return dataset_descriptions
+
+
 
     def get_node_records(self, node, program, project):
         """
@@ -78,6 +214,8 @@ class MetadataQuerier(object):
         :return: A list of records in dictionary format
         :rtype: list
         """
-        response = self._queryer.export_node(program, project, node, "json")
+        response = self._querier.export_node(program, project, node, "json")
         data = response.get("data")
         return data
+
+

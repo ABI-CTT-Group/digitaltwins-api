@@ -1,6 +1,8 @@
 from gen3.submission import Gen3Submission
 import json
 
+from pathlib import Path
+
 
 class MetadataExporter(object):
     """
@@ -58,24 +60,27 @@ class MetadataExporter(object):
         data = json.loads(output)[0]
         return data
 
-    def save(self, data, fileformat, path):
+    @staticmethod
+    def save_metadata(data, path, format="json"):
         """
         Saving the metadata (dict) in json format
 
         :param data: metadata
         :type data: dict
-        :param fileformat: file format (currently only json)
-        :type fileformat: str
+        :param format: file format (currently only json)
+        :type format: str
         :param path: Path the save file
         :type path: str
         :return:
         :rtype:
+
         """
+        path = Path(path)
         # Export data as either 'json' or 'tsv'
-        if fileformat == "json":
+        if format == "json":
             with open(path, 'w') as f:
                 json.dump(data, f, indent=4)
-        elif fileformat == "tsv":
+        elif format == "tsv":
             raise NotImplementedError("File format not supported")
         else:
             raise NotImplementedError("File format not supported")
