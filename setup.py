@@ -19,7 +19,9 @@ setup(
     package_data={'': ['resources./*']},
     install_requires=[
         "gen3>=4.21.0",
+        "python-irodsclient>=1.1.8",
         "pandas",
-        "python-irodsclient>=1.1.8"
+        "xlrd",
+        "PyYAML"
     ]
 )
