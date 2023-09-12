@@ -1,4 +1,4 @@
-from dtp import MetadataQuerier
+from digitaltwins import MetadataQuerier
 from pathlib import Path
 import configparser
 

@@ -1,4 +1,4 @@
-from dtp import Uploader
+from digitaltwins import Uploader
 from pathlib import Path
 
 if __name__ == '__main__':
