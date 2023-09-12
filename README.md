@@ -69,10 +69,10 @@ This code respository provides a python API tool to enable users to programatica
 
 ### Pre-requisites 
 - [Git](https://git-scm.com/)
-- Python 3.8+. Tested on:
-   - 3.8
+- Python 3.9+. Tested on:
+   - 3.9
 - Operating system. Tested on:
-  - Ubuntu 18
+  - Ubuntu 18.04
    
 ### PyPI
 
