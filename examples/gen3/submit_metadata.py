@@ -1,4 +1,4 @@
-from dtp import Auth, MetadataUploader
+from digitaltwins import Auth, MetadataUploader
 from pathlib import Path
 
 if __name__ == '__main__':

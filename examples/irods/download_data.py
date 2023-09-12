@@ -1,4 +1,4 @@
-from dtp.irods.irods import IRODS
+from digitaltwins.irods.irods import IRODS
 
 if __name__ == '__main__':
     config_file = "../../configs/templates/irods.json"

@@ -3,15 +3,18 @@ import configparser
 from pathlib import Path
 import shutil
 
-from dtp import MetadataConvertor
-from dtp import MetadataUploader
-from dtp.irods.irods import IRODS
+from digitaltwins import MetadataConvertor
+from digitaltwins import MetadataUploader
+from digitaltwins.irods.irods import IRODS
 
 
 class Uploader(object):
     def __init__(self, config_file):
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
+
+        self._program = self._configs["gen3"].get("program")
+        self._project = self._configs["gen3"].get("project")
 
         self._tmp_meta_dir = Path(r"./gen3_tmp")
         self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json"]
@@ -28,11 +31,9 @@ class Uploader(object):
         print("Dataset uploaded")
 
     def upload_metadata(self, dataset_dir):
-        program = self._configs["gen3"].get("program")
-        project = self._configs["gen3"].get("project")
         meta_dir = dataset_dir.joinpath(self._tmp_meta_dir)
         # convert sds metadata to gen3
-        meta_convertor = MetadataConvertor(program=program, project=project, experiment=dataset_dir.name)
+        meta_convertor = MetadataConvertor(program=self._program, project=self._project, experiment=dataset_dir.name)
         meta_convertor.execute(source_dir=dataset_dir, dest_dir=meta_dir)
 
         # upload metadata
@@ -40,7 +41,7 @@ class Uploader(object):
 
         for filename in self._meta_files:
             file = meta_dir.joinpath(filename)
-            meta_uploader.execute(program=program, project=project, file=str(file))
+            meta_uploader.execute(program=self._program, project=self._project, file=str(file))
 
         # delete the temporary metadata dir
         if meta_dir.is_dir:

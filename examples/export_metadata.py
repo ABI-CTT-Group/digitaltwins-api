@@ -1,6 +1,6 @@
-from dtp.gen3.auth import Auth
-from dtp.gen3.metadata_exporter import MetadataExporter
-from dtp.utils.config_loader import ConfigLoader
+from digitaltwins.gen3.auth import Auth
+from digitaltwins.gen3.metadata_exporter import MetadataExporter
+from digitaltwins.utils.config_loader import ConfigLoader
 
 if __name__ == '__main__':
     config_file = "../configs/templates/gen3.json"

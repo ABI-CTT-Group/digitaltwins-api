@@ -1,5 +1,5 @@
 from pathlib import Path
-from dtp.gen3.metadata_convertor import MetadataConvertor
+from digitaltwins.gen3.metadata_convertor import MetadataConvertor
 
 if __name__ == '__main__':
     project = "gen3_project_name"
