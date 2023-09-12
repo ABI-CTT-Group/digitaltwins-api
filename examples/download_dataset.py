@@ -1,4 +1,4 @@
-from dtp import Downloader
+from digitaltwins import Downloader
 
 from pathlib import Path
 

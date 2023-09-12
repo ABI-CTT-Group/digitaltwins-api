@@ -3,9 +3,9 @@ import configparser
 from pathlib import Path
 import shutil
 
-from dtp import MetadataConvertor
-from dtp import MetadataUploader
-from dtp.irods.irods import IRODS
+from digitaltwins import MetadataConvertor
+from digitaltwins import MetadataUploader
+from digitaltwins.irods.irods import IRODS
 
 
 class Uploader(object):

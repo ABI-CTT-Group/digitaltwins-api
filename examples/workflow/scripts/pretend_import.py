@@ -2,7 +2,7 @@ import os
 import shutil
 
 import workflow_manager as wm
-from dtp.irods.irods import IRODS
+from digitaltwins.irods.irods import IRODS
 
 script_id = 'pretend_import'
 run_program = 'python3'
