@@ -18,10 +18,11 @@ setup(
     include_package_data=True,
     package_data={'': ['resources./*']},
     install_requires=[
-        "gen3>=4.21.0",
+        "gen3",
         "python-irodsclient>=1.1.8",
         "pandas",
         "xlrd",
-        "PyYAML"
+        "PyYAML",
+        "openpyxl"
     ]
 )
