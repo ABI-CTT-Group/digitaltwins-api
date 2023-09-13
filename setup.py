@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="digitaltwins",
-    version="0.1.1",
+    version="0.1.3",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
     # long_description=long_description,
