@@ -18,7 +18,7 @@ setup(
     include_package_data=True,
     package_data={'': ['resources./*']},
     install_requires=[
-        "gen3",
+        "gen3>=4.21.0",
         "python-irodsclient>=1.1.8",
         "pandas",
         "xlrd",
