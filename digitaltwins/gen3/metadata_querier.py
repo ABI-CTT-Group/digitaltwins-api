@@ -195,8 +195,6 @@ class MetadataQuerier(object):
 
         return dataset_descriptions
 
-
-
     def get_node_records(self, node, program, project):
         """
         Getting all the records in a Gen3 node
