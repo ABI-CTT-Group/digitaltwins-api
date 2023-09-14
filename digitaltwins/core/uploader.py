@@ -53,7 +53,7 @@ class Uploader(object):
         # Upload the actual files to iRODS
         self.upload_dataset(dataset_dir)
 
-        if self.self._dir_tmp.is_dir:
+        if self._dir_tmp.is_dir:
             shutil.rmtree(str(self._tmp_dataset_dir))
 
         print("Dataset uploaded")
