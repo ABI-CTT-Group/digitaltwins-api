@@ -54,7 +54,7 @@ class Uploader(object):
         self.upload_dataset(dataset_dir)
 
         if self._dir_tmp.is_dir:
-            shutil.rmtree(str(self._tmp_dataset_dir))
+            shutil.rmtree(str(self._dir_tmp))
 
         print("Dataset uploaded")
 
