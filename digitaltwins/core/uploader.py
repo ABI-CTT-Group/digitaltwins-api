@@ -10,8 +10,12 @@ from digitaltwins.irods.irods import IRODS
 
 class Uploader(object):
     def __init__(self, config_file):
+        self.config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
+
+        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
+        self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
 
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
@@ -37,7 +41,7 @@ class Uploader(object):
         meta_convertor.execute(source_dir=dataset_dir, dest_dir=meta_dir)
 
         # upload metadata
-        meta_uploader = MetadataUploader(self._configs["gen3"].get("endpoint"), (self._configs["gen3"].get("cred_file")))
+        meta_uploader = MetadataUploader(self._gen3_endpoint, str(self._gen3_cred_file))
 
         for filename in self._meta_files:
             file = meta_dir.joinpath(filename)
