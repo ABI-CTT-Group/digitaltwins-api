@@ -2,9 +2,9 @@ from digitaltwins import Uploader
 from pathlib import Path
 
 if __name__ == '__main__':
-    dataset_dir = Path(r"DATASET_DIR")
+    dataset_dir = Path(r"/path/to/dataset_dir")
 
-    uploader = Uploader(Path(r"config.ini"))
+    uploader = Uploader(Path(r"/path/to/configs.ini"))
 
     uploader.execute(dataset_dir=dataset_dir)
     print("done")

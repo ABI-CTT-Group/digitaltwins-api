@@ -106,7 +106,13 @@ class MetadataQuerier(object):
         """
         response = self.graphql_query(query_string).get("experiment")
 
-        return response
+
+        datasets = list()
+        for element in response:
+            submitter_id = element.get("submitter_id")
+            datasets.append(submitter_id)
+
+        return datasets
 
     def get_subjects(self, dataset_id, program=None, project=None):
         if program is None:
