@@ -56,7 +56,7 @@ class Uploader(object):
         if self._dir_tmp.is_dir:
             shutil.rmtree(str(self._dir_tmp))
 
-        print("Dataset {dataset_id} uploaded".format(dataset_id=dataset_id))
+        print("Dataset uploaded: " + str(dataset_id))
 
     def upload_metadata(self, dataset_dir):
         meta_dir = self._meta_dir_tmp
