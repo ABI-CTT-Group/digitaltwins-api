@@ -93,7 +93,7 @@ class Uploader(object):
     def _generate_dataset_id(self, count=0):
         if count >= self._MAX_ATTEMPTS:
             raise ValueError("Max attempts {count} exceeded. Please try submitting again. If the error persists, "
-                             "please contact the developers").format(count=count)
+                             "please contact the developers".format(count=count))
         # list datasets
         querier = MetadataQuerier(self.config_file)
 
