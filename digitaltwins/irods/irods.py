@@ -40,7 +40,7 @@ class IRODS(object):
 
                         sub = str(root).replace(str(local_dataset_dir.parent), '')
                         sub = sub.replace("\\", "/")
-                        collection_path = self._project_root + '/' + sub
+                        collection_path = self._project_root + sub
                         irods_file_path = collection_path + "/" + filename
 
                         # Upload the file to iRODS
@@ -55,7 +55,7 @@ class IRODS(object):
             if item.is_dir():
                 sub = str(item).replace(str(local_dataset_dir.parent), '')
                 sub = sub.replace("\\", "/")
-                collection_path = self._project_root + '/' + sub
+                collection_path = self._project_root + sub
 
                 if session.collections.exists(collection_path):
                     continue
