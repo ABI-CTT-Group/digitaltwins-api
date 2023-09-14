@@ -73,28 +73,9 @@ This code respository provides a python API tool to enable users to programatica
    - 3.9
 - Operating system. Tested on:
   - Ubuntu 18.04
-   
-### PyPI
 
-Here is the [link](https://pypi.org/project/digital-twin-platform/) to the project on PyPI
-```
-pip install digital-twin-platform
-```
-
-### From source code
-
-#### Downloading source code
-Clone the source code repository from github, e.g.:
-```
-```commandline
-git clone https://github.com/ABI-CTT-Group/digital-twin-platform.git
-```
-
-#### Installing dependencies
-
-1. Setting up a virtual environment (optional but recommended). 
-   In this step, we will create a virtual environment in a new folder named **venv**, 
-   and activate the virtual environment.
+### Creating a python environment
+It is recommended to use a virtual environment instead of your system environment. In this step, we will create a virtual environment in a new folder named **venv**, and activate the virtual environment.
    
    * Linux
    ```
@@ -107,11 +88,34 @@ git clone https://github.com/ABI-CTT-Group/digital-twin-platform.git
    python3 -m venv venv
    venv\Scripts\activate
    ```
-   
+
+### User installation
+Here is the [link](https://pypi.org/project/digitaltwins/) to the project on PyPI.
+```
+pip install digitaltwins
+```
+You also need to install the digitaltwins package, which is a Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for Integrating Systems) Platform.
+```
+pip install sparc-me
+```
+
+### Developer installation
+
+#### Downloading source code
+Clone the source code repository from github, e.g.:
+
+```commandline
+git clone https://github.com/ABI-CTT-Group/digitaltwins-api.git
+```
+
+#### Installing dependencies
+
+1. Setting up a virtual environment (optional but recommended). 
+     
 2. Installing dependencies via pip
-    ```
-    pip install -r requirements.txt
-    ```
+```
+pip install -r requirements.txt
+```
     
 ## Using the Digital Twin Platform API
 
