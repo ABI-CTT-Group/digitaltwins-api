@@ -98,7 +98,7 @@ class Uploader(object):
         querier = MetadataQuerier(self.config_file)
 
         try:
-            datasets = querier.get_datasets(program=self._project, project=self._project)
+            datasets = querier.get_datasets(program=self._program, project=self._project)
         except Exception:
             time.sleep(2)
             self._generate_dataset_id(count=count + 1)
