@@ -68,6 +68,7 @@ class Uploader(object):
         meta_uploader = MetadataUploader(self._gen3_endpoint, str(self._gen3_cred_file))
 
         for filename in self._meta_files:
+            print("Uploading: " + str(filename))
             file = meta_dir.joinpath(filename)
             meta_uploader.execute(program=self._program, project=self._project, file=str(file))
 
