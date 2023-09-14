@@ -4,10 +4,6 @@ from gen3.submission import Gen3Submission
 from gen3.auth import Gen3Auth
 
 
-def get_project_id(program, project):
-    project_id = program + '-' + project
-    return project_id
-
 
 class MetadataQuerier(object):
     """
@@ -32,6 +28,15 @@ class MetadataQuerier(object):
         self._auth = Gen3Auth(self._endpoint, self._cred_file)
 
         self._querier = Gen3Submission(self._auth)
+
+    def _get_project_id(self, program, project):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = program + '-' + project
+        return project_id
 
     def get_program(self):
         return self._program
@@ -89,12 +94,7 @@ class MetadataQuerier(object):
         return projects
 
     def get_datasets(self, program=None, project=None):
-        if program is None:
-            program = self._program
-        if project is None:
-            project = self._project
-
-        project_id = get_project_id(program, project)
+        project_id = self._get_project_id(program, project)
 
         query_string = f"""
         {{
@@ -115,12 +115,7 @@ class MetadataQuerier(object):
         return datasets
 
     def get_subjects(self, dataset_id, program=None, project=None):
-        if program is None:
-            program = self._program
-        if project is None:
-            project = self._project
-
-        project_id = get_project_id(program, project)
+        project_id = self._get_project_id(program, project)
 
         query_string = f"""
         {{
@@ -137,12 +132,7 @@ class MetadataQuerier(object):
         return cases
 
     def get_dataset_descriptions(self, dataset_id, program=None, project=None):
-        if program is None:
-            program = self._program
-        if project is None:
-            project = self._project
-
-        project_id = get_project_id(program, project)
+        project_id = self._get_project_id(program, project)
         query_string = f"""
         {{
           experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
