@@ -97,13 +97,14 @@ class Uploader(object):
         # list datasets
         querier = MetadataQuerier(self.config_file)
 
+        datasets = list()
         try:
             datasets = querier.get_datasets(program=self._program, project=self._project)
         except Exception:
             time.sleep(2)
             self._generate_dataset_id(count=count + 1)
 
-        if datasets:
+        if len(datasets) > 0:
             datasets.sort()
             latest_dataset = datasets[-1]
             elements = re.split('_|-', latest_dataset)
