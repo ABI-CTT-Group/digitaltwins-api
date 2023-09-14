@@ -1,15 +1,15 @@
 # 12 LABOURS DigitalTWINS API
-A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for Integrating Systems) Platform
+A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translational Workflows for Integrating Systems) Platform
 
 ![Python 3](https://img.shields.io/badge/Python->=3.9-blue)
 [![Contributors][contributors-shield]][contributors-url]
 [![Stargazers][stars-shield]][stars-url]
 [![GitHub issues-closed](https://img.shields.io/github/issues-closed/ABI-CTT-Group/digitaltwins-api.svg)](https://GitHub.com/ABI-CTT-Group/digitaltwins-api/issues?q=is%3Aissue+is%3Aclosed)
-<!--* [![Issues][issues-shield]][issues-url] -->
 [![apache License][license-shield]][license-url]
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+[![PyPI version fury.io](https://badge.fury.io/py/digitaltwins-api.svg)](https://pypi.python.org/pypi/digitaltwins)
+<!--* [![Issues][issues-shield]][issues-url] -->
 <!--* [![DOI](https://zenodo.org/badge/XXXX.svg)](https://zenodo.org/badge/latestdoi/XXXXX) -->
-[![PyPI version fury.io](https://badge.fury.io/py/digitaltwins-api.svg)](https://pypi.python.org/pypi/digitaltwins/)
 
 [contributors-shield]: https://img.shields.io/github/contributors/ABI-CTT-Group/digitaltwins-api.svg?style=flat-square
 [contributors-url]: https://github.com/ABI-CTT-Group/digitaltwins-api/graphs/contributors
@@ -24,17 +24,18 @@ A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translat
 
 ## Table of contents
 * [Introduction](#introduction)
-<!--* * [The problem](#the-problem) -->
-<!--* * [Our solution - XXXXXX](#our-solution---XXXXX) -->
-<!--* * [Impact and vision](#impact-and-vision) -->
-<!--* * [Future developments](#future-developments) -->
 * [Setting up the DigitalTWINS platform API](#setting-up-the-digitaltwins-platform-API)
 * [Using the DigitalTWINS Platform API](#using-the-digitalwins-platform-api)
 * [Reporting issues](#reporting-issues)
 * [Contributing](#contributing)
+* [License](#license)
+
+<!--* * [The problem](#the-problem) -->
+<!--* * [Our solution - XXXXXX](#our-solution---XXXXX) -->
+<!--* * [Impact and vision](#impact-and-vision) -->
+<!--* * [Future developments](#future-developments) -->
 <!--* * [Cite us](#cite-us) -->
 <!--* * [FAIR practices](#fair-practices) -->
-* [License](#license)
 <!--* * * [Team](#team) -->
 <!--* * * [Acknowledgements](#acknowledgements) -->
 
