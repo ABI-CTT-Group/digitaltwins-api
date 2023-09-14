@@ -30,7 +30,7 @@ class MetadataUploader(object):
     def submit(self, program, project, record, count):
         if count >= self._MAX_ATTEMPTS:
             raise ValueError(f"Max submission attempts {count} exceeded. Please try submitting again. If the error "
-                             f"persists, please contact the developers").format(count=count)
+                             f"persists, please contact the developers".format(count=count))
         try:
             self._submission.submit_record(program, project, record)
         except Exception as e:
