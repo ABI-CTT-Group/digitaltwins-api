@@ -4,8 +4,10 @@ from pathlib import Path
 
 class Deleter(object):
     def __init__(self, config_file):
+        self.config_file = Path(config_file)
+
         self._configs = configparser.ConfigParser()
-        self._configs.read(config_file)
+        self._configs.read(str(config_file))
 
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
