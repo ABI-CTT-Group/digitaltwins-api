@@ -24,17 +24,18 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 
 ## Table of contents
 * [Introduction](#introduction)
-<!--* * [The problem](#the-problem) -->
-<!--* * [Our solution - XXXXXX](#our-solution---XXXXX) -->
-<!--* * [Impact and vision](#impact-and-vision) -->
-<!--* * [Future developments](#future-developments) -->
 * [Setting up the DigitalTWINS platform API](#setting-up-the-digitaltwins-platform-API)
 * [Using the DigitalTWINS Platform API](#using-the-digitalwins-platform-api)
 * [Reporting issues](#reporting-issues)
 * [Contributing](#contributing)
+* [License](#license)
+
+<!--* * [The problem](#the-problem) -->
+<!--* * [Our solution - XXXXXX](#our-solution---XXXXX) -->
+<!--* * [Impact and vision](#impact-and-vision) -->
+<!--* * [Future developments](#future-developments) -->
 <!--* * [Cite us](#cite-us) -->
 <!--* * [FAIR practices](#fair-practices) -->
-* [License](#license)
 <!--* * * [Team](#team) -->
 <!--* * * [Acknowledgements](#acknowledgements) -->
 
