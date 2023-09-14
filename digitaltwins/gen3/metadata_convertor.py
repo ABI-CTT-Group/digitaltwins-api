@@ -285,7 +285,6 @@ class MetadataConvertor(object):
         os.makedirs(dest.parent, exist_ok=True)
         with open(dest, 'w') as f:
             json.dump(data, f, indent=4)
-        print("Saved to " + str(dest))
 
     def _get_schema(self, category):
         """
