@@ -212,4 +212,48 @@ class MetadataQuerier(object):
         data = response.get("data")
         return data
 
+    def get_dataset_records(self, dataset_id, program=None, project=None):
+        project_id = self._get_project_id(program, project)
+
+        query_string = f"""
+                {{
+                  experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
+                    id,
+                    cases{{
+                      id,
+                      samples{{
+                        id
+                      }}
+                    }},
+                    dataset_descriptions{{
+                      id
+                    }}
+                  }}
+                }}
+                """
+        response = self.graphql_query(query_string)
+        datasets = response.get("experiment")
+        if len(datasets) == 0:
+            return None
+
+        records = list()
+
+        dataset = datasets[0]
+        records.insert(0, dataset.get("id"))
+
+        cases = dataset.get("cases")
+        for case in cases:
+            records.insert(0, case.get("id"))
+            samples = case.get("samples")
+            for sample in samples:
+                records.insert(0, sample.get("id"))
+
+        dataset_descriptions = dataset.get("dataset_descriptions")
+        for dataset_desc in dataset_descriptions:
+            records.insert(0, dataset_desc.get("id"))
+
+        return response
+
+
+
 
