@@ -5,6 +5,7 @@ from xlrd import XLRDError
 import json
 import yaml
 import re
+from datetime import datetime
 
 
 class MetadataConvertor(object):
@@ -172,7 +173,10 @@ class MetadataConvertor(object):
 
                         # check if value exists and if value equals to nan (nan variable does not equal to itself)
                         if value and value == value:
-                            if len(value) == 1:
+                            if isinstance(value, datetime):
+                                value = str(value)
+
+                            if isinstance(value, list) and len(value) == 1:
                                 value = value[0]
 
                             # handle special values
