@@ -6,3 +6,4 @@ from .gen3.metadata_uploader import MetadataUploader
 from .irods.irods import IRODS
 from .core.downloader import Downloader
 from .core.uploader import Uploader
+from .core.deleter import Deleter

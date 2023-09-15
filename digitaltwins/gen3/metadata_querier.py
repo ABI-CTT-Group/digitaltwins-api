@@ -4,10 +4,6 @@ from gen3.submission import Gen3Submission
 from gen3.auth import Gen3Auth
 
 
-def get_project_id(program, project):
-    project_id = program + '-' + project
-    return project_id
-
 
 class MetadataQuerier(object):
     """
@@ -32,6 +28,15 @@ class MetadataQuerier(object):
         self._auth = Gen3Auth(self._endpoint, self._cred_file)
 
         self._querier = Gen3Submission(self._auth)
+
+    def _get_project_id(self, program, project):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        project_id = program + '-' + project
+        return project_id
 
     def get_program(self):
         return self._program
@@ -89,12 +94,7 @@ class MetadataQuerier(object):
         return projects
 
     def get_datasets(self, program=None, project=None):
-        if program is None:
-            program = self._program
-        if project is None:
-            project = self._project
-
-        project_id = get_project_id(program, project)
+        project_id = self._get_project_id(program, project)
 
         query_string = f"""
         {{
@@ -115,12 +115,7 @@ class MetadataQuerier(object):
         return datasets
 
     def get_subjects(self, dataset_id, program=None, project=None):
-        if program is None:
-            program = self._program
-        if project is None:
-            project = self._project
-
-        project_id = get_project_id(program, project)
+        project_id = self._get_project_id(program, project)
 
         query_string = f"""
         {{
@@ -137,12 +132,7 @@ class MetadataQuerier(object):
         return cases
 
     def get_dataset_descriptions(self, dataset_id, program=None, project=None):
-        if program is None:
-            program = self._program
-        if project is None:
-            project = self._project
-
-        project_id = get_project_id(program, project)
+        project_id = self._get_project_id(program, project)
         query_string = f"""
         {{
           experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
@@ -205,8 +195,6 @@ class MetadataQuerier(object):
 
         return dataset_descriptions
 
-
-
     def get_node_records(self, node, program, project):
         """
         Getting all the records in a Gen3 node
@@ -223,5 +211,58 @@ class MetadataQuerier(object):
         response = self._querier.export_node(program, project, node, "json")
         data = response.get("data")
         return data
+
+    def get_dataset_records(self, dataset_id, program=None, project=None):
+        project_id = self._get_project_id(program, project)
+
+        query_string = f"""
+                {{
+                  experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
+                    id,
+                    cases{{
+                      id,
+                      samples{{
+                        id,
+                      }}
+                    }},
+                    dataset_descriptions{{
+                      id,
+                    }},
+                    manifests{{
+                      id
+                    }}
+                  }}
+                }}
+                """
+        response = self.graphql_query(query_string)
+        datasets = response.get("experiment")
+        if len(datasets) == 0:
+            return None
+
+        records = list()
+        uuid_tag = "id"
+        # uuid_tag = "submitter_id"
+
+        dataset = datasets[0]
+        records.insert(0, dataset.get(uuid_tag))
+
+        cases = dataset.get("cases")
+        for case in cases:
+            records.insert(0, case.get(uuid_tag))
+            samples = case.get("samples")
+            for sample in samples:
+                records.insert(0, sample.get(uuid_tag))
+
+        dataset_descriptions = dataset.get("dataset_descriptions")
+        for dataset_desc in dataset_descriptions:
+            records.insert(0, dataset_desc.get(uuid_tag))
+
+        manifests = dataset.get("manifests")
+        for manifest in manifests:
+            records.insert(0, manifest.get(uuid_tag))
+
+        return records
+
+
 
 
