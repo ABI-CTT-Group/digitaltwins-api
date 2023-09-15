@@ -222,10 +222,13 @@ class MetadataQuerier(object):
                     cases{{
                       id,
                       samples{{
-                        id
+                        id,
                       }}
                     }},
                     dataset_descriptions{{
+                      id,
+                    }},
+                    manifests{{
                       id
                     }}
                   }}
@@ -237,22 +240,28 @@ class MetadataQuerier(object):
             return None
 
         records = list()
+        uuid_tag = "id"
+        # uuid_tag = "submitter_id"
 
         dataset = datasets[0]
-        records.insert(0, dataset.get("id"))
+        records.insert(0, dataset.get(uuid_tag))
 
         cases = dataset.get("cases")
         for case in cases:
-            records.insert(0, case.get("id"))
+            records.insert(0, case.get(uuid_tag))
             samples = case.get("samples")
             for sample in samples:
-                records.insert(0, sample.get("id"))
+                records.insert(0, sample.get(uuid_tag))
 
         dataset_descriptions = dataset.get("dataset_descriptions")
         for dataset_desc in dataset_descriptions:
-            records.insert(0, dataset_desc.get("id"))
+            records.insert(0, dataset_desc.get(uuid_tag))
 
-        return response
+        manifests = dataset.get("manifests")
+        for manifest in manifests:
+            records.insert(0, manifest.get(uuid_tag))
+
+        return records
 
 
 
