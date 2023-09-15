@@ -25,13 +25,11 @@ class Deleter(object):
     def execute(self, dataset_id):
         self._delete_metadata(dataset_id)
         self._delete_dataset(dataset_id)
-        pass
 
     def _delete_metadata(self, dataset_id):
         querier = MetadataQuerier(self._config_file)
         records = querier.get_dataset_records(dataset_id=dataset_id, program=self._program, project=self._project)
         self._submission.delete_records(program=self._program, project=self._project, uuids=records)
-        pass
 
     def _delete_dataset(self, dataset_id):
         pass
