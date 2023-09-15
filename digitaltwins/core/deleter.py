@@ -5,6 +5,7 @@ from gen3.auth import Gen3Auth
 from gen3.submission import Gen3Submission
 
 from digitaltwins import MetadataQuerier
+from digitaltwins.irods.irods import IRODS
 
 
 class Deleter(object):
@@ -23,13 +24,14 @@ class Deleter(object):
         self._submission = Gen3Submission(self._gen3_endpoint, self._auth)
 
     def execute(self, dataset_id):
-        self._delete_metadata(dataset_id)
-        self._delete_dataset(dataset_id)
+        self.delete_metadata(dataset_id)
+        self.delete_dataset(dataset_id)
 
-    def _delete_metadata(self, dataset_id):
+    def delete_metadata(self, dataset_id):
         querier = MetadataQuerier(self._config_file)
         records = querier.get_dataset_records(dataset_id=dataset_id, program=self._program, project=self._project)
         self._submission.delete_records(program=self._program, project=self._project, uuids=records)
 
-    def _delete_dataset(self, dataset_id):
-        pass
+    def delete_dataset(self, dataset_id):
+        irods = IRODS(self._configs)
+        irods.delete(dataset_id)
