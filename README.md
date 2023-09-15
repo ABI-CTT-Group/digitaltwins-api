@@ -138,19 +138,19 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     <td> Getting started with the DigitalTWINS Platform (including getting access to the API).</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_create_datasets_and_description.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_create_datasets_and_its metadata.ipynb">
     2
     </a></td>
     <td> Creating and describing datasets in a standardised format (SPARC Dataset Structure).</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_submit_datasets.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_upload_datasets.ipynb">
     3
     </a></td>
     <td> Submitting datasets to the platform.</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_7_delete_datasets.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_delete_datasets.ipynb">
     4
     </a></td>
     <td> Deleting existing datasets in the platform.</td>
@@ -166,13 +166,8 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     6
     </a></td>
     <td> Downloading existing datasets in the platform.</td>
-  </tr>   
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_update_existing_datasets.ipynb">
-    7
-    </td>
-    <td> Updating existing datasets in the platform (version controlling datasets).</td>
-  </tr>
+  </tr> 
+  
 </tbody>
 </table>
 <p align="center">
