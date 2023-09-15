@@ -108,3 +108,14 @@ class IRODS(object):
                self._download_collection(session, subcollection.path, save_dir)
         else:
             return
+
+    def delete(self, collection_name):
+        with iRODSSession(host=self._host,
+                          port=self._port,
+                          user=self._user,
+                          password=self._password,
+                          zone=self._zone) as session:
+            collection_path = self._project_root + '/' + collection_name
+
+            if session.collections.exists(collection_path):
+                session.collections.remove(collection_path, recurse=True)

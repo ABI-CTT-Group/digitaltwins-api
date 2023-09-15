@@ -31,8 +31,8 @@ class Uploader(object):
 
         self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json"]
 
-        self._dataset_submitter_id_template = "dataset-12L_{id}-version-1"
-        self._dataset_id_index = 2
+        self._dataset_submitter_id_template = "{program}-{project}-dataset-{id}-version-1"
+        self._dataset_id_index = 3
         self._MAX_ATTEMPTS = 10
 
     def execute(self, dataset_dir):
@@ -56,7 +56,7 @@ class Uploader(object):
         if self._dir_tmp.is_dir:
             shutil.rmtree(str(self._dir_tmp))
 
-        print("Dataset {dataset_id} uploaded".format(dataset_id=dataset_id))
+        print("Dataset uploaded: " + str(dataset_id))
 
     def upload_metadata(self, dataset_dir):
         meta_dir = self._meta_dir_tmp
@@ -110,8 +110,8 @@ class Uploader(object):
             elements = re.split('_|-', latest_dataset)
             latest_id = elements[self._dataset_id_index]
             new_id = int(latest_id) + 1
-            new_dataset_id = self._dataset_submitter_id_template.format(id=new_id)
+            new_dataset_id = self._dataset_submitter_id_template.format(program=self._program, project=self._project, id=new_id)
         else:
-            return self._dataset_submitter_id_template.format(id="1")
+            return self._dataset_submitter_id_template.format(program=self._program, project=self._project, id="1")
 
         return new_dataset_id
