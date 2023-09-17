@@ -4,7 +4,7 @@ from pathlib import Path
 
 if __name__ == '__main__':
     dataset_name = None
-    config_file = Path(r"/path/to/configs.ini")
+    config_file = Path(r"/path/to/configs_ctt.ini")
 
     downloader = Downloader(config_file)
 
