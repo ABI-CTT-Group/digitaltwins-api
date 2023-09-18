@@ -184,6 +184,36 @@ class MetadataQuerier(object):
 
         return datasets
 
+    def get_dataset(self, dataset_id, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
+
+        query_string = f"""
+        {{
+            program (name: "{program}"){{
+                name
+                projects (name: "{project}"){{
+                    name
+                    experiments (submitter_id: "{dataset_id}"){{
+                        submitter_id
+                    }}
+                }}
+            }}
+        }}
+        """
+        data = self.graphql_query(query_string)
+
+        dataset = None
+        if data:
+            dataset = Dataset(dataset_id, program, project, self._config_file)
+        else:
+            print("Dataset not found: " + str(dataset_id))
+
+        return dataset
+
+
     def get_subjects(self, dataset_id, program=None, project=None):
         project_id = self._get_project_id(program, project)
 
