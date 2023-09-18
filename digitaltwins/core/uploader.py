@@ -21,6 +21,10 @@ class Uploader(object):
         self._gen3_endpoint = self._configs["gen3"].get("endpoint")
         self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
 
+        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._ssl_cert:
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
+
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
 

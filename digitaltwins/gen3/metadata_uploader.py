@@ -1,7 +1,7 @@
 import json
 import time
 
-from gen3.auth import Gen3Auth
+from gen3.auth import Gen3Auth, Gen3AuthError
 from gen3.submission import Gen3Submission
 
 
@@ -33,10 +33,9 @@ class MetadataUploader(object):
                              f"persists, please contact the developers".format(count=count))
         try:
             self._submission.submit_record(program, project, record)
-        except Exception as e:
+        except Gen3AuthError as e:
             time.sleep(2)
             self.submit(program, project, record, count + 1)
-
 
     def execute(self, program, project, file):
         """

@@ -1,4 +1,5 @@
 import configparser
+import os
 from pathlib import Path
 
 from gen3.auth import Gen3Auth
@@ -19,6 +20,10 @@ class Deleter(object):
         self._project = self._configs["gen3"].get("project")
         self._gen3_endpoint = self._configs["gen3"].get("endpoint")
         self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
+
+        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._ssl_cert:
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
 
         self._auth = Gen3Auth(self._gen3_endpoint, refresh_file=str(self._gen3_cred_file))
         self._submission = Gen3Submission(self._gen3_endpoint, self._auth)

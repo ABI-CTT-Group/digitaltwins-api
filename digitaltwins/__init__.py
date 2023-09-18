@@ -7,3 +7,4 @@ from .irods.irods import IRODS
 from .core.downloader import Downloader
 from .core.uploader import Uploader
 from .core.deleter import Deleter
+from .core.dataset import Dataset
