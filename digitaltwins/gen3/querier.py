@@ -196,7 +196,7 @@ class Querier(object):
                 experiments = project.get("experiments")
                 for experiment in experiments:
                     submitter_id = experiment.get("submitter_id")
-                    dataset = Dataset(id=submitter_id, program=program_name, project=project_name)
+                    dataset = Dataset(id=submitter_id, program=program_name, project=project_name, config_file=self._config_file)
                     datasets.append(dataset)
 
         return datasets

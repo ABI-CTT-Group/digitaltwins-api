@@ -8,6 +8,6 @@ if __name__ == '__main__':
 
     deleter = Deleter(config_file)
 
-    deleter.execute(dataset_id)
+    deleter.delete(dataset_id)
 
     print("done")

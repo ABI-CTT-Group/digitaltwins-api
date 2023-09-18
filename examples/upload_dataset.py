@@ -6,5 +6,5 @@ if __name__ == '__main__':
 
     uploader = Uploader(Path(r"/path/to/configs.ini"))
 
-    uploader.execute(dataset_dir=dataset_dir)
+    uploader.upload(dataset_dir=dataset_dir)
     print("done")

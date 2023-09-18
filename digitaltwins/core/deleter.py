@@ -28,7 +28,7 @@ class Deleter(object):
         self._auth = Gen3Auth(self._gen3_endpoint, refresh_file=str(self._gen3_cred_file))
         self._submission = Gen3Submission(self._gen3_endpoint, self._auth)
 
-    def execute(self, dataset_id):
+    def delete(self, dataset_id):
         self.delete_metadata(dataset_id)
         self.delete_dataset(dataset_id)
 
