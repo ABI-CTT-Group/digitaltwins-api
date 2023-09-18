@@ -1,9 +1,12 @@
 import configparser
+import os
+import time
+from pathlib import Path
 
 from gen3.submission import Gen3Submission
-from gen3.auth import Gen3Auth
+from gen3.auth import Gen3Auth, Gen3AuthError
 
-
+from requests.exceptions import ConnectionError
 
 class MetadataQuerier(object):
     """
@@ -17,17 +20,24 @@ class MetadataQuerier(object):
         :param auth: Gen3 authentication object created by the Auth class
         :type auth: object
         """
+        self._config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
         self._endpoint = self._configs["gen3"].get("endpoint")
-        self._cred_file = self._configs["gen3"].get("cred_file")
+        self._cred_file = Path(self._configs["gen3"].get("cred_file"))
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
 
-        self._auth = Gen3Auth(self._endpoint, self._cred_file)
+        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._ssl_cert:
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
+
+        self._auth = Gen3Auth(self._endpoint, str(self._cred_file))
 
         self._querier = Gen3Submission(self._auth)
+
+        self._MAX_ATTEMPTS = 10
 
     def _get_project_id(self, program, project):
         if program is None:
@@ -44,7 +54,7 @@ class MetadataQuerier(object):
     def get_project(self):
         return self._project
 
-    def graphql_query(self, query_string, variables=None):
+    def graphql_query(self, query_string, variables=None, count=0):
         """
         Sending a GraphQL query to Gen3
 
@@ -55,9 +65,20 @@ class MetadataQuerier(object):
         :return: query response
         :rtype: dict
         """
-        response = self._querier.query(query_string, variables).get("data")
-
-        return response
+        if count >= self._MAX_ATTEMPTS:
+            raise ValueError(f"Max attempts {count} exceeded. Please try again. If the error "
+                             f"persists, please contact the developers".format(count=count))
+        try:
+            response = self._querier.query(query_string, variables)
+            data = response.get("data")
+            return data
+        except Gen3AuthError as e:
+            time.sleep(2)
+            count = count + 1
+            return self.graphql_query(query_string, variables=variables, count=count)
+        except ConnectionError as e:
+            raise ConnectionError("HTTP connection error: Please make sure you have access to the remote server. then "
+                                  "try again!")
 
     def get_programs_all(self):
         """
@@ -66,12 +87,15 @@ class MetadataQuerier(object):
         :return: List of programs
         :rtype: list
         """
-        response = self._querier.get_programs()
-
-        programs = list()
-        for resp in response.get("links"):
-            program = resp.split('/')[-1]
-            programs.append(program)
+        query_string = f"""
+        {{
+            program{{
+                name
+            }}
+        }}
+        """
+        data = self.graphql_query(query_string)
+        programs = data.get('program')
 
         return programs
 
@@ -84,35 +108,128 @@ class MetadataQuerier(object):
         :return: List of projects
         :rtype: list
         """
-        response = self._querier.get_projects(program)
+        query_string = f"""
+        {{
+            program (name: "{program}"){{
+                name
+                projects{{
+                    name
+                }}
+            }}
+        }}
+        """
+        data = self.graphql_query(query_string)
 
-        projects = list()
-        for resp in response.get("links"):
-            project = resp.split('/')[-1]
-            projects.append(project)
+        projects = None
+        programs = data.get('program')
+        if programs and len(programs) >= 0:
+            projects = programs[0].get("projects")
 
         return projects
 
     def get_datasets(self, program=None, project=None):
-        project_id = self._get_project_id(program, project)
+        if program is None and project is None:
+            query_string = f"""
+            {{
+                program{{
+                    name
+                    projects{{
+                        name
+                        experiments{{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        if program and project is None:
+            query_string = f"""
+            {{
+                program (name: "{program}"){{
+                    name
+                    projects{{
+                        name
+                        experiments{{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        if program is None and project:
+            query_string = f"""
+            {{
+                program{{
+                    name
+                    projects (name: "{project}"){{
+                        name
+                        experiments{{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        if program and project:
+            query_string = f"""
+            {{
+                program (name: "{program}") {{
+                    name
+                    projects (name: "{project}"){{
+                        name
+                        experiments {{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        data = self.graphql_query(query_string)
+
+        datasets = list()
+        programs = data.get('program')
+        for program in programs:
+            program_name = program.get("name")
+            projects = program.get("projects")
+            for project in projects:
+                project_name = project.get("name")
+                experiments = project.get("experiments")
+                for experiment in experiments:
+                    submitter_id = experiment.get("submitter_id")
+                    dataset = Dataset(id=submitter_id, program=program_name, project=project_name)
+                    datasets.append(dataset)
+
+        return datasets
+
+    def get_dataset(self, dataset_id, program=None, project=None):
+        if program is None:
+            program = self._program
+        if project is None:
+            project = self._project
 
         query_string = f"""
         {{
-          experiment (project_id: "{project_id}"){{
-              id,
-              submitter_id
-          }}
+            program (name: "{program}"){{
+                name
+                projects (name: "{project}"){{
+                    name
+                    experiments (submitter_id: "{dataset_id}"){{
+                        submitter_id
+                    }}
+                }}
+            }}
         }}
         """
-        response = self.graphql_query(query_string).get("experiment")
+        data = self.graphql_query(query_string)
 
+        dataset = None
+        if data:
+            dataset = Dataset(dataset_id, program, project, self._config_file)
+        else:
+            print("Dataset not found: " + str(dataset_id))
 
-        datasets = list()
-        for element in response:
-            submitter_id = element.get("submitter_id")
-            datasets.append(submitter_id)
+        return dataset
 
-        return datasets
 
     def get_subjects(self, dataset_id, program=None, project=None):
         project_id = self._get_project_id(program, project)
@@ -266,3 +383,4 @@ class MetadataQuerier(object):
 
 
 
+from digitaltwins.core.dataset import Dataset
