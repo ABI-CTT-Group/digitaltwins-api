@@ -25,7 +25,11 @@ class MetadataQuerier(object):
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
 
-        self._auth = Gen3Auth(self._endpoint, self._cred_file)
+        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._ssl_cert:
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
+
+        self._auth = Gen3Auth(self._endpoint, str(self._cred_file))
 
         self._querier = Gen3Submission(self._auth)
 
