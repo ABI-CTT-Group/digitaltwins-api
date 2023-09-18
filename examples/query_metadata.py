@@ -1,11 +1,11 @@
-from digitaltwins import MetadataQuerier
+from digitaltwins import Querier
 from pathlib import Path
 import configparser
 
 if __name__ == '__main__':
     config_file = Path(r"/path/to/configs.ini")
 
-    querier = MetadataQuerier(config_file)
+    querier = Querier(config_file)
 
     # List programs
     programs = querier.get_programs_all()

@@ -5,7 +5,7 @@ from pathlib import Path
 from gen3.auth import Gen3Auth
 from gen3.submission import Gen3Submission
 
-from digitaltwins import MetadataQuerier
+from digitaltwins import Querier
 from digitaltwins.irods.irods import IRODS
 
 
@@ -33,7 +33,7 @@ class Deleter(object):
         self.delete_dataset(dataset_id)
 
     def delete_metadata(self, dataset_id):
-        querier = MetadataQuerier(self._config_file)
+        querier = Querier(self._config_file)
         records = querier.get_dataset_records(dataset_id=dataset_id, program=self._program, project=self._project)
         self._submission.delete_records(program=self._program, project=self._project, uuids=records)
 

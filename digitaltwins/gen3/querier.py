@@ -8,7 +8,7 @@ from gen3.auth import Gen3Auth, Gen3AuthError
 
 from requests.exceptions import ConnectionError
 
-class MetadataQuerier(object):
+class Querier(object):
     """
     Class for querying Gen3.
     Also accepts queries in GraphQL syntax.
