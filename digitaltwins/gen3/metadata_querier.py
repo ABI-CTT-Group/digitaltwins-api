@@ -1,8 +1,9 @@
 import configparser
-
+import os
+import time
+from pathlib import Path
 from gen3.submission import Gen3Submission
-from gen3.auth import Gen3Auth
-
+from gen3.auth import Gen3Auth, Gen3AuthError
 
 
 class MetadataQuerier(object):
