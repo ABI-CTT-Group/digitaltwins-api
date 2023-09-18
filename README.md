@@ -73,7 +73,8 @@ This code respository provides a python API tool to enable users to programatica
 - Python 3.9+. Tested on:
    - 3.9
 - Operating system. Tested on:
-  - Ubuntu 18.04
+  - Ubuntu 20.04
+  - Windows 10
 
 ### Creating a python environment
 It is recommended to use a virtual environment instead of your system environment. In this step, we will create a virtual environment in a new folder named **venv**, and activate the virtual environment.
@@ -139,35 +140,29 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     <td> Getting started with the DigitalTWINS Platform (including getting access to the API).</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_create_datasets_and_its metadata.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb">
     2
     </a></td>
     <td> Creating and describing datasets in a standardised format (SPARC Dataset Structure).</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_upload_datasets.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_loading_and_exploring_sds_datasets.ipynb">
     3
     </a></td>
     <td> Submitting datasets to the platform.</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_delete_datasets.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_creating_sds_datasets.ipynb">
     4
     </a></td>
     <td> Deleting existing datasets in the platform.</td>
   </tr> 
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_5_query_existing_datasets.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_5_uploading_datasets.ipynb">
     5
     </a></td>
     <td> Accessing metadata for existing datasets in the platform.</td>
   </tr>
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_6_download_existing_datasets.ipynb">
-    6
-    </a></td>
-    <td> Downloading existing datasets in the platform.</td>
-  </tr> 
   
 </tbody>
 </table>
