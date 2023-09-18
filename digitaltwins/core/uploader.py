@@ -6,7 +6,7 @@ import time
 from pathlib import Path
 import shutil
 
-from digitaltwins import MetadataQuerier
+from digitaltwins import Querier
 from digitaltwins import MetadataConvertor
 from digitaltwins import MetadataUploader
 from digitaltwins.irods.irods import IRODS
@@ -99,7 +99,7 @@ class Uploader(object):
             raise ValueError("Max attempts {count} exceeded. Please try submitting again. If the error persists, "
                              "please contact the developers".format(count=count))
         # list datasets
-        querier = MetadataQuerier(self.config_file)
+        querier = Querier(self.config_file)
 
         datasets = list()
         try:

@@ -1,4 +1,4 @@
-from digitaltwins.gen3.metadata_querier import MetadataQuerier
+from digitaltwins.gen3.querier import Querier
 
 
 class Dataset(object):
@@ -8,7 +8,7 @@ class Dataset(object):
         self._id = id # submitter_id
 
         self._configs = config_file
-        self._querier = MetadataQuerier(self._configs)
+        self._querier = Querier(self._configs)
 
     def get_program(self):
         return self._program
