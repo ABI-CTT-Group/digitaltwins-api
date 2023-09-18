@@ -87,12 +87,15 @@ class MetadataQuerier(object):
         :return: List of programs
         :rtype: list
         """
-        response = self._querier.get_programs()
-
-        programs = list()
-        for resp in response.get("links"):
-            program = resp.split('/')[-1]
-            programs.append(program)
+        query_string = f"""
+        {{
+            program{{
+                name
+            }}
+        }}
+        """
+        data = self.graphql_query(query_string)
+        programs = data.get('program')
 
         return programs
 
