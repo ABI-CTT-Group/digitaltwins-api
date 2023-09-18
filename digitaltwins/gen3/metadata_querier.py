@@ -34,6 +34,8 @@ class MetadataQuerier(object):
 
         self._querier = Gen3Submission(self._auth)
 
+        self._MAX_ATTEMPTS = 10
+
     def _get_project_id(self, program, project):
         if program is None:
             program = self._program
@@ -49,7 +51,7 @@ class MetadataQuerier(object):
     def get_project(self):
         return self._project
 
-    def graphql_query(self, query_string, variables=None):
+    def graphql_query(self, query_string, variables=None, count=0):
         """
         Sending a GraphQL query to Gen3
 
@@ -60,9 +62,18 @@ class MetadataQuerier(object):
         :return: query response
         :rtype: dict
         """
-        response = self._querier.query(query_string, variables).get("data")
+        if count >= self._MAX_ATTEMPTS:
+            raise ValueError(f"Max attempts {count} exceeded. Please try again. If the error "
+                             f"persists, please contact the developers".format(count=count))
+        try:
+            response = self._querier.query(query_string, variables)
+            data = response.get("data")
+            return data
+        except Gen3AuthError as e:
+            time.sleep(2)
+            count = count + 1
+            return self.graphql_query(query_string, variables=variables, count=count)
 
-        return response
 
     def get_programs_all(self):
         """
