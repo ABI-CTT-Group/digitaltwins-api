@@ -111,7 +111,7 @@ class Uploader(object):
         if len(datasets) > 0:
             datasets.sort()
             latest_dataset = datasets[-1]
-            elements = re.split('_|-', latest_dataset)
+            elements = re.split('_|-', latest_dataset.get_id())
             latest_id = elements[self._dataset_id_index]
             new_id = int(latest_id) + 1
             new_dataset_id = self._dataset_submitter_id_template.format(program=self._program, project=self._project, id=new_id)
