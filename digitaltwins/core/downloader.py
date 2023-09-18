@@ -14,7 +14,7 @@ class Downloader(object):
 
         self._irods = IRODS(self._configs)
 
-    def execute(self, dataset_name=None, save_dir=None):
+    def download(self, dataset_name=None, save_dir=None):
         if dataset_name is None:
             raise ValueError("Dataset not specified")
         if save_dir is None:

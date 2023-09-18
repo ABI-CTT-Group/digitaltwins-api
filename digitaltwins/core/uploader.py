@@ -39,7 +39,7 @@ class Uploader(object):
         self._dataset_id_index = 3
         self._MAX_ATTEMPTS = 10
 
-    def execute(self, dataset_dir):
+    def upload(self, dataset_dir):
         dataset_dir = Path(dataset_dir)
         self._verify_dataset(dataset_dir)
 
