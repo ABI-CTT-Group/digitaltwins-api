@@ -2,9 +2,11 @@ import configparser
 import os
 import time
 from pathlib import Path
+
 from gen3.submission import Gen3Submission
 from gen3.auth import Gen3Auth, Gen3AuthError
 
+from requests.exceptions import ConnectionError
 
 class MetadataQuerier(object):
     """
@@ -74,7 +76,9 @@ class MetadataQuerier(object):
             time.sleep(2)
             count = count + 1
             return self.graphql_query(query_string, variables=variables, count=count)
-
+        except ConnectionError as e:
+            raise ConnectionError("HTTP connection error: Please make sure you have access to the remote server. then "
+                                  "try again!")
 
     def get_programs_all(self):
         """
