@@ -17,11 +17,12 @@ class MetadataQuerier(object):
         :param auth: Gen3 authentication object created by the Auth class
         :type auth: object
         """
+        self._config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
         self._endpoint = self._configs["gen3"].get("endpoint")
-        self._cred_file = self._configs["gen3"].get("cred_file")
+        self._cred_file = Path(self._configs["gen3"].get("cred_file"))
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
 
