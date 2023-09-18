@@ -111,23 +111,76 @@ class MetadataQuerier(object):
         return projects
 
     def get_datasets(self, program=None, project=None):
-        project_id = self._get_project_id(program, project)
-
-        query_string = f"""
-        {{
-          experiment (project_id: "{project_id}"){{
-              id,
-              submitter_id
-          }}
-        }}
-        """
-        response = self.graphql_query(query_string).get("experiment")
-
+        if program is None and project is None:
+            query_string = f"""
+            {{
+                program{{
+                    name
+                    projects{{
+                        name
+                        experiments{{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        if program and project is None:
+            query_string = f"""
+            {{
+                program (name: "{program}"){{
+                    name
+                    projects{{
+                        name
+                        experiments{{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        if program is None and project:
+            query_string = f"""
+            {{
+                program{{
+                    name
+                    projects (name: "{project}"){{
+                        name
+                        experiments{{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        if program and project:
+            query_string = f"""
+            {{
+                program (name: "{program}") {{
+                    name
+                    projects (name: "{project}"){{
+                        name
+                        experiments {{
+                            submitter_id
+                        }}
+                    }}
+                }}
+            }}
+            """
+        data = self.graphql_query(query_string)
 
         datasets = list()
-        for element in response:
-            submitter_id = element.get("submitter_id")
-            datasets.append(submitter_id)
+        programs = data.get('program')
+        for program in programs:
+            program_name = program.get("name")
+            projects = program.get("projects")
+            for project in projects:
+                project_name = project.get("name")
+                experiments = project.get("experiments")
+                for experiment in experiments:
+                    submitter_id = experiment.get("submitter_id")
+                    dataset = Dataset(id=submitter_id, program=program_name, project=project_name)
+                    datasets.append(dataset)
 
         return datasets
 
