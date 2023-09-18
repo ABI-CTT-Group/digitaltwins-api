@@ -108,12 +108,22 @@ class MetadataQuerier(object):
         :return: List of projects
         :rtype: list
         """
-        response = self._querier.get_projects(program)
+        query_string = f"""
+        {{
+            program (name: "{program}"){{
+                name
+                projects{{
+                    name
+                }}
+            }}
+        }}
+        """
+        data = self.graphql_query(query_string)
 
-        projects = list()
-        for resp in response.get("links"):
-            project = resp.split('/')[-1]
-            projects.append(project)
+        projects = None
+        programs = data.get('program')
+        if programs and len(programs) >= 0:
+            projects = programs[0].get("projects")
 
         return projects
 
