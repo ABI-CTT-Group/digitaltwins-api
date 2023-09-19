@@ -92,7 +92,7 @@ API documentation lists all the classes and methods available. This can be a use
 - digitaltwins API documentation TODO Add link
 
 ## Feedback
-Once you have completed this tutorial, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future tutorials.
+Once you have completed this tutorial, please complete [this survey](https://docs.google.com/forms/d/e/1FAIpQLSe-EsVz6ahz2FXFy906AZh68i50jRYnt3hQe-loc-1DaFWoFQ/viewform?usp=sf_link), which will allow us to improve this and future tutorials.
 
 ## Next steps
 The [next tutorial](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb) will show how to explore and download datasets from the 12 LABOURS DigitalTWINS platform.
