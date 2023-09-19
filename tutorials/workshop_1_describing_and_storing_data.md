@@ -76,4 +76,4 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
 <br/>
 
 ## Feedback
-Once you have completed this workshop, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future workshops.
+Once you have completed this workshop, please complete [this survey](https://docs.google.com/forms/d/e/1FAIpQLSe-EsVz6ahz2FXFy906AZh68i50jRYnt3hQe-loc-1DaFWoFQ/viewform?usp=sf_link), which will allow us to improve this and future workshops.
