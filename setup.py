@@ -16,7 +16,8 @@ setup(
     license="Apache-2.0",
     packages=find_packages(),
     include_package_data=True,
-    package_data={'digitaltwins': ['resources/*']},
+    package_data={'': ['./resources/**']},
+    # package_data={'digitaltwins': ['./digitaltwins/resources/*']},
     install_requires=[
         "gen3~=4.21.0",
         "python-irodsclient>=1.1.8",
