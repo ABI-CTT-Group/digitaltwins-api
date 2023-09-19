@@ -11,6 +11,9 @@ from digitaltwins import MetadataConvertor
 from digitaltwins import MetadataUploader
 from digitaltwins.irods.irods import IRODS
 
+import urllib3
+urllib3.disable_warnings()
+
 
 class Uploader(object):
     def __init__(self, config_file):

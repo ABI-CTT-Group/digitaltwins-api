@@ -8,6 +8,10 @@ from gen3.auth import Gen3Auth, Gen3AuthError
 
 from requests.exceptions import ConnectionError
 
+import urllib3
+urllib3.disable_warnings()
+
+
 class Querier(object):
     """
     Class for querying Gen3.
