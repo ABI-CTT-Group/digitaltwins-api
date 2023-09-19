@@ -14,16 +14,21 @@ from digitaltwins.irods.irods import IRODS
 
 class Uploader(object):
     def __init__(self, config_file):
-        self.config_file = config_file
+        config_file = Path(config_file)
+        self._config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
-        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
+        self._config_dir = self._config_file.parent
         self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
-
         self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._gen3_cred_file:
+            self._gen3_cred_file = self._config_dir.joinpath(self._gen3_cred_file)
         if self._ssl_cert:
-            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
+            self._ssl_cert = self._config_dir.joinpath(self._ssl_cert)
+            os.environ["REQUESTS_CA_BUNDLE"] = str(self._ssl_cert.resolve())
+
+        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
 
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
@@ -99,7 +104,7 @@ class Uploader(object):
             raise ValueError("Max attempts {count} exceeded. Please try submitting again. If the error persists, "
                              "please contact the developers".format(count=count))
         # list datasets
-        querier = Querier(self.config_file)
+        querier = Querier(self._config_file)
 
         datasets = list()
         try:
