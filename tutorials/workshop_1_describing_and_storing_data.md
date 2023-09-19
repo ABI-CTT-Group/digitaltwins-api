@@ -3,16 +3,16 @@
 ## Introduction
 This 2 hour workshop aims to allow researchers in the 12 LABOURS project to become familiar with the 12 LABOURS DigitalTWINS platform. This includes understanding how to connect to the platform, store their data within a standardised dataset structure, and upload/download it to/from the platform.
 
-This workshop has been organised by the CTT group and the 12L portal development team, and the demonstrators are Chinchien Lin, Linkun Gao, Jiali Xu, Thiranja Prasad Babarenda Gamage.
+This workshop has been organised by the CTT group and the 12L portal development team, and the demonstrators are Chinchien Lin, Linkun Gao, Jiali Xu, and Thiranja Prasad Babarenda Gamage.
 
 ## Learning outcomes
-How to connect to the 12 LABOURS DigitalTWINS platform via the web portal and programmatically via its python API. 
-How to create datasets in the SPARC Dataset Structure (SDS) programmatically using a python tool (sparc-me)
-How to upload and download your data to the 12 LABOURS DigitalTWINS platform via its python API
+- How to connect to the 12 LABOURS DigitalTWINS platform via the web portal and programmatically via its python API. 
+- How to create datasets in the SPARC Dataset Structure (SDS) programmatically using a python tool (sparc-me)
+- How to upload and download your data to the 12 LABOURS DigitalTWINS platform via its python API
 
 ## Workshop programme
-15 mins - Brief overview of the workshop and tutorials
-1 hour 45 mins - Attendees will run through tutorials themselves and then adapt code in tutorials to the data they use in their EP projects.
+- 15 mins - Brief overview of the workshop and tutorials
+- 1 hour 45 mins - Attendees will run through tutorials themselves and then adapt code in tutorials to the data they use in their EP projects.
 
 ## Prerequisites
 - Familiarity with python >=3.9
@@ -28,7 +28,7 @@ We will be using the computers on Level 5 at ABI. These machines do not have pyt
 
 ## Next steps
 
-Guided Jupyter Notebook tutorials have been developed describing how to use the DigitalTWINS platform. This workskhop involves running through these tutorials.
+Guided Jupyter Notebook tutorials have been developed describing how to use the DigitalTWINS platform. This workshop involves running through these tutorials.
 
 <table>
 <thead>
@@ -39,34 +39,34 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
 </thead>
 <tbody>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_1_getting_started.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_1_getting_started.md">
     1
     </a></td>
-    <td> Getting started with the DigitalTWINS platform (including getting access to the API).</td>
+    <td> Getting started with the 12 LABOURS DigitalTWINS platform.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb">
     2
     </a></td>
-    <td> Creating and describing datasets in a standardised format (SPARC Dataset Structure).</td>
+    <td> Exploring and downloading datasets from the DigitalTWINS platform using the digitaltwins-api.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_loading_and_exploring_sds_datasets.ipynb">
     3
     </a></td>
-    <td> Submitting datasets to the platform.</td>
+    <td> Loading and exploring SDS datasets locally using sparc-me.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_creating_sds_datasets.ipynb">
     4
     </a></td>
-    <td> Deleting existing datasets in the platform.</td>
+    <td> Creating SDS datasets locally using sparc-me.</td>
   </tr> 
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_5_uploading_datasets.ipynb">
     5
     </a></td>
-    <td> Accessing metadata for existing datasets in the platform.</td>
+    <td> Uploading datasets to the DigitalTWINS platform using the digitaltwins-api.</td>
   </tr>
   
 </tbody>
@@ -76,4 +76,4 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
 <br/>
 
 ## Feedback
-Once you have completed the workshop, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future workshops.
+Once you have completed this workshop, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future workshops.
