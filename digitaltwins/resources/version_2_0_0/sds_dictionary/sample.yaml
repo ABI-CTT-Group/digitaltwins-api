@@ -1,0 +1,152 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "sample"
+title: Sample
+type: object
+namespace: http://gdc.nci.nih.gov
+category: biospecimen
+program: '*'
+project: '*'
+description: >
+  Any material sample taken from a biological entity for testing, diagnostic, propagation, treatment
+  or research purposes, including a sample obtained from a living organism or taken from the
+  biological object after halting of all its life functions. Biospecimen can contain one or more
+  components including but not limited to cellular molecules, cells, tissues, organs, body fluids,
+  embryos, and body excretory products.
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - state
+  - created_datetime
+  - updated_datetime
+
+required:
+  - submitter_id
+  - type
+  - cases
+  - subject_id
+  - sample_id
+  - wasDerivedFromSample
+  - pool_id
+  - sample_experimental_group
+  - sample_type
+  - sample_anatomical_location
+  - also_in_dataset
+  - member_of
+
+uniqueKeys:
+  - [id]
+  - [project_id, submitter_id]
+
+links:
+  - name: cases
+    backref: samples
+    label: derived_from
+    target_type: case
+    multiplicity: many_to_one #not sure
+    required: true
+
+# Sample properties: keep TCGA-specific fields
+properties:
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+  project_id:
+    type: string
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  state:
+    $ref: "_definitions.yaml#/state"
+  submitter_id:
+    type:
+      - string
+      - "null"
+    description: >
+      The legacy barcode used before prior to the use UUIDs, varies by project.
+      For TCGA this is bcrsamplebarcode.
+  type:
+    type: string
+  cases:
+    $ref: "_definitions.yaml#/to_one"
+  subject_id:
+    description: "Lab-based schema for identifying each subject"
+    type:
+      - string
+  sample_id:
+    description: "Lab-based schema for identifying each sample, must be unique"
+    type:
+      - string
+  wasDerivedFromSample:
+    description: "sample_id of the sample from which the current sample was derived (e.g., slice, tissue punch, biopsy, etc.)"
+    type:
+      - string
+  pool_id:
+    description: "If data is collected on multiple samples at the same time include the identifier of the pool where the data file will be found."
+    type:
+      - string
+  sample_experimental_group:
+    description: "Experimental group subject is assigned to in research project. If you have experimental groups for samples please add another column."
+    type:
+      - string
+  sample_type:
+    description: "Physical type of the specimen from which the data were extracted"
+    type:
+      - string
+  sample_anatomical_location:
+    description: "The organ, or subregion of organ from which the data were extracted"
+    type:
+      - string
+  also_in_dataset:
+    description: ""
+    type:
+      - string
+  member_of:
+    description: ""
+    type:
+      - string
+  laboratory_internal_id:
+    description: ""
+    type:
+      - string
+  date_of_derivation:
+    description: ""
+    type:
+      - string
+  experimental_log_file_path:
+    description: ""
+    type:
+      - string
+  reference_atlas:
+    description: "The reference atlas and organ"
+    type:
+      - string
+  pathology:
+    description: ""
+    type:
+      - string
+  laterality:
+    description: ""
+    type:
+      - string
+  cell_type:
+    description: ""
+    type:
+      - string
+  plane_of_section:
+    description: ""
+    type:
+      - string
+  protocol_title:
+    description: "Once the research protocol is uploaded to Protocols.io, the title of the protocol within Protocols.io must be noted in this field."
+    type:
+      - string
+  protocol_url_or_doi:
+    description: ""
+    type:
+      - string

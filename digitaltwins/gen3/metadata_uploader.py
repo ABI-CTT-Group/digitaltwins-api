@@ -4,6 +4,9 @@ import time
 from gen3.auth import Gen3Auth, Gen3AuthError
 from gen3.submission import Gen3Submission
 
+import urllib3
+urllib3.disable_warnings()
+
 
 class MetadataUploader(object):
     """

@@ -1,0 +1,109 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "manifest"
+title: Manifest
+type: object
+namespace: http://gdc.nci.nih.gov
+category: administrative
+program: '*'
+project: '*'
+description: >
+  Represents the manifest metadata in SPARC dataset structure version 2.0.0. Containing the file locations in relative path format.
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - state
+  - created_datetime
+  - updated_datetime
+
+links:
+  - name: experiments
+    backref: manifests
+    label: member_of
+    target_type: experiment
+    multiplicity: many_to_one
+    required: true
+
+required:
+  - submitter_id
+  - type
+  - filename
+  - timestamp
+  - description
+  - file_type
+
+uniqueKeys:
+  - [id]
+  - [project_id, submitter_id]
+
+properties:
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+  project_id:
+    type: string
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  state:
+    $ref: "_definitions.yaml#/state"
+  submitter_id:
+    type:
+      - string
+      - "null"
+    description: >
+      The legacy barcode used before prior to the use UUIDs, varies by project.
+      For TCGA this is bcrsamplebarcode.
+  type:
+    type: string
+  experiments:
+    $ref: "_definitions.yaml#/to_one"
+  filename:
+    description: "Relative path to file location (from project root)"
+    type:
+      - string
+  timestamp:
+    description: ""
+    type:
+      - string
+  description:
+    description: ""
+    type:
+      - string
+  file_type:
+    description: ""
+    type:
+      - string
+  additional_types:
+    description: ""
+    type:
+      - string
+  is_described_by:
+    description: ""
+    type:
+      - string
+      - array
+  is_derived_from:
+    description: ""
+    type:
+      - string
+      - array
+  is_source_of:
+    description: ""
+    type:
+      - string
+      - array
+  supplemental_json_metadata:
+    description: ""
+    type:
+      - string
+  additional_metadata:
+    description: ""
+    type:
+      - string
+      - array

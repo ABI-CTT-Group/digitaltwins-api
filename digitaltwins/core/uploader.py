@@ -11,6 +11,9 @@ from digitaltwins import MetadataConvertor
 from digitaltwins import MetadataUploader
 from digitaltwins.irods.irods import IRODS
 
+import urllib3
+urllib3.disable_warnings()
+
 
 class Uploader(object):
     def __init__(self, config_file):
@@ -113,10 +116,15 @@ class Uploader(object):
             time.sleep(2)
             self._generate_dataset_id(count=count + 1)
 
+        dataset_ids = list()
+        for dataset in datasets:
+            id = dataset.get_id()
+            dataset_ids.append(id)
+
         if len(datasets) > 0:
-            datasets.sort()
-            latest_dataset = datasets[-1]
-            elements = re.split('_|-', latest_dataset.get_id())
+            dataset_ids.sort()
+            latest_dataset = dataset_ids[-1]
+            elements = re.split('_|-', latest_dataset)
             latest_id = elements[self._dataset_id_index]
             new_id = int(latest_id) + 1
             new_dataset_id = self._dataset_submitter_id_template.format(program=self._program, project=self._project, id=new_id)

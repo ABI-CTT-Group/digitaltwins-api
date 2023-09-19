@@ -8,6 +8,9 @@ from gen3.submission import Gen3Submission
 from digitaltwins import Querier
 from digitaltwins.irods.irods import IRODS
 
+import urllib3
+urllib3.disable_warnings()
+
 
 class Deleter(object):
     def __init__(self, config_file):
