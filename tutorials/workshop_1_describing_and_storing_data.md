@@ -45,10 +45,10 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     <td> Getting started with the 12 LABOURS DigitalTWINS platform.</td>
   </tr>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_finding_and_downloading_platform_datasets.ipynb">
     2
     </a></td>
-    <td> Exploring and downloading datasets from the DigitalTWINS platform using the digitaltwins-api.</td>
+    <td> Finding and downloading datasets from the DigitalTWINS platform using the digitaltwins-api.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_loading_and_exploring_sds_datasets.ipynb">
