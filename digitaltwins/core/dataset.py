@@ -40,6 +40,9 @@ class Dataset(object):
                 }}
             }}
             """
+            response = self._querier.graphql_query(query_string=query_string)
+
+            metadata = response.get("experiment")[0].get(metadata)
         else:
             query_string = f"""
             {{
@@ -51,7 +54,8 @@ class Dataset(object):
             }}
             """
 
-        metadata = self._querier.graphql_query(query_string=query_string).get("experiment")[0].get(metadata)
+            response = self._querier.graphql_query(query_string=query_string)
+            metadata = response.get("experiment")[0].get(metadata)
 
         return metadata
 
