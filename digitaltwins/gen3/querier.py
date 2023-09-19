@@ -86,7 +86,7 @@ class Querier(object):
             raise ConnectionError("HTTP connection error: Please make sure you have access to the remote server. then "
                                   "try again!")
 
-    def get_programs_all(self):
+    def get_all_programs(self):
         """
         Getting all programs that the user have access to
 
