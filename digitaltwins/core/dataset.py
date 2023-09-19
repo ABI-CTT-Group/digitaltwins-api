@@ -27,15 +27,30 @@ class Dataset(object):
         elif metadata == "subjects":
             metadata = "cases"
 
-        query_string = f"""
-        {{
-            experiment (submitter_id: "{self._id}") {{
-                {metadata}{{
-                    {' '.join(fields)}
+        if metadata in ["samples", "sample"]:
+            # sample is under the subject/case node
+            query_string = f"""
+            {{
+                experiment (submitter_id: "{self._id}") {{
+                    cases{{
+                        samples{{
+                            {' '.join(fields)}
+                        }}
+                    }}
                 }}
             }}
-        }}
-        """
+            """
+        else:
+            query_string = f"""
+            {{
+                experiment (submitter_id: "{self._id}") {{
+                    {metadata}{{
+                        {' '.join(fields)}
+                    }}
+                }}
+            }}
+            """
+
         metadata = self._querier.graphql_query(query_string=query_string).get("experiment")[0].get(metadata)
 
         return metadata
