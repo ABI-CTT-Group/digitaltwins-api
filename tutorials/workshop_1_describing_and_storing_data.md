@@ -3,7 +3,7 @@
 ## Introduction
 This 2 hour workshop aims to allow researchers in the 12 LABOURS project to become familiar with the 12 LABOURS DigitalTWINS platform. This includes understanding how to connect to the platform, store their data within a standardised dataset structure, and upload/download it to/from the platform.
 
-This workshop has been organised by the CTT group and the 12L portal development team, and the demonstrators are Chinchien Lin, Linkun Gao, Jiali Xu, Thiranja Prasad Babarenda Gamage.
+This workshop has been organised by the CTT group and the 12L portal development team, and the demonstrators are Chinchien Lin, Linkun Gao, Jiali Xu, and Thiranja Prasad Babarenda Gamage.
 
 ## Learning outcomes
 How to connect to the 12 LABOURS DigitalTWINS platform via the web portal and programmatically via its python API. 
@@ -28,7 +28,7 @@ We will be using the computers on Level 5 at ABI. These machines do not have pyt
 
 ## Next steps
 
-Guided Jupyter Notebook tutorials have been developed describing how to use the DigitalTWINS platform. This workskhop involves running through these tutorials.
+Guided Jupyter Notebook tutorials have been developed describing how to use the DigitalTWINS platform. This workshop involves running through these tutorials.
 
 <table>
 <thead>
@@ -39,7 +39,7 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
 </thead>
 <tbody>
   <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_1_getting_started.ipynb">
+    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_1_getting_started.md">
     1
     </a></td>
     <td> Getting started with the DigitalTWINS platform (including getting access to the API).</td>
