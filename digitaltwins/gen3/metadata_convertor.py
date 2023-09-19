@@ -29,16 +29,22 @@ class MetadataConvertor(object):
         self._program = program
         self._project = project
         self._experiment = experiment
+
+        self._current_dir = Path(__file__).parent.resolve()
+
+        self._resources_dir = self._current_dir.joinpath("../resources")
+
         if schema_dir:
             self._schema_dir = schema_dir
         else:
             version_dirname = "version_" + version.replace('.', '_')
-            # self._schema_dir = Path.cwd().joinpath("resources", version_dirname, "sds_dictionary")
-            self._schema_dir = Path(__file__).parent.resolve().joinpath("resources", version_dirname, "sds_dictionary")
+            self._schema_dir = self._resources_dir.joinpath(version_dirname, "sds_dictionary")
+            # self._schema_dir = Path(__file__).parent.resolve().joinpath("resources", version_dirname, "sds_dictionary")
 
         self._supported_versions = ["1.2.3", "2.0.0"]
-        self._current_dir = Path(__file__).parent.resolve()
-        self._resources_dir = self._current_dir / "resources"
+        # self._current_dir = Path(__file__).parent.resolve()
+
+        # self._resources_dir = self._current_dir.joinpath("../resources")
         self._special_chars = ['/', '_']
 
         self._categories = ["experiment", "dataset_description", "subjects", "manifest"]

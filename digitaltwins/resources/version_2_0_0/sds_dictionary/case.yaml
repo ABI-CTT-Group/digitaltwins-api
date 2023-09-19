@@ -1,0 +1,181 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "case"
+title: Case (Subject)
+type: object
+namespace: http://gdc.nci.nih.gov
+category: administrative
+program: '*'
+project: '*'
+description: >
+  The collection of all data related to a specific subject in the
+  context of a specific experiment. Schema based on the SPARC subject metadata template (v2.0.0)
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - created_datetime
+  - updated_datetime
+  - state
+
+links:
+  - name: experiments 
+    backref: cases
+    label: member_of
+    target_type: experiment
+    multiplicity: many_to_one
+    required: true
+
+required:
+  - submitter_id
+  - type
+  - experiments
+  - subject_id
+  - pool_id
+  - subject_experimental_group
+  - age
+  - sex
+  - species
+  - strain
+  - rrid_for_strain
+  - age_category
+  - also_in_dataset
+  - member_of
+
+uniqueKeys:
+  - [id]
+  - [project_id, submitter_id]
+
+# Case properties
+properties:
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  state:
+    $ref: "_definitions.yaml#/state"
+  submitter_id:
+    type:
+      - string
+      - "null"
+  type:
+    type: string
+  experiments:
+    $ref: "_definitions.yaml#/to_one"
+  subject_id:
+    description: "Lab-based schema for identifying each subject, should match folder names"
+    type:
+      - string
+  pool_id:
+    description: "If data is collected on multiple subjects at the same time include the identifier of the pool where the data file will be found. If this is included it should be the name of the top level folder inside primary."
+    type:
+      - string
+  subject_experimental_group:
+    description: "Experimental group subject is assigned to in research project"
+    type:
+      - string
+  age:
+    description: "Age of the subject (e.g., hours, days, weeks, years old) or if unknown fill in with “unknown”"
+    type:
+      - string
+  sex:
+    description: "Sex of the subject, or if unknown fill in with “Unknown”"
+    type:
+      - string
+  species:
+    description: "Subject species"
+    type:
+      - string
+  strain:
+    description: "Organism strain of the subject"
+    type:
+      - string
+  rrid_for_strain:
+    description: "Research Resource Identifier Identification (RRID) for the strain For this field"
+    type:
+      - string
+  age_category:
+    description: "description of age category from derived from UBERON life cycle stage"
+    type:
+      - string
+  also_in_dataset:
+    description: ""
+    type:
+      - string
+  member_of:
+    description: ""
+    type:
+      - string
+  laboratory_internal_id:
+    description: ""
+    type:
+      - string
+  date_of_birth:
+    description: ""
+    type:
+      - string
+  age_range_min:
+    description: "The minimal age (youngest) of the research subjects. The format for this field: numerical value + space + unit (spelled out)"
+    type:
+      - string
+  age_range_max:
+    description: "The maximal age (oldest) of the research subjects. The format for this field: numerical value + space + unit (spelled out)"
+    type:
+      - string
+  body_mass:
+    description: ""
+    type:
+      - string
+  genotype:
+    description: "Ignore if RRID is filled in, Genetic makeup of genetically modified alleles in transgenic animals belonging to the same subject group"
+    type:
+      - string
+  phenotype:
+    description: ""
+    type:
+      - string
+  handedness:
+    description: "Preference of the subject to use the right or left hand, if applicable"
+    type:
+      - string
+  reference_atlas:
+    description: "The reference atlas and organ"
+    type:
+      - string
+  experimental_log_file_path:
+    description: "A file containing experimental records for each sample."
+    type:
+      - string
+  experiment_date:
+    description: ""
+    type:
+      - string
+  disease_or_disorder:
+    description: ""
+    enum:
+      - disease
+      - disorder
+  intervention:
+    description: ""
+    type:
+      - string
+  disease_model:
+    description: ""
+    type:
+      - string
+  protocol_title:
+    description: "Once the research protocol is uploaded to Protocols.io, the title of the protocol within Protocols.io must be noted in this field."
+    type:
+      - string
+  protocol_url_or_doi:
+    description: ""
+    type:
+      - string
