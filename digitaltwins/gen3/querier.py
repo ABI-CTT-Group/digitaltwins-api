@@ -6,7 +6,7 @@ from pathlib import Path
 from gen3.submission import Gen3Submission
 from gen3.auth import Gen3Auth, Gen3AuthError
 
-from requests.exceptions import ConnectionError
+from requests.exceptions import ConnectionError, HTTPError
 
 import urllib3
 urllib3.disable_warnings()
@@ -88,6 +88,10 @@ class Querier(object):
             count = count + 1
             print("Connection failed.")
             return self.graphql_query(query_string, variables=variables, count=count)
+        except HTTPError as e:
+            print("Connection failed.")
+            raise HTTPError("HTTP connection error: Please make sure you have access to the remote server. then "
+                                  "try again!")
         except ConnectionError as e:
             print("Connection failed.")
             raise ConnectionError("HTTP connection error: Please make sure you have access to the remote server. then "
