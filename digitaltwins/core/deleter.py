@@ -8,6 +8,8 @@ from gen3.submission import Gen3Submission
 from digitaltwins import Querier
 from digitaltwins.irods.irods import IRODS
 
+from requests.exceptions import HTTPError
+
 import urllib3
 urllib3.disable_warnings()
 
