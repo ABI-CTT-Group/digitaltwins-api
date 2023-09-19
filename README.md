@@ -118,56 +118,10 @@ git clone https://github.com/ABI-CTT-Group/digitaltwins-api.git
 ```
 pip install -r requirements.txt
 ```
-    
+
 ## Using the DigitalTWINS Platform API
 
-### Running tutorials
-
-Guided Jupyter Notebook tutorials have been developed describing how to use the DigitalTWINS Platform API in different scenarios:
-
-<table>
-<thead>
-  <tr>
-    <th> Tutorial</th>
-    <th> Description</th>
-  </tr>
-</thead>
-<tbody>
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_1_getting_started.ipynb">
-    1
-    </a></td>
-    <td> Getting started with the 12 LABOURS DigitalTWINS platform.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb">
-    2
-    </a></td>
-    <td> Exploring and downloading datasets from the DigitalTWINS platform.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_loading_and_exploring_sds_datasets.ipynb">
-    3
-    </a></td>
-    <td> Loading and exploring SDS datasets.</td>
-  </tr>
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_creating_sds_datasets.ipynb">
-    4
-    </a></td>
-    <td> Creating SDS datasets.</td>
-  </tr> 
-  <tr>
-    <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_5_uploading_datasets.ipynb">
-    5
-    </a></td>
-    <td> Uploading datasets to the DigitalTWINS platform.</td>
-  </tr>
-</tbody>
-</table>
-<p align="center">
-</p>
-<br/>
+Please see the [documentation for workshop 1](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/workshop_1_describing_and_storing_data.md), which describes how to use the platform.
 
 ## Reporting issues 
 To report an issue or suggest a new feature, please use the [issues page](https://github.com/ABI-CTT-Group/digitaltwins-api/issues). Issue templates are provided to allow users to report bugs, and documentation or feature requests. Please check existing issues before submitting a new one.
