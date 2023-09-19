@@ -74,6 +74,7 @@ This code repository provides a Python API tool to enable users to connect to an
 - Operating system. Tested on:
   - Ubuntu 20.04
   - Windows 10
+  - Mac 13.3, 13.5
 
 ### User installation
 The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to be used with the `sparc-me` python tool.
@@ -93,7 +94,7 @@ The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to
    python3 -m venv venv
    venv\Scripts\activate
    ```
-2. **Installing [digitaltwins and sparc-me from PyPI](https://pypi.org/project/digitaltwins/)**
+2. **Installing digitaltwins and sparc-me from PyPI**
    ```
    pip install digitaltwins
    pip install sparc-me
@@ -111,7 +112,7 @@ The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to
    
 2. **Setting up a virtual environment (optional but recommended)**
    
-   See step 1 in the user installation instructions.
+   See step 1 in the user installation instructions. 
    
 3. **Installing dependencies via pip**
    
