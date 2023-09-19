@@ -11,8 +11,8 @@ How to create datasets in the SPARC Dataset Structure (SDS) programmatically usi
 How to upload and download your data to the 12 LABOURS DigitalTWINS platform via its python API
 
 ## Workshop programme
-15 mins - Brief overview of the workshop and tutorials
-1 hour 45 mins - Attendees will run through tutorials themselves and then adapt code in tutorials to the data they use in their EP projects.
+- 15 mins - Brief overview of the workshop and tutorials
+- 1 hour 45 mins - Attendees will run through tutorials themselves and then adapt code in tutorials to the data they use in their EP projects.
 
 ## Prerequisites
 - Familiarity with python >=3.9
