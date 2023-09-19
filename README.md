@@ -76,7 +76,7 @@ This code repository provides a Python API tool to enable users to connect to an
   - Windows 10
 
 ### User installation
-The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to be used with the sparc-me python tool.
+The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to be used with the `sparc-me` python tool.
 
 1. **Setting up a virtual environment (optional but recommended)**
    
