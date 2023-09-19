@@ -26,7 +26,7 @@ We will connect to the DigitalTWINS platform programmatically using its Python A
 
 ### 1. **Setting up a virtual environment (optional but recommended)**
 
-It is recommended to use a virtual environment instead of your system environment. Your integrated development environment (IDE) software e.g. (PyCharm, VisualStudio Code etc) provides the ability to create a Python virtual environment for new projects. The code below shows how to create a new Python virtual environment directly from the Linux or Mac terminal or from the Windows PowerShell (will be stored in a new folder named **venv** in the current working directory), and how to activate the virtual environment.
+It is recommended to use a virtual environment instead of your system environment. Your integrated development environment (IDE) software e.g. (PyCharm, VisualStudio Code etc) provides the ability to create a Python virtual environment for new projects. The code below shows how to create a new Python virtual environment directly from the Linux or Mac terminal or from the Windows PowerShell, and how to activate the virtual environment. The newly created virtual environment will be stored in a new folder named **venv** in the current working directory.
 
 Linux and MacOS
 ```
@@ -95,4 +95,4 @@ API documentation lists all the classes and methods available. This can be a use
 Once you have completed this tutorial, please complete [this survey](https://docs.google.com/forms/d/e/1FAIpQLSe-EsVz6ahz2FXFy906AZh68i50jRYnt3hQe-loc-1DaFWoFQ/viewform?usp=sf_link), which will allow us to improve this and future tutorials.
 
 ## Next steps
-The [next tutorial](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb) will show how to explore and download datasets from the 12 LABOURS DigitalTWINS platform.
+The [next tutorial](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_finding_and_downloading_platform_datasets.ipynb) will show how to find and download datasets from the 12 LABOURS DigitalTWINS platform.
