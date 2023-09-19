@@ -20,18 +20,24 @@ class Querier(object):
         :param auth: Gen3 authentication object created by the Auth class
         :type auth: object
         """
+        config_file = Path(config_file)
         self._config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
-        self._endpoint = self._configs["gen3"].get("endpoint")
+        self._config_dir = self._config_file.parent
         self._cred_file = Path(self._configs["gen3"].get("cred_file"))
+        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._cred_file:
+            self._cred_file = self._config_dir.joinpath(self._cred_file)
+        if self._ssl_cert:
+            self._ssl_cert = self._config_dir.joinpath(self._ssl_cert)
+            os.environ["REQUESTS_CA_BUNDLE"] = str(self._ssl_cert.resolve())
+
+
+        self._endpoint = self._configs["gen3"].get("endpoint")
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
-
-        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
-        if self._ssl_cert:
-            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
 
         self._auth = Gen3Auth(self._endpoint, str(self._cred_file))
 
@@ -80,7 +86,7 @@ class Querier(object):
             raise ConnectionError("HTTP connection error: Please make sure you have access to the remote server. then "
                                   "try again!")
 
-    def get_programs_all(self):
+    def get_all_programs(self):
         """
         Getting all programs that the user have access to
 
