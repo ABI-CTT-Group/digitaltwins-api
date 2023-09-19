@@ -11,8 +11,8 @@ How to create datasets in the SPARC Dataset Structure (SDS) programmatically usi
 How to upload and download your data to the 12 LABOURS DigitalTWINS platform via its python API
 
 ## Workshop programme
-15 mins - Brief overview of the workshop and tutorials
-1 hour 45 mins - Attendees will run through tutorials themselves and then adapt code in tutorials to the data they use in their EP projects.
+- 15 mins - Brief overview of the workshop and tutorials
+- 1 hour 45 mins - Attendees will run through tutorials themselves and then adapt code in tutorials to the data they use in their EP projects.
 
 ## Prerequisites
 - Familiarity with python >=3.9
@@ -42,31 +42,31 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_1_getting_started.md">
     1
     </a></td>
-    <td> Getting started with the DigitalTWINS platform (including getting access to the API).</td>
+    <td> Getting started with the 12 LABOURS DigitalTWINS platform.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb">
     2
     </a></td>
-    <td> Creating and describing datasets in a standardised format (SPARC Dataset Structure).</td>
+    <td> Exploring and downloading datasets from the DigitalTWINS platform.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_loading_and_exploring_sds_datasets.ipynb">
     3
     </a></td>
-    <td> Submitting datasets to the platform.</td>
+    <td> Loading and exploring SDS datasets locally using sparc-me.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_4_creating_sds_datasets.ipynb">
     4
     </a></td>
-    <td> Deleting existing datasets in the platform.</td>
+    <td> Creating SDS datasets locally using sparc-me.</td>
   </tr> 
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_5_uploading_datasets.ipynb">
     5
     </a></td>
-    <td> Accessing metadata for existing datasets in the platform.</td>
+    <td> Uploading datasets to the DigitalTWINS platform.</td>
   </tr>
   
 </tbody>
