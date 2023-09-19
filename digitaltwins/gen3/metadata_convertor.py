@@ -84,6 +84,8 @@ class MetadataConvertor(object):
         """
         if category == "subjects":
             type = "case"
+        elif category == "samples":
+            type = "sample"
         else:
             type = category
 
@@ -96,11 +98,19 @@ class MetadataConvertor(object):
                 }],
             }
         else:
-            data = {
-                "type": type,
-                "experiments": [{"submitter_id": self._experiment}],
-                "submitter_id": self._experiment + '-' + category
-            }
+            if category == "samples":
+                data = {
+                    "type": type,
+                    "case": [{"submitter_id": self._experiment}],
+                    "submitter_id": self._experiment + '-' + category
+                }
+            else:
+                data = {
+                    "type": type,
+                    "experiments": [{"submitter_id": self._experiment}],
+                    "submitter_id": self._experiment + '-' + category
+                }
+
         return data
 
     def execute(self, source_dir, dest_dir):
