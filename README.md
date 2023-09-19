@@ -94,7 +94,7 @@ The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to
    python3 -m venv venv
    venv\Scripts\activate
    ```
-2. **Installing [digitaltwins and sparc-me from PyPI](https://pypi.org/project/digitaltwins/)**
+2. **Installing digitaltwins and sparc-me from PyPI**
    ```
    pip install digitaltwins
    pip install sparc-me
