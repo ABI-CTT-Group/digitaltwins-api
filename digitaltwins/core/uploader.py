@@ -49,8 +49,7 @@ class Uploader(object):
         self._verify_dataset(dataset_dir)
 
         # get dataset (submitter) id
-        # dataset_id = self._generate_dataset_id()
-        dataset_id = "addasifniasnf"
+        dataset_id = self._generate_dataset_id()
 
         os.makedirs(self._dir_tmp, exist_ok=True)
 
