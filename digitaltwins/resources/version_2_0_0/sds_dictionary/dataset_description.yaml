@@ -1,0 +1,270 @@
+$schema: "http://json-schema.org/draft-04/schema#"
+
+id: "dataset_description"
+title: Dataset Description
+type: object
+namespace: http://bloodprofilingatlas.org/bpa/
+category: administrative
+program: '*'
+project: '*'
+description: >
+  Dataset description based on the SPARC dataset_description metadata template (v2.0.0)
+additionalProperties: false
+submittable: true
+validators: null
+
+systemProperties:
+  - id
+  - project_id
+  - created_datetime
+  - updated_datetime
+  - state
+
+links:
+  - name: experiments
+    backref: dataset_descriptions
+    label: member_of
+    target_type: experiment
+    multiplicity: one_to_one
+    required: true
+
+required:
+  - type
+  - submitter_id
+  - experiments
+  - metadata_version
+  - dataset_type
+  - title
+  - subtitle
+  - keywords
+  - study_purpose
+  - study_data_collection
+  - study_primary_conclusion
+  - study_organ_system
+  - study_approach
+  - study_technique
+  - contributor_name
+  - contributor_orcid
+  - contributor_affiliation
+  - contributor_role
+  - identifier_description
+  - relation_type
+  - identifier
+  - identifier_type
+  - number_of_subjects
+  - number_of_samples
+
+uniqueKeys:
+  - [ id ]
+  - [ project_id, submitter_id ]
+
+properties:
+  id:
+    $ref: "_definitions.yaml#/UUID"
+    systemAlias: node_id
+  project_id:
+    $ref: "_definitions.yaml#/project_id"
+  created_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  updated_datetime:
+    $ref: "_definitions.yaml#/datetime"
+  state:
+    $ref: "_definitions.yaml#/state"
+  submitter_id:
+    type:
+      - string
+      - "null"
+  type:
+    type: string
+  experiments:
+    $ref: "_definitions.yaml#/to_one"
+  metadata_version:
+    description: "SPARC metadata version"
+    type: array
+    items:
+      type: string
+  dataset_type:
+    description: "The type of this dataset, specifically whether it is experimental or computation. The only valid values are experimental or computational. If experimental subjects are required, if computational, subjects are not required. Set to experimental by default, if you are submitting a computational study be sure to change it."
+    type: array
+    items:
+      type: string
+  title:
+    description: "Descriptive title for the data set. Equivalent to the title of a scientific paper. The metadata associated with the published version of this dataset does not currently make use of this field."
+    type: array
+    items:
+      type: string
+  subtitle:
+    description: "NOTE This field is not currently used when publishing a SPARC dataset. Brief description of the study and the data set. Equivalent to the abstract of a scientific paper. Include the rationale for the approach, the types of data collected, the techniques used, formats and number of files and an approximate size. The metadata associated with the published version of this dataset does not currently make use of this field."
+    type: array
+    items:
+      type: string
+  keywords:
+    description: "A set of keywords to assist in search."
+    type: array
+    items:
+      type: string
+  funding:
+    description: "Funding sources"
+    type: array
+    items:
+      type: string
+  acknowledgments:
+    description: "Acknowledgments beyond funding and contributors"
+    type: array
+    items:
+      type: string
+  study_purpose:
+    description: "A description of the study purpose for the structured abstract."
+    type: array
+    items:
+      type: string
+  study_data_collection:
+    description: "A description of the study data collection process for this dataset. Used to generate the structured abstract."
+    type: array
+    items:
+      type: string
+  study_primary_conclusion:
+    description: "A description of the primary conclusion drawn from the study for the structured abstract."
+    type: array
+    items:
+      type: string
+  study_organ_system:
+    description: "The major organ systems related to this study."
+    type: array
+    items:
+      type: string
+  study_approach:
+    description: "The experimental approach or approaches taken in this study."
+    type: array
+    items:
+      type: string
+  study_technique:
+    description: "The experimental techniques used in this study."
+    type: array
+    items:
+      type: string
+  study_collection_title:
+    description: "Title of the larger collection of to which this dataset belongs."
+    type: array
+    items:
+      type: string
+  contributor_name:
+    description: "Name of any contributors to the dataset.  These individuals need not have been authors on any publications describing the data, but should be acknowledged for their role in producing and publishing the data set.  If more than one, add each contributor in a new column."
+    type: array
+    items:
+      type: string
+  contributor_orcid:
+    description: "ORCiD ID. If you don't have an ORCiD, we suggest you sign up for one."
+    type: array
+    items:
+      type: string
+  contributor_affiliation:
+    description: "Institutional affiliation for contributors"
+    type: array
+    items:
+      type: string
+  contributor_role:
+    description: "Contributor role. At most one PrincipalInvestigator and at least one CorrespondingAuthor are required. These roles are provided by the Data Cite schema."
+    type: array
+    items:
+      type: string
+    
+#    type:
+#      - string
+#      - array
+#
+#
+#    items:
+#      enum:
+#        - NA
+#        - PrincipalInvestigator
+#        - Creator
+#        - CoInvestigator
+#        - CorrespondingAuthor
+#        - DataCollector
+#        - DataCurator
+#        - DataManager
+#        - Distributor
+#        - Editor
+#        - Producer
+#        - ProjectLeader
+#        - ProjectManager
+#        - ProjectMember
+#        - RelatedPerson
+#        - Researcher
+#        - ResearchGroup
+#        - Sponsor
+#        - Supervisor
+#        - WorkPackageLeader
+#        - Other
+  identifier_description:
+    description: "A description of the referent of the related identifier."
+    type: array
+    items:
+      type: string
+  relation_type:
+    description: "The relationship that this dataset has to the related identifier. For example the originating article would be this dataset IsDescribedBy originating article"
+    type: array
+    items:
+      type: string
+    # enum:
+      # - NA
+      # - IsProtocolFor
+      # - HasProtocol
+      # - IsSoftwareFor
+      # - HasSoftware
+      # - IsCitedBy
+      # - Cites
+      # - IsSupplementTo
+      # - IsSupplementedBy
+      # - IsContinuedByContinues
+      # - IsDescribedBy
+      # - Describes
+      # - HasMetadata
+      # - IsMetadataFor
+      # - HasVersion
+      # - IsVersionOf
+      # - IsNewVersionOf
+      # - IsPreviousVersionOf
+      # - IsPartOf
+      # - HasPart
+      # - IsPublishedIn
+      # - IsReferencedBy
+      # - References
+      # - IsDocumentedBy
+      # - Documents
+      # - IsCompiledBy
+      # - Compiles
+      # - IsVariantFormOf
+      # - IsOriginalFormOf
+      # - IsIdenticalTo
+      # - IsReviewedBy
+      # - Reviews
+      # - IsDerivedFrom
+      # - IsSourceOf
+      # - IsRequiredBy
+      # - Requires
+      # - IsObsoletedBy
+      # - Obsoletes
+  identifier:
+    description: "The identifier for something related to this dataset."
+    type: array
+    items:
+      type: string
+  identifier_type:
+    description: "The type of the identifier."
+    type: array
+    items:
+      type: string
+  number_of_subjects:
+    description: "Number of unique subjects in this dataset, should match subjects metadata file. Only required for experimental datasets."
+    type:
+       - array
+    items:
+      type: integer
+  number_of_samples:
+    description: "Number of unique samples in this dataset, should match samples metadata file. Set to zero if there are no samples. Only required for experimental datasets."
+    type:
+       - array
+    items:
+      type: integer

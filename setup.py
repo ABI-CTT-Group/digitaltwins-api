@@ -6,7 +6,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="digitaltwins",
-    version="0.3.2",
+    version="0.3.8",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
     # long_description=long_description,
@@ -16,13 +16,15 @@ setup(
     license="Apache-2.0",
     packages=find_packages(),
     include_package_data=True,
-    package_data={'': ['resources./*']},
+    package_data={'': ['./resources/**']},
     install_requires=[
-        "gen3>=4.21.0",
+        "gen3~=4.21.0",
         "python-irodsclient>=1.1.8",
         "pandas",
         "xlrd",
         "PyYAML",
-        "openpyxl"
+        "openpyxl",
+        "jsonschema",
+        "dictionaryutils"
     ]
 )

@@ -11,19 +11,27 @@ from digitaltwins import MetadataConvertor
 from digitaltwins import MetadataUploader
 from digitaltwins.irods.irods import IRODS
 
+import urllib3
+urllib3.disable_warnings()
+
 
 class Uploader(object):
     def __init__(self, config_file):
-        self.config_file = config_file
+        config_file = Path(config_file)
+        self._config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
-        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
+        self._config_dir = self._config_file.parent
         self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
-
         self._ssl_cert = self._configs["gen3"].get("ssl_cert")
+        if self._gen3_cred_file:
+            self._gen3_cred_file = self._config_dir.joinpath(self._gen3_cred_file)
         if self._ssl_cert:
-            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
+            self._ssl_cert = self._config_dir.joinpath(self._ssl_cert)
+            os.environ["REQUESTS_CA_BUNDLE"] = str(self._ssl_cert.resolve())
+
+        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
 
         self._program = self._configs["gen3"].get("program")
         self._project = self._configs["gen3"].get("project")
@@ -99,7 +107,7 @@ class Uploader(object):
             raise ValueError("Max attempts {count} exceeded. Please try submitting again. If the error persists, "
                              "please contact the developers".format(count=count))
         # list datasets
-        querier = Querier(self.config_file)
+        querier = Querier(self._config_file)
 
         datasets = list()
         try:
@@ -108,9 +116,14 @@ class Uploader(object):
             time.sleep(2)
             self._generate_dataset_id(count=count + 1)
 
+        dataset_ids = list()
+        for dataset in datasets:
+            id = dataset.get_id()
+            dataset_ids.append(id)
+
         if len(datasets) > 0:
-            datasets.sort()
-            latest_dataset = datasets[-1]
+            dataset_ids.sort()
+            latest_dataset = dataset_ids[-1]
             elements = re.split('_|-', latest_dataset)
             latest_id = elements[self._dataset_id_index]
             new_id = int(latest_id) + 1

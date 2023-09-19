@@ -8,7 +8,7 @@ if __name__ == '__main__':
     querier = Querier(config_file)
 
     # List programs
-    programs = querier.get_programs_all()
+    programs = querier.get_all_programs()
     print("Programs: " + str(programs))
 
     # List projects
