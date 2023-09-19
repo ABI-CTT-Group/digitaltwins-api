@@ -43,8 +43,14 @@ class Deleter(object):
     def delete_metadata(self, dataset_id):
         querier = Querier(self._config_file)
         records = querier.get_dataset_records(dataset_id=dataset_id, program=self._program, project=self._project)
-        self._submission.delete_records(program=self._program, project=self._project, uuids=records)
 
+        try:
+            self._submission.delete_records(program=self._program, project=self._project, uuids=records)
+        except HTTPError as e:
+            print("Connection failed.")
+            raise HTTPError("HTTP connection error: Please make sure you have access to the remote server. then "
+                                  "try again!")
+    #
     def delete_dataset(self, dataset_id):
         irods = IRODS(self._configs)
         irods.delete(dataset_id)
