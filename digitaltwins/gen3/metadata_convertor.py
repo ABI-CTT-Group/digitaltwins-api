@@ -44,8 +44,8 @@ class MetadataConvertor(object):
 
         self._special_chars = ['/', '_']
 
-        self._categories = ["experiment", "dataset_description", "subjects", "manifest"]
-        self._row_based = ["subjects", "manifest"]
+        self._categories = ["experiment", "dataset_description", "subjects", "manifest", "samples"]
+        self._row_based = ["subjects", "manifest", "samples"]
         self._col_based = ["dataset_description"]
 
         self._validate_version(version)
@@ -300,6 +300,8 @@ class MetadataConvertor(object):
         """
         if category == "subjects":
             category = "case"
+        if category == "samples":
+            category = "sample"
         schema_file = category + ".yaml"
         schema_file = self._schema_dir / schema_file
 
