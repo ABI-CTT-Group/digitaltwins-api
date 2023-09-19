@@ -353,17 +353,22 @@ class Querier(object):
                 {{
                   experiment(project_id: "{project_id}", submitter_id: "{dataset_id}"){{
                     id,
+                    submitter_id,
                     cases{{
                       id,
+                      submitter_id,
                       samples{{
                         id,
+                        submitter_id
                       }}
                     }},
                     dataset_descriptions{{
                       id,
+                      submitter_id
                     }},
                     manifests{{
-                      id
+                      id,
+                      submitter_id
                     }}
                   }}
                 }}
@@ -373,27 +378,36 @@ class Querier(object):
         if len(datasets) == 0:
             return None
 
+        # the submitter_ids var is only for testing purpose
+        submitter_ids = list()
+        submitter_id_tag = "submitter_id"
+
         records = list()
         uuid_tag = "id"
         # uuid_tag = "submitter_id"
 
         dataset = datasets[0]
         records.insert(0, dataset.get(uuid_tag))
+        submitter_ids.insert(0, dataset.get(submitter_id_tag))
 
         cases = dataset.get("cases")
         for case in cases:
             records.insert(0, case.get(uuid_tag))
+            submitter_ids.insert(0, case.get(submitter_id_tag))
             samples = case.get("samples")
             for sample in samples:
                 records.insert(0, sample.get(uuid_tag))
+                submitter_ids.insert(0, sample.get(submitter_id_tag))
 
         dataset_descriptions = dataset.get("dataset_descriptions")
         for dataset_desc in dataset_descriptions:
             records.insert(0, dataset_desc.get(uuid_tag))
+            submitter_ids.insert(0, dataset_desc.get(submitter_id_tag))
 
         manifests = dataset.get("manifests")
         for manifest in manifests:
             records.insert(0, manifest.get(uuid_tag))
+            submitter_ids.insert(0, manifest.get(submitter_id_tag))
 
         return records
 
