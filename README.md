@@ -1,5 +1,5 @@
 # 12 LABOURS DigitalTWINS API
-A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translational Workflows for Integrating Systems) Platform
+A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translational Workflows for Integrating Systems) platform
 
 ![Python 3](https://img.shields.io/badge/Python->=3.9-blue)
 [![Contributors][contributors-shield]][contributors-url]
@@ -42,31 +42,30 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 ## Introduction
 The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led **Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling** to link information encoded in the genome to organism-wide physiological function and dysfunction in disease. The **[12 LABOURS project](https://www.auckland.ac.nz/en/abi/our-research/research-groups-themes/12-Labours.html) aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications**.
 
-As part of the 12 LABOURS project, we are **building a DigitalTWINS Platform to provide common infrastructure**:
+As part of the 12 LABOURS project, we are **building a DigitalTWINS platform to provide common infrastructure**:
 * A **data catalogue** that describes what data is available, what it can be used for, and how to request it.
 * A **harmonised data repository** that provides access control to primary and derived data (waveforms, medical images, electronic health records, measurements from remote monitoring devices such as wearables and implantables etc), tools, and workflows that are stored with a standardised dataset description.
-* **Describe computational physiology workfkows in a standardised language** (including workflows for knowledge discovery, clinical translation, or eductation, etc), and **run and monitor their progress**.
+* **Describe computational physiology workflows in a standardised language** (including workflows for knowledge discovery, clinical translation, or education, etc), and **run and monitor their progress**.
 * **Securely access electronic health records from health systems** (WIP).
 * **Securely link data from remote monitoring devices** such as wearables and implantables into computational physiology workflows.
-* A **web-portal** to enable different researchers, including researchers, clinicians, patients, industry, and the public to interact with the platform.
+* A **web portal** to enable different researchers, including researchers, clinicians, patients, industry, and the public, to interact with the platform.
 * **Guidelines for data management**.
 * **Guidelines for clinical translation of computational physiology workflows** and digital twins via commercialisation
-* **Unified ethics application templates** that aim to maxmise data reuseablity and linking to enable our vision for creating integrated and personalised digital twins.
+* **Unified ethics application templates** that aim to maximise data reusability and linking to enable our vision for creating integrated and personalised digital twins.
 
-Please see the [User Documentation for the DigitalTWINS Platform](https://docs.google.com/document/d/10dQ0Cyq0NQ1JlxPYCVtGCIY2umZrYzhAltsyRd9QhgY/edit) for more information in the current capabilities of the platform.
+Please see the [User Documentation for the DigitalTWINS platform](https://docs.google.com/document/d/10dQ0Cyq0NQ1JlxPYCVtGCIY2umZrYzhAltsyRd9QhgY/edit) for more information in the current capabilities of the platform.
 
 These efforts are aimed at **supporting an ecosystem** to:
-* **Make research outcomes FAIR** (Findable, Accessible, Interoperable, and Reuseable).
+* **Make research outcomes FAIR** (Findable, Accessible, Interoperable, and Reusable).
 * Enable **reproducible science**.
 * **Meet data sovereignty requirements**.
-* **Support clinical translation via commercialisation** by enabling researchers to conduct clinical trials more effcienty to demonstrate the efficacy of their computational physiology workflows. 
-* Provide a **foundation for integrating research developements** across different research groups for assembling more comprehensive computational physiology/digital twin workflows.
+* **Support clinical translation via commercialisation** by enabling researchers to conduct clinical trials more efficiently to demonstrate the efficacy of their computational physiology workflows. 
+* Provide a **foundation for integrating research developments** across different research groups for assembling more comprehensive computational physiology/digital twin workflows.
 
-This code respository provides a python API tool to enable users to programatically connect to and interact with the DigitalTWINS Platform.
+**If you find the DigitalTWINS platform useful, please add a GitHub Star to support developments!**
 
-**If you find the DigitalTWINS Platform useful, please add a GitHub Star to support developments!**
-
-## Setting up the DigitalTWINS Platform API
+## Installing the DigitalTWINS platform API
+This code repository provides a Python API tool to enable users to connect to and interact with the DigitalTWINS platform programmatically.
 
 ### Pre-requisites 
 - [Git](https://git-scm.com/)
@@ -76,8 +75,12 @@ This code respository provides a python API tool to enable users to programatica
   - Ubuntu 20.04
   - Windows 10
 
-### Creating a python environment
-It is recommended to use a virtual environment instead of your system environment. In this step, we will create a virtual environment in a new folder named **venv**, and activate the virtual environment.
+### User installation
+The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to be used with the `sparc-me` python tool.
+
+1. **Setting up a virtual environment (optional but recommended)**
+   
+   It is recommended to use a virtual environment instead of your system environment. Your integrated development environment (IDE) software e.g. (PyCharm, VisualStudio Code etc) provides the ability to create a Python virtual environment for new projects. The code below shows how to create a new Python virtual environment directly from the Linux or Mac terminal or from the Windows PowerShell (will be stored in a new folder named **venv** in the current working directory), and how to activate the virtual environment.
    
    * Linux
    ```
@@ -90,44 +93,41 @@ It is recommended to use a virtual environment instead of your system environmen
    python3 -m venv venv
    venv\Scripts\activate
    ```
-
-### User installation
-Here is the [link](https://pypi.org/project/digitaltwins/) to the project on PyPI.
-```
-pip install digitaltwins
-```
-You also need to install the digitaltwins package, which is a Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for Integrating Systems) Platform.
-```
-pip install sparc-me
-```
+2. **Installing [digitaltwins and sparc-me from PyPI](https://pypi.org/project/digitaltwins/)**
+   ```
+   pip install digitaltwins
+   pip install sparc-me
+   ```
 
 ### Developer installation
 
-#### Downloading source code
-Clone the source code repository from github, e.g.:
+1. **Downloading source code**
+   
+   Clone the source code repository from github, e.g.:
+   
+   ```commandline
+   git clone https://github.com/ABI-CTT-Group/digitaltwins-api.git
+   ```
+   
+2. **Setting up a virtual environment (optional but recommended)**
+   
+   See step 1 in the user installation instructions.
+   
+3. **Installing dependencies via pip**
+   
+   ```
+   pip install -r requirements.txt
+   ```
+   
+## Using the DigitalTWINS platform
 
-```commandline
-git clone https://github.com/ABI-CTT-Group/digitaltwins-api.git
-```
-
-#### Installing dependencies
-
-1. Setting up a virtual environment (optional but recommended). 
-     
-2. Installing dependencies via pip
-```
-pip install -r requirements.txt
-```
-
-## Using the DigitalTWINS Platform API
-
-Please see the [documentation for workshop 1](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/workshop_1_describing_and_storing_data.md), which describes how to use the platform.
+Please see the [documentation for workshop 1](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/workshop_1_describing_and_storing_data.md), which describes how to use the 12 LABOURS DigitalTWINS platform and its API.
 
 ## Reporting issues 
 To report an issue or suggest a new feature, please use the [issues page](https://github.com/ABI-CTT-Group/digitaltwins-api/issues). Issue templates are provided to allow users to report bugs, and documentation or feature requests. Please check existing issues before submitting a new one.
 
 ## Contributing
-Fork this repository and submit a pull request to contribute. Before doing so, please read our [Code of Conduct](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/master/CODE_OF_CONDUCT.md) and [Contributing Guidelines](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/master/CONTRIBUTING.md). Pull request templates are provided to help guide developers in describing their contribution, mentioning the issues related to the pull request and describing their testing environment. 
+Fork this repository and submit a pull request to contribute. Before doing so, please read our [Code of Conduct](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/master/CODE_OF_CONDUCT.md) and [Contributing Guidelines](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/master/CONTRIBUTING.md). Pull request templates are provided to help developers describe their contribution, mention the issues related to the pull request, and describe their testing environment. 
 
 ## License
-The DigitalTWINS Platform API is fully open source and distributed under the very permissive Apache License 2.0. See [LICENSE](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/LICENSE) for more information.
+The DigitalTWINS platform API is fully open source and distributed under the very permissive Apache License 2.0. See [LICENSE](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/LICENSE) for more information.
