@@ -27,16 +27,35 @@ class Dataset(object):
         elif metadata == "subjects":
             metadata = "cases"
 
-        query_string = f"""
-        {{
-            experiment (submitter_id: "{self._id}") {{
-                {metadata}{{
-                    {' '.join(fields)}
+        if metadata in ["samples", "sample"]:
+            # sample is under the subject/case node
+            query_string = f"""
+            {{
+                experiment (submitter_id: "{self._id}") {{
+                    cases{{
+                        samples{{
+                            {' '.join(fields)}
+                        }}
+                    }}
                 }}
             }}
-        }}
-        """
-        metadata = self._querier.graphql_query(query_string=query_string).get("experiment")[0].get(metadata)
+            """
+            response = self._querier.graphql_query(query_string=query_string)
+
+            metadata = response.get("experiment")[0].get(metadata)
+        else:
+            query_string = f"""
+            {{
+                experiment (submitter_id: "{self._id}") {{
+                    {metadata}{{
+                        {' '.join(fields)}
+                    }}
+                }}
+            }}
+            """
+
+            response = self._querier.graphql_query(query_string=query_string)
+            metadata = response.get("experiment")[0].get(metadata)
 
         return metadata
 
@@ -93,7 +112,7 @@ class Dataset(object):
                 "number_of_subjects",
                 "number_of_samples"
             ]
-        elif metadata == "subjects":
+        elif metadata in ["subjects", "subject"]:
             fields = [
                 "subject_id",
                 "pool_id",
@@ -123,6 +142,30 @@ class Dataset(object):
                 "protocol_title",
                 "protocol_url_or_doi"
             ]
+        elif metadata in ["samples", "sample"]:
+            fields = [
+                "sample_id",
+                "subject_id",
+                "wasDerivedFromSample",
+                "pool_id",
+                "sample_experimental_group",
+                "sample_type",
+                "sample_anatomical_location",
+                "also_in_dataset",
+                "member_of",
+                "laboratory_internal_id",
+                "date_of_derivation",
+                "experimental_log_file_path",
+                "reference_atlas",
+                "pathology",
+                "laterality",
+                "cell_type",
+                "plane_of_section",
+                "protocol_title",
+                "protocol_url_or_doi"
+            ]
+        else:
+            raise ValueError(f"Querying for metadata {metadata} is not supported yet".format(metadata=metadata))
 
         return fields
 
