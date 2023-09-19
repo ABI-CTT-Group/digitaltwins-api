@@ -79,14 +79,17 @@ class Querier(object):
             raise ValueError(f"Max attempts {count} exceeded. Please try again. If the error "
                              f"persists, please contact the developers".format(count=count))
         try:
+            print("Sending request...")
             response = self._querier.query(query_string, variables)
             data = response.get("data")
             return data
         except Gen3AuthError as e:
             time.sleep(2)
             count = count + 1
+            print("Connection failed.")
             return self.graphql_query(query_string, variables=variables, count=count)
         except ConnectionError as e:
+            print("Connection failed.")
             raise ConnectionError("HTTP connection error: Please make sure you have access to the remote server. then "
                                   "try again!")
 
