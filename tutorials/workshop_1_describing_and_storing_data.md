@@ -6,9 +6,9 @@ This 2 hour workshop aims to allow researchers in the 12 LABOURS project to beco
 This workshop has been organised by the CTT group and the 12L portal development team, and the demonstrators are Chinchien Lin, Linkun Gao, Jiali Xu, and Thiranja Prasad Babarenda Gamage.
 
 ## Learning outcomes
-How to connect to the 12 LABOURS DigitalTWINS platform via the web portal and programmatically via its python API. 
-How to create datasets in the SPARC Dataset Structure (SDS) programmatically using a python tool (sparc-me)
-How to upload and download your data to the 12 LABOURS DigitalTWINS platform via its python API
+- How to connect to the 12 LABOURS DigitalTWINS platform via the web portal and programmatically via its python API. 
+- How to create datasets in the SPARC Dataset Structure (SDS) programmatically using a python tool (sparc-me)
+- How to upload and download your data to the 12 LABOURS DigitalTWINS platform via its python API
 
 ## Workshop programme
 - 15 mins - Brief overview of the workshop and tutorials
@@ -48,7 +48,7 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb">
     2
     </a></td>
-    <td> Exploring and downloading datasets from the DigitalTWINS platform.</td>
+    <td> Exploring and downloading datasets from the DigitalTWINS platform using the digitaltwins-api.</td>
   </tr>
   <tr>
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_3_loading_and_exploring_sds_datasets.ipynb">
@@ -66,7 +66,7 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
     <td><a href="https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_5_uploading_datasets.ipynb">
     5
     </a></td>
-    <td> Uploading datasets to the DigitalTWINS platform.</td>
+    <td> Uploading datasets to the DigitalTWINS platform using the digitaltwins-api.</td>
   </tr>
   
 </tbody>
@@ -76,4 +76,4 @@ Guided Jupyter Notebook tutorials have been developed describing how to use the 
 <br/>
 
 ## Feedback
-Once you have completed the workshop, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future workshops.
+Once you have completed this workshop, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future workshops.

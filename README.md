@@ -64,11 +64,13 @@ These efforts are aimed at **supporting an ecosystem** to:
 
 **If you find the DigitalTWINS platform useful, please add a GitHub Star to support developments!**
 
+## Storing datasets in the DigitalTWINS platform
+Data within the DigitalTWINS platform is stored in the SPARC Dataset Structure (SDS). More information about SDS datasets can be found on the [SPARC project's documentation](https://docs.sparc.science/docs/overview-of-sparc-dataset-format). The use of SDS datasets in the 12 LABOURS DigitaTWINS platform is described in the following [presentation](https://docs.google.com/file/d/1zZ3-C17lPIgtRp6bnkSwvKacaTA66GVR/edit?usp=docslist_api&filetype=mspresentation).
+
 ## Installing the DigitalTWINS platform API
 This code repository provides a Python API tool to enable users to connect to and interact with the DigitalTWINS platform programmatically.
 
-### Pre-requisites 
-- [Git](https://git-scm.com/)
+### Pre-requisites
 - Python 3.9+. Tested on:
    - 3.9
 - Operating system. Tested on:

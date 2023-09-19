@@ -4,8 +4,8 @@
 This tutorial shows how to get access to and interact with the 12 LABOURS DigitalTWINS Platform and its web portal.
 
 ## Definitions
-API - Application Programming Interface used to access the features or data of an application or service.
-CTT - ABI Clinical Translational Technologies Research Group
+- API - Application Programming Interface used to access the features or data of an application or service.
+- CTT - ABI Clinical Translational Technologies Research Group
 
 ## Learning outcomes
 In this tutorial, you will learn how to:
@@ -15,6 +15,14 @@ In this tutorial, you will learn how to:
 
 ## Installing the platform's API
 We will connect to the DigitalTWINS platform programmatically using its Python API, which is called `digitaltwins`. It is designed to be used with the `sparc-me` Python tool, which is used for managing datasets.
+
+### Pre-requisites 
+- Python 3.9+. Tested on:
+   - 3.9
+- Operating system. Tested on:
+  - Ubuntu 20.04
+  - Windows 10
+  - Mac 13.3, 13.5
 
 ### 1. **Setting up a virtual environment (optional but recommended)**
 
@@ -60,7 +68,15 @@ If successful, a command prompt will appear. Please leave this terminal running 
 
 ### 3. Locating your platform API configuration file
 
-A configuration file is required to programmatically interact with your instance of the platform. The path to this file needs to be specified when connecting to the platform using the `digitaltwins` Python API in Tutorials 2 and 5. The location of your project-specific configuration file can be found in the `README.txt` file located in the root directory of your eResearch storage drive. **Please do not copy, move, or share the configuration file**.
+A configuration file is required to programmatically interact with your instance of the platform. The path to this file needs to be specified when connecting to the platform using the `digitaltwins` Python API in Tutorials 2 and 5. The location of your project-specific configuration file can be found in your eResearch storage drive. **Please do not copy, move, or share the configuration file**.
+
+##### Windows
+`X:\DigitalTWINS\resources\latest\configs\configs.ini`
+- please replace `X:` with the drive letter that you mounted your eResearch drive. 
+
+##### Linux or MacOs
+`/MOUNT_POINT/DigitalTWINS/resources/latest/configs/configs.ini`
+- please replace `/MOUNT_POINT` with the location where you mounted your eResearch drive. 
 
 ### Troubleshooting
 Sometimes you need to connect to VPN even if you are on campus (UoA IT ticket has been submitted and CeR are following up).
@@ -69,6 +85,14 @@ Sometimes you need to connect to VPN even if you are on campus (UoA IT ticket ha
 Once you have connected to the platform, open https://localhost:3000 in a web browser to access the web portal for the 12 LABOURS DigitalTWINS platform. The data catalogue can be found from the `View data browswer` link on the `DATA & MODELS` page.
 
 Please wait a moment for the datasets to load. If the datasets still do not load, then please reload the website.
+
+## Accessing API Documentation
+API documentation lists all the classes and methods available. This can be a useful reference when trying to understand input arguments of the classes and methods when using the `digitaltwins` and `sparc-me` Python tools.
+- sparc-me API documentation TODO Add link
+- digitaltwins API documentation TODO Add link
+
+## Feedback
+Once you have completed this tutorial, please complete [this survey](https://docs.google.com/forms/d/10n2ZLDXxQl6I-f-i0kfJb8DOQrmDehSFeRHGqWiuYzQ/edit), which will allow us to improve this and future tutorials.
 
 ## Next steps
 The [next tutorial](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/tutorial_2_exploring_and_downloading_platform_datasets.ipynb) will show how to explore and download datasets from the 12 LABOURS DigitalTWINS platform.
