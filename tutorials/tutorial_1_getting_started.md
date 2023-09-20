@@ -68,7 +68,9 @@ If successful, a command prompt will appear. Please leave this terminal running 
 
 ### 3. Locating your platform API configuration file
 
-A configuration file is required to programmatically interact with your instance of the platform. The path to this file needs to be specified when connecting to the platform using the `digitaltwins` Python API in Tutorials 2 and 5. The location of your project-specific configuration file can be found in your eResearch storage drive. **Please do not copy, move, or share the configuration file**.
+A configuration file is required to programmatically interact with your instance of the platform. The path to this file needs to be specified when connecting to the platform using the `digitaltwins` Python API in Tutorials 2 and 5. The location of your project-specific configuration file can be found in your eResearch storage drive. **Please do not edit, copy, move, or share the configuration file**.
+
+Please use the paths below in the tutorials when specifying the location of the configuration files (please do not edit the paths in the configuration files).
 
 ##### Windows
 `X:\DigitalTWINS\resources\latest\configs\configs.ini`
@@ -98,7 +100,7 @@ Tutorial 4: `/MOUNT_POINT/DigitalTWINS/resources/latest/example_datasets/example
 - please replace `/MOUNT_POINT` with the location where you mounted your eResearch drive. 
 
 ## Accessing the platform's web portal
-Once you have connected to the platform, open https://localhost:3000 in a web browser to access the web portal for the 12 LABOURS DigitalTWINS platform. The data catalogue can be found from the `View data browswer` link on the `DATA & MODELS` page.
+Once you have connected to the platform, open https://localhost:3000 (or open http://localhost:3000) in a web browser to access the web portal for the 12 LABOURS DigitalTWINS platform. The data catalogue can be found from the `View data browswer` link on the `DATA & MODELS` page.
 
 Please wait a moment for the datasets to load. If the datasets still do not load, then please reload the website.
 
