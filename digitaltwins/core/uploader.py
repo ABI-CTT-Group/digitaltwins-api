@@ -41,7 +41,8 @@ class Uploader(object):
         self._dir_tmp = Path(dirname_tmp)
         self._meta_dir_tmp = self._dir_tmp.joinpath(Path("gen3_tmp"))
 
-        self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json", "samples.json"]
+        self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json"]
+        # self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json", "samples.json"]
 
         self._dataset_submitter_id_template = "{program}-{project}-dataset-{id}-version-1"
         self._dataset_id_index = 3

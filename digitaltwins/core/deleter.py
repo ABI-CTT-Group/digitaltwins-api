@@ -2,7 +2,7 @@ import configparser
 import os
 from pathlib import Path
 
-from gen3.auth import Gen3Auth
+from gen3.auth import Gen3Auth, Gen3AuthError
 from gen3.submission import Gen3Submission
 
 from digitaltwins import Querier
@@ -47,11 +47,15 @@ class Deleter(object):
         records = querier.get_dataset_records(dataset_id=dataset_id, program=self._program, project=self._project)
 
         try:
-            self._submission.delete_records(program=self._program, project=self._project, uuids=records)
+            self._submission.delete_records(program=self._program, project=self._project, uuids=records, batch_size=1000)
+            # for record in records:
+            #     self._submission.delete_record(program=self._program, project=self._project, uuid=record)
         except HTTPError as e:
             print("Connection failed.")
             raise HTTPError("HTTP connection error: Please make sure you have access to the remote server. then "
                                   "try again!")
+        except Gen3AuthError as e:
+            raise ValueError("Connection failed. Please try again. If the error persists, please contact the developers")
     #
     def delete_dataset(self, dataset_id):
         irods = IRODS(self._configs)
