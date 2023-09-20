@@ -46,7 +46,7 @@ pip install sparc-me
 ```
 
 ## Accessing your local eResearch storage drive
-For security reasons, the CTT team have placed project specific documentation for connecting to your instance of the 12 LABOURS DigitalTWINS platform on your project-specific eResearch drive. Please see the [Workshop FAQ Section of the 12 LABOURS DigitalTWINS platform user documentation] to find the instructions for mounting your eResearch drive.
+For security reasons, the CTT team have placed project specific documentation for connecting to your instance of the 12 LABOURS DigitalTWINS platform on your project-specific eResearch drive. Please see the [Workshop FAQ Section of the 12 LABOURS DigitalTWINS platform user documentation](https://docs.google.com/document/d/10dQ0Cyq0NQ1JlxPYCVtGCIY2umZrYzhAltsyRd9QhgY/edit?pli=1#heading=h.1rd514tjkqxp) to find the instructions for mounting your eResearch drive.
 
 ## Connecting to the platform
 
