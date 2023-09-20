@@ -44,8 +44,10 @@ class MetadataConvertor(object):
 
         self._special_chars = ['/', '_']
 
-        self._categories = ["experiment", "dataset_description", "subjects", "manifest", "samples"]
-        self._row_based = ["subjects", "manifest", "samples"]
+        self._categories = ["experiment", "dataset_description", "subjects", "manifest"]
+        # self._categories = ["experiment", "dataset_description", "subjects", "manifest", "samples"]
+        self._row_based = ["subjects", "manifest"]
+        # self._row_based = ["subjects", "manifest", "samples"]
         self._col_based = ["dataset_description"]
 
         self._validate_version(version)
@@ -84,6 +86,8 @@ class MetadataConvertor(object):
         """
         if category == "subjects":
             type = "case"
+        elif category == "samples":
+            type = "sample"
         else:
             type = category
 
@@ -96,11 +100,19 @@ class MetadataConvertor(object):
                 }],
             }
         else:
-            data = {
-                "type": type,
-                "experiments": [{"submitter_id": self._experiment}],
-                "submitter_id": self._experiment + '-' + category
-            }
+            if category == "samples":
+                data = {
+                    "type": type,
+                    "cases": [{"submitter_id": self._experiment}],
+                    "submitter_id": self._experiment + '-' + category
+                }
+            else:
+                data = {
+                    "type": type,
+                    "experiments": [{"submitter_id": self._experiment}],
+                    "submitter_id": self._experiment + '-' + category
+                }
+
         return data
 
     def execute(self, source_dir, dest_dir):
