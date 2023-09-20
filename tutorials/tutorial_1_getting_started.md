@@ -81,15 +81,26 @@ A configuration file is required to programmatically interact with your instance
 ### Troubleshooting
 Sometimes you need to connect to VPN even if you are on campus (UoA IT ticket has been submitted and CeR are following up).
 
+## Locating example datasets used in the tutorials
+
+Example datasets are provided that can be used for the tutorials. These are located in your eResearch storage drive.
+
+##### Windows
+Tutorial 3: `X:\DigitalTWINS\resources\latest\example_datasets\example_sds_dataset`
+
+Tutorial 4: `X:\DigitalTWINS\resources\latest\example_datasets\example_raw_dataset`
+- please replace `X:` with the drive letter that you mounted your eResearch drive. 
+
+##### Linux or MacOs
+Tutorial 3: `/MOUNT_POINT/DigitalTWINS/resources/latest/example_datasets/sds_raw_dataset`
+
+Tutorial 4: `/MOUNT_POINT/DigitalTWINS/resources/latest/example_datasets/example_raw_dataset`
+- please replace `/MOUNT_POINT` with the location where you mounted your eResearch drive. 
+
 ## Accessing the platform's web portal
 Once you have connected to the platform, open https://localhost:3000 in a web browser to access the web portal for the 12 LABOURS DigitalTWINS platform. The data catalogue can be found from the `View data browswer` link on the `DATA & MODELS` page.
 
 Please wait a moment for the datasets to load. If the datasets still do not load, then please reload the website.
-
-## Accessing API Documentation
-API documentation lists all the classes and methods available. This can be a useful reference when trying to understand input arguments of the classes and methods when using the `digitaltwins` and `sparc-me` Python tools.
-- sparc-me API documentation TODO Add link
-- digitaltwins API documentation TODO Add link
 
 ## Feedback
 Once you have completed this tutorial, please complete [this survey](https://docs.google.com/forms/d/e/1FAIpQLSe-EsVz6ahz2FXFy906AZh68i50jRYnt3hQe-loc-1DaFWoFQ/viewform?usp=sf_link), which will allow us to improve this and future tutorials.
