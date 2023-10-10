@@ -1,12 +1,9 @@
-Digital Twin Platform API documentation
+DigitalTWINS-API documentation
 =======================================
 
 
 .. toctree::
    :maxdepth: 2
-
-   api
-   
     
 Indices and tables
 ==================
