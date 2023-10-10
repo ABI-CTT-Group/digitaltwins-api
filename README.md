@@ -29,6 +29,9 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 * [Reporting issues](#reporting-issues)
 * [Contributing](#contributing)
 * [License](#license)
+* [Team](#team)
+* [Funding](#funding)
+* [Acknowledgements](#acknowledgements)
 
 <!--* * [The problem](#the-problem) -->
 <!--* * [Our solution - XXXXXX](#our-solution---XXXXX) -->
@@ -36,8 +39,6 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 <!--* * [Future developments](#future-developments) -->
 <!--* * [Cite us](#cite-us) -->
 <!--* * [FAIR practices](#fair-practices) -->
-<!--* * * [Team](#team) -->
-<!--* * * [Acknowledgements](#acknowledgements) -->
 
 ## Introduction
 The development of novel medical diagnosis and treatment approaches requires understanding how diseases that operate at the molecular scale influence physiological function at the scale of cells, tissues, organs, and organ systems. The Auckland Bioengineering Institute (ABI) led **Physiome Project aims to establish an integrative “systems medicine” framework based on personalised computational modelling** to link information encoded in the genome to organism-wide physiological function and dysfunction in disease. The **[12 LABOURS project](https://www.auckland.ac.nz/en/abi/our-research/research-groups-themes/12-Labours.html) aims to extend and apply the developments of the Physiome Project to clinical and home-based healthcare applications**.
@@ -134,3 +135,31 @@ Fork this repository and submit a pull request to contribute. Before doing so, p
 
 ## License
 The DigitalTWINS platform API is fully open source and distributed under the very permissive Apache License 2.0. See [LICENSE](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/LICENSE) for more information.
+
+## Team
+- Chinchien Lin (12L, CTT, BBRG)
+- Linkun Gao (12L, CTT, BBRG)
+- Jiali Xu (12L, CTT)
+- David Yu (12L portal)
+- Frances Feng (12L portal)
+- Alan Wu (12L portal)
+- David Nickerson (12L, SPARC DRC, CTT)
+- Thiranja Prasad Babarenda Gamage (12L, CTT, BBRG)
+
+## Funding
+This software was funded by the [New Zealand Ministry of Business Innovation and Employment’s Catalyst: Strategic fund](https://www.mbie.govt.nz/science-and-technology/science-and-innovation/funding-information-and-opportunities/investment-funds/catalyst-fund/funded-projects/catalyst-strategic-auckland-bioengineering-institute-12-labours-project/). This research is also supported by the use of the Nectar Research Cloud, a collaborative Australian research platform supported by the National Collaborative Research Infrastructure Strategy-funded ARDC.
+
+## Acknowledgements
+We gratefully acknowledge the valuable contributions from:
+- University of Auckland
+  - Auckland Bioengineering Institute (ABI) Clinical Translational Technologies Group (CTT)
+  - ABI 12 LABOURS project
+  - ABI Breast Biomechanics Research Group (BBRG)
+  - Infrastructure and technical support from the Centre for eResearch (including Anita Kean)
+- New Zealand eScience Infrastructure (NeSI)
+  - Nathalie Giraudon, Claire Rye, Jun Huh, and Nick Jones
+- Gen3 team at the Centre for Translational Data Science at the University of Chicago
+- Members of the SPARC Data and Resource Center (DRC).
+
+<img src='docs/acknowledgements.jpg' width='500'>
+
