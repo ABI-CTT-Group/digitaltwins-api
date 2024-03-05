@@ -161,5 +161,4 @@ We gratefully acknowledge the valuable contributions from:
 - Gen3 team at the Centre for Translational Data Science at the University of Chicago
 - Members of the SPARC Data and Resource Center (DRC).
 
-<img src='docs/acknowledgements.jpg' width='500'>
-
+<img src='https://raw.githubusercontent.com/ABI-CTT-Group/digitaltwins-api/main/docs/acknowledgements.jpg' width='500' alt="acknowledgements.jpg">
