@@ -6,11 +6,12 @@ from setuptools import setup, find_packages
 
 setup(
     name="digitaltwins",
-    version="0.3.12",
+    version="0.3.13",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
     # long_description=long_description,
     # long_description_content_type='text/markdown',
+    url='https://github.com/ABI-CTT-Group/digitaltwins-api',
     author="Thiranja Prasad Babarenda Gamage, Chinchien Lin, Linkun Gao, Jiali Xu, David Nickerson",
     email="psam012@aucklanduni.ac.nz, clin864@aucklanduni.ac.nz",
     license="Apache-2.0",
