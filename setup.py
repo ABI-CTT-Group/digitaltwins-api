@@ -1,16 +1,16 @@
 from setuptools import setup, find_packages
 
-# from pathlib import Path
-# this_directory = Path(__file__).parent
-# long_description = (this_directory / "README.md").read_text() ## UnicodeDecodeError when decoding the REAME file
+from pathlib import Path
+this_directory = Path(__file__).parent
+long_description = (this_directory / "README.md").read_text(encoding="utf8") ## UnicodeDecodeError when decoding the REAME file
 
 setup(
     name="digitaltwins",
     version="0.3.13",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
-    # long_description=long_description,
-    # long_description_content_type='text/markdown',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     url='https://github.com/ABI-CTT-Group/digitaltwins-api',
     author="Thiranja Prasad Babarenda Gamage, Chinchien Lin, Linkun Gao, Jiali Xu, David Nickerson",
     email="psam012@aucklanduni.ac.nz, clin864@aucklanduni.ac.nz",
