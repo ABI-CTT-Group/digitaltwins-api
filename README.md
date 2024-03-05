@@ -7,7 +7,7 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 [![GitHub issues-closed](https://img.shields.io/github/issues-closed/ABI-CTT-Group/digitaltwins-api.svg)](https://GitHub.com/ABI-CTT-Group/digitaltwins-api/issues?q=is%3Aissue+is%3Aclosed)
 [![apache License][license-shield]][license-url]
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
-[![PyPI version fury.io](https://badge.fury.io/py/digitaltwins-api.svg)](https://pypi.python.org/pypi/digitaltwins)
+[![PyPI version fury.io](https://badge.fury.io/py/digitaltwins.svg)](https://pypi.python.org/pypi/digitaltwins)
 <!--* [![Issues][issues-shield]][issues-url] -->
 <!--* [![DOI](https://zenodo.org/badge/XXXX.svg)](https://zenodo.org/badge/latestdoi/XXXXX) -->
 
@@ -161,5 +161,4 @@ We gratefully acknowledge the valuable contributions from:
 - Gen3 team at the Centre for Translational Data Science at the University of Chicago
 - Members of the SPARC Data and Resource Center (DRC).
 
-<img src='docs/acknowledgements.jpg' width='500'>
-
+<img src='https://raw.githubusercontent.com/ABI-CTT-Group/digitaltwins-api/main/docs/acknowledgements.jpg' width='500' alt="acknowledgements.jpg">
