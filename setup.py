@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf8") ## 
 
 setup(
     name="digitaltwins",
-    version="0.3.13",
+    version="0.3.16",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
     long_description=long_description,
