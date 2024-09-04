@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  digitaltwins_postgres:
+    image: postgres:latest
+    # Official docker image https://hub.docker.com/_/postgres
+    container_name: digitaltwins_postgres
+    environment:
+      POSTGRES_DB: digitaltwins
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5433:5432"
+    volumes:
+      - digitaltwins_postgres:/var/lib/postgresql/data
+      - ./db_backup/digitaltwins_backup.sql:/docker-entrypoint-initdb.d/digitaltwins_backup.sql
+
+volumes:
+  digitaltwins_postgres:
+
+# Usage instructions
+# 1. Navigate to <repo_root>/docker/postgres
+# 2. sudo docker compose up -d
