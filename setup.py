@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf8") ## 
 
 setup(
     name="digitaltwins",
-    version="0.3.16",
+    version="1.0b2",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
     long_description=long_description,
@@ -19,13 +19,14 @@ setup(
     include_package_data=True,
     package_data={'': ['./resources/**']},
     install_requires=[
-        "gen3~=4.21.0",
+        "psycopg2",
+        # "gen3~=4.21.0",
         "python-irodsclient>=1.1.8",
-        "pandas",
-        "xlrd",
-        "PyYAML",
-        "openpyxl",
-        "jsonschema",
-        "dictionaryutils"
+        # "pandas",
+        # "xlrd",
+        # "PyYAML",
+        # "openpyxl",
+        # "jsonschema",
+        # "dictionaryutils"
     ]
 )
