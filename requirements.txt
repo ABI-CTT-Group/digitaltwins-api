@@ -57,3 +57,5 @@ gdcdictionary~=1.2.0
 referencing~=0.30.2
 pymongo~=3.11.2
 dicom2nifti~=2.4.8
+
+psycopg2
