@@ -23,20 +23,3 @@ class QuerierFactory:
         else:
             raise ValueError("Unknown metadata service")
 
-
-# class QuerierFactory(AbstractFactory):
-#     def create(self, config_file):
-#         """
-#         Constructor
-#         """
-#         super().create(config_file)
-#         # super(AbstractFactory, self).__init__(config_file)
-#
-#         self._metadata_service = self._configs["general"]["metadata_service"]
-#         if self._metadata_service == "postgres":
-#             return PostgresQuerier(config_file)
-#         elif self._metadata_service == "gen3":
-#             return Gen3Querier(config_file)
-#         else:
-#             raise ValueError("Unknown metadata service")
-
