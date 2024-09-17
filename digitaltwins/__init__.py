@@ -14,5 +14,5 @@
 # from .metadata.uploader import Uploader
 # from .metadata.exporter import Exporter
 
-from .core.connection import Connection
-from .metadata.querier import Querier
+
+from .core.querier_factory import QuerierFactory
