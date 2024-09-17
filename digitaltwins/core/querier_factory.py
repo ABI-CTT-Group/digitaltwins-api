@@ -1,5 +1,3 @@
-# from ..abstract.abstract_factory import AbstractFactory
-
 import configparser
 from pathlib import Path
 
