@@ -16,3 +16,4 @@
 
 
 from .core.querier_factory import QuerierFactory
+from .core.downloader import Downloader
