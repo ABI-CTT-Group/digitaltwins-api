@@ -2,7 +2,7 @@ import configparser
 import os
 from pathlib import Path
 
-from digitaltwins import IRODS
+from ..irods.irods import IRODS
 
 
 class Downloader(object):

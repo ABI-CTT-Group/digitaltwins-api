@@ -6,7 +6,7 @@ long_description = (this_directory / "README.md").read_text(encoding="utf8") ## 
 
 setup(
     name="digitaltwins",
-    version="1.0b2",
+    version="1.0b3",
     description='A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for '
                 'Integrating Systems) Platform',
     long_description=long_description,
@@ -20,7 +20,7 @@ setup(
     package_data={'': ['./resources/**']},
     install_requires=[
         "psycopg2",
-        # "gen3~=4.21.0",
+        "gen3~=4.21.0",
         "python-irodsclient>=1.1.8",
         # "pandas",
         # "xlrd",
