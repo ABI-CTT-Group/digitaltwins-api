@@ -20,6 +20,53 @@ class Querier(AbstractQuerier):
         self._cur = None
         self._conn = None
 
+    def _connect(self):
+        self._conn = psycopg2.connect(
+            host=self._host,
+            port=self._port,
+            database=self._database,
+            user=self._user,
+            password=self._password)
+        # create a cursor
+        self._cur = self._conn.cursor()
+
+    def _disconnect(self):
+        self._cur.close()
+        self._conn.close()
+
+    def _query(self, sql):
+        self._connect()
+
+        self._cur.execute(sql)
+        resp = self._cur.fetchall()
+
+        self._disconnect()
+
+        results = self._format_results(resp)
+
+        return results
+
+    def _format_results(self, results):
+        column_names = []
+
+        # Iterate over the cursor description to extract column names
+        for desc in self._cur.description:
+            column_name = desc[0]  # Get the column name from the description tuple
+            column_names.append(column_name)  # Add the column name to the list
+
+        results_formated = []
+        for result in results:
+            row_dict = {}
+            for i in range(len(result)):
+                column_name = column_names[i]
+                row_value = result[i]
+                # Add the column name and value to the dictionary
+                row_dict[column_name] = row_value
+            # Convert the dictionary to a JSON object and add it to the list
+            # datasets_formated.append(json.dumps(row_dict))
+            results_formated.append(row_dict)
+        return results_formated
+
     def get_programs(self):
         """
 
@@ -76,50 +123,3 @@ class Querier(AbstractQuerier):
 
         results = self._query(sql)
         return results
-
-    def _connect(self):
-        self._conn = psycopg2.connect(
-            host=self._host,
-            port=self._port,
-            database=self._database,
-            user=self._user,
-            password=self._password)
-        # create a cursor
-        self._cur = self._conn.cursor()
-
-    def _disconnect(self):
-        self._cur.close()
-        self._conn.close()
-
-    def _query(self, sql):
-        self._connect()
-
-        self._cur.execute(sql)
-        resp = self._cur.fetchall()
-
-        self._disconnect()
-
-        results = self._format_results(resp)
-
-        return results
-
-    def _format_results(self, results):
-        column_names = []
-
-        # Iterate over the cursor description to extract column names
-        for desc in self._cur.description:
-            column_name = desc[0]  # Get the column name from the description tuple
-            column_names.append(column_name)  # Add the column name to the list
-
-        results_formated = []
-        for result in results:
-            row_dict = {}
-            for i in range(len(result)):
-                column_name = column_names[i]
-                row_value = result[i]
-                # Add the column name and value to the dictionary
-                row_dict[column_name] = row_value
-            # Convert the dictionary to a JSON object and add it to the list
-            # datasets_formated.append(json.dumps(row_dict))
-            results_formated.append(row_dict)
-        return results_formated
