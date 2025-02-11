@@ -138,3 +138,9 @@ class Querier(AbstractQuerier):
         result = self._query(sql)
 
         return result
+
+    def get_sample(self, sample_uuid):
+        sql = "SELECT * FROM sample WHERE sample_uuid='{sample_uuid}'".format(sample_uuid=sample_uuid)
+        resp = self._query(sql)
+
+        return resp
