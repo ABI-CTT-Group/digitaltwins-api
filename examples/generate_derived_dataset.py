@@ -93,7 +93,7 @@ def run_dicom_to_nifti(source_dataset_path, subject, sample, save_dataset_path):
 
     dicom_dir = source_dataset_path.joinpath("primary", subject, sample)
 
-    temp_nii_dir = Path(r"./tmp/temp_nii_dir")
+    temp_nii_dir = Path(r"./logs/temp_nii_dir")
     nii_file = temp_nii_dir.joinpath("results.nii.gz")
 
     convert_DICOM_to_Nifti(dicom_dir, nii_file)
@@ -114,8 +114,8 @@ def rm_tree(pth):
 
 
 if __name__ == '__main__':
-    source_dataset_path = Path(r"./tmp/primary_dataset")
-    save_dataset_path = Path(r"./tmp/derived_dataset")
+    source_dataset_path = Path(r"./logs/primary_dataset")
+    save_dataset_path = Path(r"./logs/derived_dataset")
 
     subject = "sub-1.3.6.1.4.1.14519.5.2.1.186051521067863971269584893740842397538"
     sample = "sam-1.3.6.1.4.1.14519.5.2.1.175414966301645518238419021688341658582"

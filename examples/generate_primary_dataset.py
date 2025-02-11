@@ -125,7 +125,7 @@ def add_data(dataset, source_path, subject, sample, save_dir):
 
 
 if __name__ == '__main__':
-    save_dir = "./tmp/primary_dataset/"
+    save_dir = "./logs/primary_dataset/"
 
     # Creating a SDS dataset from template
     dataset = Dataset()

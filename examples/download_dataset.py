@@ -8,6 +8,6 @@ if __name__ == '__main__':
 
     downloader = Downloader(config_file)
 
-    downloader.download(dataset_id, save_dir="./tmp")
+    downloader.download(dataset_id, save_dir="./logs")
 
     print("done")

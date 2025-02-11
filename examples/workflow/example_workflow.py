@@ -26,7 +26,7 @@ def setup_workflow(project_name, root):
 
 if __name__ == '__main__':
     project_name = 'example_project'
-    root = './tmp/example_project'
+    root = './logs/example_project'
 
     delete_duplicate(project_name, root)
 

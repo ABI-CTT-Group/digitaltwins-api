@@ -10,7 +10,7 @@ class Downloader(object):
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
-        self._save_dir = Path(r"./tmp")
+        self._save_dir = Path(r"./logs")
 
         self._irods = IRODS(self._configs)
 
