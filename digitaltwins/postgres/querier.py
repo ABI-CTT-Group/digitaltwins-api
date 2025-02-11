@@ -6,7 +6,7 @@ import psycopg2
 class Querier(AbstractQuerier):
     def __init__(self, config_file):
         """
-        Constructor
+        Constructor inherited and expanded from AbstractQuerier
         """
         super(Querier, self).__init__(config_file)
 
@@ -21,6 +21,11 @@ class Querier(AbstractQuerier):
         self._conn = None
 
     def get_programs(self):
+        """
+
+        :return: a list of program names
+        :rtype: list
+        """
         sql = "SELECT * FROM program"
         results = self._query(sql)
 

@@ -6,10 +6,19 @@ from ..gen3.querier import Querier as Gen3Querier
 
 
 class QuerierFactory:
+    """
+    static factory
+    """
     @staticmethod
     def create(config_file):
         """
-        Constructor
+        static method for creating Querier instance
+        by the value of the metadata service field in the given configuration file
+
+        :param config_file: path to the configuration file
+        :type config_file: str or Path
+        :return: a Querier instance
+        :rtype: PostgresQuerier or Gen3Querier
         """
         config_file = Path(config_file)
         configs = configparser.ConfigParser()
