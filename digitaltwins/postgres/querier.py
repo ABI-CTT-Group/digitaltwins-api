@@ -129,3 +129,12 @@ class Querier(AbstractQuerier):
 
         results = self._query(sql)
         return results
+
+    def get_subject_by_sample(self, sample_uuid):
+        sql = "SELECT DISTINCT subject_uuid FROM dataset_mapping WHERE sample_uuid='{sample_uuid}'".format(sample_uuid=sample_uuid)
+        resp = self._query(sql)
+        subject_uuid = resp[0].get("subject_uuid")
+        sql = "SELECT * FROM subject WHERE subject_uuid='{subject_uuid}'".format(subject_uuid=subject_uuid)
+        result = self._query(sql)
+
+        return result
