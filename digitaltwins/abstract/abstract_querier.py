@@ -17,6 +17,9 @@ class AbstractQuerier(ABC):
         Constructor
         """
         self._config_file = Path(config_file)
+        if not self._config_file.is_file():
+            raise ValueError(f"Configuration file '{config_file}' does not exist.")
+
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
