@@ -53,12 +53,12 @@ if __name__ == '__main__':
     print(assay)
 
     print("SOPs:")
-    sops = querier.get_assays()
+    sops = querier.get_sops()
     print(sops)
 
     print("SOP 1:")
     sop_id = 1
-    sop = querier.get_assay(sop_id)
+    sop = querier.get_sop(sop_id)
     print(sop)
 
     # Object dependencies can be collected by get_dependencies(data, target). e.g.
