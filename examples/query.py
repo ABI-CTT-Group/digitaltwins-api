@@ -73,4 +73,11 @@ if __name__ == '__main__':
     investigations = querier.get_dependencies(project, "investigations")
     print(investigations)
 
+    print("datasets:")
+    datasets = querier.get_datasets()
+    print(datasets)
+    print("workflow datasets:")
+    datasets = querier.get_datasets(categories=["workflow"])
+    print(datasets)
+
 
