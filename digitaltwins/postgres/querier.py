@@ -105,6 +105,18 @@ class Querier(AbstractQuerier):
 
         return results
 
+    def get_dataset_uuid_by_seek_id(self, seek_id):
+        sql = "SELECT dataset_uuid FROM dataset WHERE seek_id='{seek_id}'".format(seek_id=seek_id)
+        results = self._query(sql)
+
+        if len(results) > 0:
+            dataset_uuid = results[0].get("dataset_uuid")
+        else:
+            print("No dataset found by seek_id '{}'".format(seek_id))
+            dataset_uuid = None
+
+        return dataset_uuid
+
     def get_dataset_descriptions(self, dataset_uuid):
         sql = "SELECT * FROM dataset_description WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
         results = self._query(sql)
@@ -141,6 +153,13 @@ class Querier(AbstractQuerier):
 
     def get_sample(self, sample_uuid):
         sql = "SELECT * FROM sample WHERE sample_uuid='{sample_uuid}'".format(sample_uuid=sample_uuid)
+        resp = self._query(sql)
+
+        return resp
+
+    def get_workflow(self, dataset_uuid):
+        sql = "SELECT * FROM workflow WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
+
         resp = self._query(sql)
 
         return resp

@@ -136,6 +136,27 @@ class Querier(AbstractQuerier):
         else:
             raise ValueError("Missing metadata service: SEEK")
 
+        inputs = list()
+        outputs = list()
+
+        dataset_uuid = self._postgre_querier.get_dataset_uuid_by_seek_id(sop_id)
+
+        workflow_params = self._postgre_querier.get_workflow(dataset_uuid)
+
+        for param in workflow_params:
+            field_type = param.get("field_type")
+            field_name = param.get("field_name")
+
+            if field_type == "input":
+                inputs.append(field_name)
+            elif field_type == "output":
+                outputs.append(field_name)
+            else:
+                continue
+
+        results["inputs"] = inputs
+        results["outputs"] = outputs
+
         return results
 
     def get_datasets(self, descriptions=False, categories=list(), keywords=dict()):
