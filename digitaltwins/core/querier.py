@@ -34,9 +34,9 @@ class Querier(AbstractQuerier):
 
         return relationships
 
-    def get_programs(self):
+    def get_programs(self, get_details=False):
         if self._configs.getboolean("seek", "enabled"):
-            results = self._seek_querier.get_programs()
+            results = self._seek_querier.get_programs(get_details)
         elif self._configs.getboolean("postgres", "enabled"):
             results = self._postgre_querier.get_programs()
         elif self._configs.getboolean("gen3", "enabled"):
@@ -54,9 +54,9 @@ class Querier(AbstractQuerier):
 
         return results
 
-    def get_projects(self):
+    def get_projects(self, get_details=False):
         if self._configs.getboolean("seek", "enabled"):
-            results = self._seek_querier.get_projects()
+            results = self._seek_querier.get_projects(get_details)
         elif self._configs.getboolean("postgres", "enabled"):
             results = self._postgre_querier.get_projects()
         elif self._configs.getboolean("gen3", "enabled"):
@@ -74,9 +74,9 @@ class Querier(AbstractQuerier):
 
         return results
 
-    def get_investigations(self):
+    def get_investigations(self, get_details=False):
         if self._configs.getboolean("seek", "enabled"):
-            results = self._seek_querier.get_investigations()
+            results = self._seek_querier.get_investigations(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
 
@@ -90,9 +90,9 @@ class Querier(AbstractQuerier):
 
         return results
 
-    def get_studies(self):
+    def get_studies(self, get_details=False):
         if self._configs.getboolean("seek", "enabled"):
-            results = self._seek_querier.get_studies()
+            results = self._seek_querier.get_studies(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
 
@@ -106,9 +106,9 @@ class Querier(AbstractQuerier):
 
         return results
 
-    def get_assays(self):
+    def get_assays(self, get_details=False):
         if self._configs.getboolean("seek", "enabled"):
-            results = self._seek_querier.get_assays()
+            results = self._seek_querier.get_assays(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
 
@@ -122,9 +122,9 @@ class Querier(AbstractQuerier):
 
         return results
 
-    def get_sops(self):
+    def get_sops(self, get_details=False):
         if self._configs.getboolean("seek", "enabled"):
-            results = self._seek_querier.get_sops()
+            results = self._seek_querier.get_sops(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
 

@@ -37,7 +37,7 @@ class Querier(AbstractQuerier):
 
         return data
 
-    def get_programs(self):
+    def get_programs(self, get_details=False):
         """
 
         :return: a list of program names
@@ -46,6 +46,13 @@ class Querier(AbstractQuerier):
         url = self._base_url + "/programmes"
         resp = requests.get(url, headers=self._headers)
         data = self._format_resp(resp)
+
+        if get_details:
+            for idx, record in enumerate(data):
+                record_id = record.get("id")
+                details = self.get_program(record_id)
+
+                data[idx]["details"] = details
 
         return data
 
@@ -56,10 +63,17 @@ class Querier(AbstractQuerier):
 
         return data
 
-    def get_projects(self):
+    def get_projects(self, get_details=False):
         url = self._base_url + "/projects"
         resp = requests.get(url, headers=self._headers)
         data = self._format_resp(resp)
+
+        if get_details:
+            for idx, record in enumerate(data):
+                record_id = record.get("id")
+                details = self.get_project(record_id)
+
+                data[idx]["details"] = details
 
         return data
 
@@ -70,10 +84,17 @@ class Querier(AbstractQuerier):
 
         return data
 
-    def get_investigations(self):
+    def get_investigations(self, get_details=False):
         url = self._base_url + "/investigations"
         resp = requests.get(url, headers=self._headers)
         data = self._format_resp(resp)
+
+        if get_details:
+            for idx, record in enumerate(data):
+                record_id = record.get("id")
+                details = self.get_investigation(record_id)
+
+                data[idx]["details"] = details
 
         return data
 
@@ -84,10 +105,17 @@ class Querier(AbstractQuerier):
 
         return data
 
-    def get_studies(self):
+    def get_studies(self, get_details=False):
         url = self._base_url + "/studies"
         resp = requests.get(url, headers=self._headers)
         data = self._format_resp(resp)
+
+        if get_details:
+            for idx, record in enumerate(data):
+                record_id = record.get("id")
+                details = self.get_study(record_id)
+
+                data[idx]["details"] = details
 
         return data
 
@@ -98,10 +126,17 @@ class Querier(AbstractQuerier):
 
         return data
 
-    def get_assays(self):
+    def get_assays(self, get_details=False):
         url = self._base_url + "/assays"
         resp = requests.get(url, headers=self._headers)
         data = self._format_resp(resp)
+
+        if get_details:
+            for idx, record in enumerate(data):
+                record_id = record.get("id")
+                details = self.get_assay(record_id)
+
+                data[idx]["details"] = details
 
         return data
 
@@ -112,7 +147,7 @@ class Querier(AbstractQuerier):
 
         return data
 
-    def get_sops(self):
+    def get_sops(self, get_details=False):
         """
         SOP == workflow
         :return:
@@ -121,6 +156,13 @@ class Querier(AbstractQuerier):
         url = self._base_url + "/sops"
         resp = requests.get(url, headers=self._headers)
         data = self._format_resp(resp)
+
+        if get_details:
+            for idx, record in enumerate(data):
+                record_id = record.get("id")
+                details = self.get_sop(record_id)
+
+                data[idx]["details"] = details
 
         return data
 
