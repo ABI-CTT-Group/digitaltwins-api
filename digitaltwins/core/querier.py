@@ -137,3 +137,8 @@ class Querier(AbstractQuerier):
             raise ValueError("Missing metadata service: SEEK")
 
         return results
+
+    def get_datasets(self, descriptions=False, categories=list(), keywords=dict()):
+        results = self._postgre_querier.get_datasets(descriptions=descriptions, categories=categories, keywords=keywords)
+
+        return results
