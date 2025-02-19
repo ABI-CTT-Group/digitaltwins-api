@@ -146,11 +146,17 @@ class Querier(AbstractQuerier):
         for param in workflow_params:
             field_type = param.get("field_type")
             field_name = param.get("field_name")
+            field_label = param.get("field_label")
+
+            data = {
+                "name": field_name,
+                "category": field_label
+            }
 
             if field_type == "input":
-                inputs.append(field_name)
+                inputs.append(data)
             elif field_type == "output":
-                outputs.append(field_name)
+                outputs.append(data)
             else:
                 continue
 
