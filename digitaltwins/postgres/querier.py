@@ -105,6 +105,12 @@ class Querier(AbstractQuerier):
 
         return results
 
+    def get_dataset(self, dataset_uuid):
+        sql = "SELECT * FROM dataset WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
+        results = self._query(sql)
+
+        return results
+
     def get_dataset_uuid_by_seek_id(self, seek_id):
         sql = "SELECT dataset_uuid FROM dataset WHERE seek_id='{seek_id}'".format(seek_id=seek_id)
         results = self._query(sql)
