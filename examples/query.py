@@ -80,4 +80,8 @@ if __name__ == '__main__':
     datasets = querier.get_datasets(categories=["workflow"])
     print(datasets)
 
+    print("sample types:")
+    sample_types = querier.get_dataset_sample_types(dataset_uuid="")
+    print(sample_types)
+
 

@@ -163,3 +163,9 @@ class Querier(AbstractQuerier):
         results = self._postgre_querier.get_datasets(descriptions=descriptions, categories=categories, keywords=keywords)
 
         return results
+
+    def get_dataset_sample_types(self, dataset_uuid):
+        results = self._postgre_querier.get_dataset_sample_types(dataset_uuid)
+
+        return results
+

@@ -163,3 +163,33 @@ class Querier(AbstractQuerier):
         resp = self._query(sql)
 
         return resp
+
+    def get_dataset_sample_types(self, dataset_uuid):
+        sql = "SELECT DISTINCT dataset_uuid, sample_uuid FROM dataset_mapping WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
+
+        resp = self._query(sql)
+
+        sample_uuids = list()
+        for sample in resp:
+            sample_uuid = sample.get("sample_uuid")
+            sample_uuids.append(sample_uuid)
+
+        formatted_sample_uuids_list = []
+
+        # Loop through each category and format it
+        for sample_uuid in sample_uuids:
+            formatted_sample_uuids = f"'{sample_uuid}'"
+            formatted_sample_uuids_list.append(formatted_sample_uuids)
+
+        formatted_sample_uuids = ', '.join(formatted_sample_uuids_list)
+        sql = f"SELECT sample_type FROM sample WHERE sample_uuid IN ({formatted_sample_uuids})"
+
+        resp = self._query(sql)
+
+        sample_types = list()
+        for row in resp:
+            sample_type = row.get("sample_type")
+            if sample_type and sample_type not in sample_types:
+                sample_types.append(sample_type)
+
+        return sample_types
