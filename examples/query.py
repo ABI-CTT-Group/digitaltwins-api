@@ -47,9 +47,12 @@ if __name__ == '__main__':
     assays = querier.get_assays()
     print(assays)
 
-    print("assay 2:")
-    assay_id = 2
+    print("assay 1:")
+    assay_id = 1
     assay = querier.get_assay(assay_id)
+    print(assay)
+    print("assay params:")
+    assay = querier.get_assay(assay_id, get_params=True)
     print(assay)
 
     print("SOPs:")
