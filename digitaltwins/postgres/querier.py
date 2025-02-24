@@ -205,10 +205,22 @@ class Querier(AbstractQuerier):
         return sample_types
 
     def get_assay(self, seek_id=""):
+        result = None
         sql = ("SELECT * FROM assay "
-               "inner join public.assay_input ai on assay.assay_uuid = ai.assay_uuid "
-               "inner join public.assay_output ao on assay.assay_uuid = ao.assay_uuid "
-               "WHERE assay.assay_seek_id = %s")
+               "WHERE assay_seek_id = %s")
         resp = self._query(sql, (seek_id,))
+        result = resp[0]
+        assay_uuid = result.get("assay_uuid")
+
+        # inputs
+        sql = ("SELECT * FROM assay_input "
+               "WHERE assay_uuid = %s")
+        resp = self._query(sql, (assay_uuid,))
+        result["inputs"] = resp
+
+        sql = ("SELECT * FROM assay_output "
+               "WHERE assay_uuid = %s")
+        resp = self._query(sql, (assay_uuid,))
+        result["output"] = resp
 
         return resp
