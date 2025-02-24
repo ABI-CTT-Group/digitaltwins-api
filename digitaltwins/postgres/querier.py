@@ -34,10 +34,14 @@ class Querier(AbstractQuerier):
         self._cur.close()
         self._conn.close()
 
-    def _query(self, sql):
+    def _query(self, sql, values=None):
         self._connect()
 
-        self._cur.execute(sql)
+        if values:
+            self._cur.execute(sql, values)
+        else:
+            self._cur.execute(sql)
+
         resp = self._cur.fetchall()
 
         self._disconnect()
