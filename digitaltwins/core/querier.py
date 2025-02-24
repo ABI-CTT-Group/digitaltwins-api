@@ -114,11 +114,16 @@ class Querier(AbstractQuerier):
 
         return results
 
-    def get_assay(self, assay_id):
+    def get_assay(self, assay_id, get_params=False):
         if self._configs.getboolean("seek", "enabled"):
             results = self._seek_querier.get_assay(assay_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
+
+        if get_params:
+            #  "created" means the actual assay has been created in the platform/postgres
+            results_created_assay = self._postgre_querier.get_assay(seek_id=assay_id)
+            results["params"] = results_created_assay
 
         return results
 
