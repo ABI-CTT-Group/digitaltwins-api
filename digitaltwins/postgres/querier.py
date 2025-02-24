@@ -223,4 +223,4 @@ class Querier(AbstractQuerier):
         resp = self._query(sql, (assay_uuid,))
         result["output"] = resp
 
-        return resp
+        return result
