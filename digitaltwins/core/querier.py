@@ -185,3 +185,7 @@ class Querier(AbstractQuerier):
 
         return results
 
+    def get_dataset_samples(self, dataset_uuid, sample_type=None):
+        results = self._postgre_querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
+        return results
+

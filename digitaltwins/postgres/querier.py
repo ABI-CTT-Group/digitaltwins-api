@@ -224,3 +224,14 @@ class Querier(AbstractQuerier):
         result["output"] = resp
 
         return result
+
+    def get_dataset_samples(self, dataset_uuid, sample_type=None):
+        sql = (r"SELECT * "
+               r"FROM dataset_mapping "
+               r"INNER JOIN sample ON dataset_mapping.sample_uuid = sample.sample_uuid "
+               r"WHERE dataset_mapping.dataset_uuid='{dataset_uuid}' "
+               r"AND sample.sample_type='{sample_type}'").format(dataset_uuid=dataset_uuid, sample_type=sample_type)
+
+        resp = self._query(sql)
+
+        return resp
