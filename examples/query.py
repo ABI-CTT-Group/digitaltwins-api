@@ -87,4 +87,10 @@ if __name__ == '__main__':
     sample_types = querier.get_dataset_sample_types(dataset_uuid="")
     print(sample_types)
 
+    print("dataset samples with sample_type==:'ax dyn pre'")
+    dataset_uuid = ""
+    sample_type = "ax dyn pre"
+    samples = querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
+    print(samples)
+
 
