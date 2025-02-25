@@ -145,6 +145,7 @@ class Querier(AbstractQuerier):
         outputs = list()
 
         dataset_uuid = self._postgre_querier.get_dataset_uuid_by_seek_id(sop_id)
+        results["dataset_uuid"] = dataset_uuid
 
         workflow_params = self._postgre_querier.get_workflow(dataset_uuid)
 
