@@ -221,7 +221,7 @@ class Querier(AbstractQuerier):
         sql = ("SELECT * FROM assay_output "
                "WHERE assay_uuid = %s")
         resp = self._query(sql, (assay_uuid,))
-        result["output"] = resp
+        result["outputs"] = resp
 
         return result
 
