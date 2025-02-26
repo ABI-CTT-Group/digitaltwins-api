@@ -39,20 +39,16 @@ class Uploader(object):
 
         if isinstance(values, tuple):
             self._cur.execute(sql, values)
-            inserted = self._cur.fetchall()
-            column_names = [desc[0] for desc in self._cur.description]
 
         elif isinstance(values, list) and all(isinstance(item, tuple) for item in values):
             self._cur.execute(sql)
-
-            # inserted = self._cur.fetchall()
-            print(inserted)
         else:
             raise ValueError("Values must be a tuple or a list of tuples")
 
-        # column_names = [desc[0] for desc in self._cur.description]
-
         self._conn.commit()
+
+        inserted = self._cur.fetchall()
+        column_names = [desc[0] for desc in self._cur.description]
 
         self._disconnect()
 
@@ -64,6 +60,7 @@ class Uploader(object):
         sql = r"SELECT assay_uuid FROM assay WHERE assay_seek_id=%s"
         self._cur.execute(sql, (assay_seek_id,))
         record = self._cur.fetchone()
+        column_names = [desc[0] for desc in self._cur.description]
 
         if record:
             # delete assay
@@ -78,24 +75,41 @@ class Uploader(object):
         self._conn.commit()
         self._disconnect()
 
+    def _delete_assay_inputs_outputs(self, assay_uuid):
+        self._connect()
+
+        sql = r"DELETE FROM assay_input WHERE assay_uuid=%s"
+        self._cur.execute(sql, (assay_uuid,))
+
+        sql = r"DELETE FROM assay_output WHERE assay_uuid=%s"
+        self._cur.execute(sql, (assay_uuid,))
+
+        self._conn.commit()
+        self._disconnect()
+
 
     def upload_assay(self, assay_data):
         self._connect()
 
+        assay_uuid = assay_data.get("assay_uuid")
         assay_seek_id = assay_data.get("assay_seek_id")
         workflow_seek_id = assay_data.get("workflow_seek_id")
         cohort = assay_data.get("cohort")
         ready = assay_data.get("ready")
 
-        self._delete_assay(assay_seek_id)
+        if assay_uuid:
+            sql = r"UPDATE assay SET workflow_seek_id = %s, cohort = %s, ready = %s WHERE assay_uuid = %s RETURNING *;"
+            values = (workflow_seek_id, cohort, ready, assay_uuid)
+            column_names, inserted = self._exec(sql, values)
+        else:
+            sql = r"""INSERT INTO assay (assay_seek_id, workflow_seek_id, cohort, ready) VALUES (%s, %s, %s, %s) RETURNING *;"""
+            values = (assay_seek_id, workflow_seek_id, cohort, ready)
+            column_names, inserted = self._exec(sql, values)
+            inserted_record = dict(zip(column_names, inserted[0]))
+            assay_uuid = inserted_record.get("assay_uuid")
 
-        sql = r"""INSERT INTO assay (assay_seek_id, workflow_seek_id, cohort, ready) VALUES (%s, %s, %s, %s) RETURNING *;"""
-        values = (assay_seek_id, workflow_seek_id, cohort, ready)
-        column_names, inserted = self._exec(sql, values)
-
-        inserted_record = dict(zip(column_names, inserted[0]))
-        assay_uuid = inserted_record.get("assay_uuid")        # print(f"Assay uploaded: {inserted_record}")
-
+        if assay_uuid:
+            self._delete_assay_inputs_outputs(assay_uuid)
         # inputs
         inputs = assay_data.get("inputs")
         for input in inputs:
@@ -110,6 +124,8 @@ class Uploader(object):
             values = (assay_uuid, output.get("name"), output.get("dataset_name"),
                       output.get("sample_name"), output.get("category"))
             column_names, inserted = self._exec(sql, values)
+
+        self._disconnect()
 
         # testing: multiple input
         # values = [(item['name'], item['dataset_uuid'], item['sample_type'], item['category']) for item in inputs]
