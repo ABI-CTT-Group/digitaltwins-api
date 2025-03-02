@@ -28,7 +28,7 @@ class Workflow(object):
         workflow = querier.get_sop(sop_id=workflow_seek_id)
         workflow_dataset_uuid = workflow.get("dataset_uuid")
         dag_url = f"{self._airflow_api_url}/dags/{workflow_dataset_uuid}/dagRuns"
-
+        dag_rul_ui = f"http://0.0.0.0:8080/dags/{workflow_dataset_uuid}/grid"
 
         params = {
             "assay_seek_id": assay_seek_id,
@@ -42,4 +42,6 @@ class Workflow(object):
             headers={"Content-Type": "application/json"},
             data=json.dumps({"conf": params})
         )
+
+        return response, dag_rul_ui
 

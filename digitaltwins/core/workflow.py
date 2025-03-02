@@ -29,6 +29,6 @@ class Workflow(object):
         querier = Querier(self._config_file)
         assay = querier.get_assay(assay_id, get_params=True)
 
-        self._airflow_workflow.run(assay)
+        response, workflow_monitor_url = self._airflow_workflow.run(assay)
 
-        # self._airflow_workflow.download(assay)
+        return response, workflow_monitor_url

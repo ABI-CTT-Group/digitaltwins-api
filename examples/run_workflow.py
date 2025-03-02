@@ -7,4 +7,7 @@ if __name__ == '__main__':
     assay_id = 2
 
     workflow = Workflow(config_file)
-    workflow.run(assay_id=assay_id)
+    response, workflow_monitor_url = workflow.run(assay_id=assay_id)
+
+    print("response.status_code:" + str(response.status_code))
+    print("Monitoring workflow on: " + workflow_monitor_url)
