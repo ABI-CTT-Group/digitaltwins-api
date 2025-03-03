@@ -15,6 +15,8 @@ class Workflow(object):
         self._configs = ConfigLoader.load_from_ini(config_file)
         self._configs = self._configs["airflow"]
 
+        # get airflow api url and username/password
+        self._airflow_endpoint = self._configs.get('airflow_endpoint')
         self._airflow_api_url = self._configs.get('airflow_api_url')
         self._username = self._configs.get('username')
         self._password = self._configs.get('password')
@@ -28,7 +30,8 @@ class Workflow(object):
         workflow = querier.get_sop(sop_id=workflow_seek_id)
         workflow_dataset_uuid = workflow.get("dataset_uuid")
         dag_url = f"{self._airflow_api_url}/dags/{workflow_dataset_uuid}/dagRuns"
-        dag_rul_ui = f"http://0.0.0.0:8080/dags/{workflow_dataset_uuid}/grid"
+        # dag_rul_ui = f"http://0.0.0.0:8080/dags/{workflow_dataset_uuid}/grid"
+        dag_rul_ui = f"{self._airflow_endpoint}/dags/{workflow_dataset_uuid}/grid"
 
         params = {
             "assay_seek_id": assay_seek_id,
