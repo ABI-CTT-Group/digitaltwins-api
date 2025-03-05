@@ -63,12 +63,12 @@ class IRODS(object):
                     session.collections.create(collection_path, recurse=True)
 
 
-    def download(self, collection_name, save_dir=None):
+    def download(self, collection, save_dir=None):
         """
         Downloading data from iRODS
 
-        :param collection_name: iRODS collection/Dataset name in the iRODS zone
-        :type collection_name: str
+        :param collection: iRODS collection/Dataset name in the iRODS zone
+        :type collection: str
         :param save_dir: path to the save directory
         :type save_dir: str
         :return:
@@ -79,7 +79,7 @@ class IRODS(object):
                           user=self._user,
                           password=self._password,
                           zone=self._zone) as session:
-            collection_path = self._project_root + '/' + collection_name
+            collection_path = self._project_root + '/' + collection
             self._download_collection(session, collection_path, save_dir=save_dir)
 
     def _download_collection(self, session, collection_path, save_dir):
