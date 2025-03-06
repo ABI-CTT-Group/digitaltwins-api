@@ -14,7 +14,7 @@ class Downloader(object):
         if self._configs.getboolean("irods", "enabled"):
             self._irods_downloader = IRODS(self._configs)
 
-    def download_dataset(self, dataset_id, save_dir="./"):
+    def download_dataset(self, dataset_id, save_dir="./tmp"):
         if self._irods_downloader:
             os.makedirs(str(save_dir), exist_ok=True)
 
