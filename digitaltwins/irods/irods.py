@@ -67,7 +67,7 @@ class IRODS(object):
         """
         Downloading data from iRODS
 
-        :param collection: iRODS collection/Dataset name in the iRODS zone
+        :param collection: iRODS collection. path relative to the project root
         :type collection: str
         :param save_dir: path to the save directory
         :type save_dir: str
