@@ -6,6 +6,7 @@ from ..irods.irods import IRODS
 
 class Downloader(object):
     def __init__(self, config_file):
+        self._config_file = config_file
         self._configs = configparser.ConfigParser()
         self._configs.read(config_file)
 
