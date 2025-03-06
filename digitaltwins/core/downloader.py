@@ -2,7 +2,7 @@ import configparser
 import os
 import shutil
 
-from ..irods.irods import IRODS
+from ..irods.downloader import Downloader as IRODSDownloader
 
 from digitaltwins import Querier
 
@@ -16,7 +16,7 @@ class Downloader(object):
         self._irods_downloader = None
 
         if self._configs.getboolean("irods", "enabled"):
-            self._irods_downloader = IRODS(self._configs)
+            self._irods_downloader = IRODSDownloader(self._config_file)
 
     def download_dataset(self, dataset_id, save_dir="./tmp"):
         if self._irods_downloader:
