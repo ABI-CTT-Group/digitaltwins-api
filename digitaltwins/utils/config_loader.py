@@ -26,8 +26,3 @@ class ConfigLoader(object):
         configs.read(config_file)
 
         return configs
-
-
-        with open(file) as f:
-            configs = json.load(f)
-        return configs
