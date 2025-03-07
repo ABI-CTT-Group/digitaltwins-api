@@ -1,15 +1,14 @@
-from ..abstract.abstract_querier import AbstractQuerier
+from ..utils.config_loader import ConfigLoader
 
 from ..postgres.querier import Querier as PostgresQuerier
 from ..gen3.querier import Querier as Gen3Querier
 from ..seek.querier import Querier as SeekQuerier
 
 
-class Querier(AbstractQuerier):
+class Querier(object):
 
     def __init__(self, config_file):
-
-        super().__init__(config_file)
+        self._configs = ConfigLoader.load_from_ini(config_file)
 
         if self._configs.getboolean("postgres", "enabled") and self._configs.getboolean("gen3", "enabled"):
             raise ValueError("Metadata service conflict. Only one of 'postgres' or 'gen3' can be enabled")

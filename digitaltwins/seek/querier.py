@@ -1,14 +1,14 @@
-from ..abstract.abstract_querier import AbstractQuerier
+from ..utils.config_loader import ConfigLoader
 
 import requests
 
 
-class Querier(AbstractQuerier):
+class Querier(object):
     def __init__(self, config_file):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
-        super(Querier, self).__init__(config_file)
+        self._configs = ConfigLoader.load_from_ini(config_file)
 
         configs = self._configs["seek"]
         self._host = configs["host"]

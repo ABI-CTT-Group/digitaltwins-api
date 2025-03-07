@@ -1,14 +1,14 @@
-from ..abstract.abstract_querier import AbstractQuerier
+from ..utils.config_loader import ConfigLoader
 
 import psycopg2
 
 
-class Querier(AbstractQuerier):
+class Querier(object):
     def __init__(self, config_file):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
-        super(Querier, self).__init__(config_file)
+        self._configs = ConfigLoader.load_from_ini(config_file)
 
         configs_postgres = self._configs["postgres"]
         self._host = configs_postgres["host"]
