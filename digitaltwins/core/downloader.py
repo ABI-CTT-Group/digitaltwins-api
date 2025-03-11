@@ -38,33 +38,42 @@ class Downloader(object):
         assay_uuid = params.get("assay_uuid")
         inputs = params.get("inputs")
 
+        assay_dir = os.path.join(save_dir, assay_uuid)
+
+        assay_inputs_dir = os.path.join(assay_dir, "inputs")
         for input in inputs:
-            name = input.get("name")
-            save_dir_input = os.path.join(save_dir, assay_uuid, "input", name)
-            os.makedirs(save_dir_input)
+            self.download_assay_input(input, assay_inputs_dir)
 
-            dataset_uuid = input.get("dataset_uuid")
-            sample_type = input.get("sample_type")
-            category = input.get("category")
-            if category == "measurement":
-                # get sample uuids by sample_type
-                samples = querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
-                print(samples)
-                for sample in samples:
-                    subject_id = sample.get("subject_id")
-                    sample_id = sample.get("sample_id")
-                    sample_uuid = sample.get("sample_uuid")
+    def download_assay_input(self, assay_input, save_dir="./tmp"):
+        querier = Querier(self._config_file)
 
-                    sample_path = dataset_uuid + "/primary/" + subject_id + "/" + sample_id
+        name = assay_input.get("name")
+        assay_input_dir = os.path.join(save_dir, name)
+        os.makedirs(assay_input_dir, exist_ok=True)
 
-                    local_sample_path_tmp = save_dir_input + "/" + sample_id
-                    if os.path.exists(local_sample_path_tmp):
-                        shutil.rmtree(local_sample_path_tmp)
+        dataset_uuid = assay_input.get("dataset_uuid")
+        sample_type = assay_input.get("sample_type")
+        category = assay_input.get("category")
+        if category == "measurement":
+            # get sample uuids by sample_type
+            samples = querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
+            for sample in samples:
+                subject_id = sample.get("subject_id")
+                sample_id = sample.get("sample_id")
+                sample_uuid = sample.get("sample_uuid")
 
-                    self._irods_downloader.download(sample_path, save_dir_input)
+                sample_path = dataset_uuid + "/primary/" + subject_id + "/" + sample_id
 
-                    local_sample_path = save_dir_input + "/" + sample_uuid
-                    if os.path.exists(local_sample_path):
-                        shutil.rmtree(local_sample_path)
+                local_sample_path_tmp = assay_input_dir + "/" + sample_id
+                if os.path.exists(local_sample_path_tmp):
+                    shutil.rmtree(local_sample_path_tmp)
 
-                    os.rename(local_sample_path_tmp, local_sample_path)
+                self._irods_downloader.download(sample_path, assay_input_dir)
+
+                local_sample_path = assay_input_dir + "/" + sample_uuid
+                if os.path.exists(local_sample_path):
+                    shutil.rmtree(local_sample_path)
+
+                os.rename(local_sample_path_tmp, local_sample_path)
+
+
