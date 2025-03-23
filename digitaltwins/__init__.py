@@ -15,5 +15,8 @@
 # from .metadata.exporter import Exporter
 
 
-from .core.querier_factory import QuerierFactory
+from .core.querier import Querier
+from .core.uploader import Uploader
+# from .core.querier_factory import QuerierFactory
 from .core.downloader import Downloader
+from .core.workflow import Workflow

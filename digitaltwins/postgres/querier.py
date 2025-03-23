@@ -1,14 +1,14 @@
-from ..abstract.abstract_querier import AbstractQuerier
+from ..utils.config_loader import ConfigLoader
 
 import psycopg2
 
 
-class Querier(AbstractQuerier):
+class Querier(object):
     def __init__(self, config_file):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
-        super(Querier, self).__init__(config_file)
+        self._configs = ConfigLoader.load_from_ini(config_file)
 
         configs_postgres = self._configs["postgres"]
         self._host = configs_postgres["host"]
@@ -34,10 +34,14 @@ class Querier(AbstractQuerier):
         self._cur.close()
         self._conn.close()
 
-    def _query(self, sql):
+    def _query(self, sql, values=None):
         self._connect()
 
-        self._cur.execute(sql)
+        if values:
+            self._cur.execute(sql, values)
+        else:
+            self._cur.execute(sql)
+
         resp = self._cur.fetchall()
 
         self._disconnect()
@@ -105,6 +109,24 @@ class Querier(AbstractQuerier):
 
         return results
 
+    def get_dataset(self, dataset_uuid):
+        sql = "SELECT * FROM dataset WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
+        results = self._query(sql)
+
+        return results
+
+    def get_dataset_uuid_by_seek_id(self, seek_id):
+        sql = "SELECT dataset_uuid FROM dataset WHERE seek_id='{seek_id}'".format(seek_id=seek_id)
+        results = self._query(sql)
+
+        if len(results) > 0:
+            dataset_uuid = results[0].get("dataset_uuid")
+        else:
+            print("No dataset found by seek_id '{}'".format(seek_id))
+            dataset_uuid = None
+
+        return dataset_uuid
+
     def get_dataset_descriptions(self, dataset_uuid):
         sql = "SELECT * FROM dataset_description WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
         results = self._query(sql)
@@ -141,6 +163,75 @@ class Querier(AbstractQuerier):
 
     def get_sample(self, sample_uuid):
         sql = "SELECT * FROM sample WHERE sample_uuid='{sample_uuid}'".format(sample_uuid=sample_uuid)
+        resp = self._query(sql)
+
+        return resp
+
+    def get_workflow(self, dataset_uuid):
+        sql = "SELECT * FROM workflow WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
+
+        resp = self._query(sql)
+
+        return resp
+
+    def get_dataset_sample_types(self, dataset_uuid):
+        sql = "SELECT DISTINCT dataset_uuid, sample_uuid FROM dataset_mapping WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
+
+        resp = self._query(sql)
+
+        sample_uuids = list()
+        for sample in resp:
+            sample_uuid = sample.get("sample_uuid")
+            sample_uuids.append(sample_uuid)
+
+        formatted_sample_uuids_list = []
+
+        # Loop through each category and format it
+        for sample_uuid in sample_uuids:
+            formatted_sample_uuids = f"'{sample_uuid}'"
+            formatted_sample_uuids_list.append(formatted_sample_uuids)
+
+        formatted_sample_uuids = ', '.join(formatted_sample_uuids_list)
+        sql = f"SELECT sample_type FROM sample WHERE sample_uuid IN ({formatted_sample_uuids})"
+
+        resp = self._query(sql)
+
+        sample_types = list()
+        for row in resp:
+            sample_type = row.get("sample_type")
+            if sample_type and sample_type not in sample_types:
+                sample_types.append(sample_type)
+
+        return sample_types
+
+    def get_assay(self, seek_id=""):
+        result = None
+        sql = ("SELECT * FROM assay "
+               "WHERE assay_seek_id = %s")
+        resp = self._query(sql, (seek_id,))
+        result = resp[0]
+        assay_uuid = result.get("assay_uuid")
+
+        # inputs
+        sql = ("SELECT * FROM assay_input "
+               "WHERE assay_uuid = %s")
+        resp = self._query(sql, (assay_uuid,))
+        result["inputs"] = resp
+
+        sql = ("SELECT * FROM assay_output "
+               "WHERE assay_uuid = %s")
+        resp = self._query(sql, (assay_uuid,))
+        result["outputs"] = resp
+
+        return result
+
+    def get_dataset_samples(self, dataset_uuid, sample_type=None):
+        sql = (r"SELECT * "
+               r"FROM dataset_mapping "
+               r"INNER JOIN sample ON dataset_mapping.sample_uuid = sample.sample_uuid "
+               r"WHERE dataset_mapping.dataset_uuid='{dataset_uuid}' "
+               r"AND sample.sample_type='{sample_type}'").format(dataset_uuid=dataset_uuid, sample_type=sample_type)
+
         resp = self._query(sql)
 
         return resp
