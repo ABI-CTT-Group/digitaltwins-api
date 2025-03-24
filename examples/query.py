@@ -31,7 +31,7 @@ if __name__ == '__main__':
 
     print("investigation 2:")
     investigation_id = 2
-    investigation = querier.get_project(investigation_id)
+    investigation = querier.get_investigation(investigation_id)
     print(investigation)
 
     print("studies:")
