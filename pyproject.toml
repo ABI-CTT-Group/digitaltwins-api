@@ -1,0 +1,42 @@
+[build-system]
+requires = ["setuptools>=56.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "digitaltwins"
+dynamic = ["version", "dependencies"]
+description = "A Python tool for interacting with the 12 Labours DigitalTWINS (Digital Translational Workflows for Integrating Systems) Platform"
+authors = [
+    { name = "Chinchien Lin", email = "clin864@aucklanduni.ac.nz"},
+    { name = "Thiranja Prasad Babarenda Gamage", email = "psam012@aucklanduni.ac.nz"},
+    { name = "Linkun Gao"},
+    { name = "Jiali Xu"},
+    { name = "David Nickerson"}
+]
+maintainers = [{ name = "Chinchien Lin", email = "clin864@aucklanduni.ac.nz"}]
+readme = "README.md"
+requires-python = ">=3.8"
+license = "Apache-2.0"
+
+[project.urls]
+Homepage = "https://github.com/ABI-CTT-Group/digitaltwins-api"
+
+[tool.setuptools.dynamic]
+version = { attr = "digitaltwins.__version__.__version__" }
+dependencies = { file = "requirements-prod.txt" }
+
+[tool.setuptools]
+packages = ["digitaltwins"]
+include-package-data = true
+#license-files = ["LICENSE"] # introduced in PEP639. However, as of February 2025, setuptools does not support PEP639 yet
+
+[tool.setuptools.package-data]
+"digitaltwins" = ["resources/**"]
+
+
+
+# Validating
+    # python -m build -v
+# Building
+    # python -m build
+
