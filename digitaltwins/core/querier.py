@@ -28,6 +28,11 @@ class Querier(object):
         else:
             self._seek_querier = None
 
+        if self._configs.getboolean("irods", "enabled"):
+            self._irods_querier = IRODSQuerier(config_file)
+        else:
+            self._irods_querier = None
+
     def get_dependencies(self, data, target):
         relationships = self._seek_querier.get_dependencies(data, target)
 
