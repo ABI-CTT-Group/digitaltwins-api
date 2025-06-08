@@ -1,3 +1,6 @@
+from pathlib import Path
+from irods.session import iRODSSession
+
 from ..utils.config_loader import ConfigLoader
 
 class Querier(object):
@@ -18,5 +21,19 @@ class Querier(object):
         self._password = self._configs.get("irods_password")
         self._zone = self._configs.get("irods_zone")
         self._project_root = self._configs.get("irods_project_root")
+
+    def load_file(self, path):
+        with iRODSSession(host=self._host,
+                          port=self._port,
+                          user=self._user,
+                          password=self._password,
+                          zone=self._zone) as session:
+            path = Path(self._project_root) / path
+            obj = session.data_objects.get(str(path))
+
+            with obj.open('r') as file_obj:
+                contents = file_obj.read()
+
+        return contents
 
 
