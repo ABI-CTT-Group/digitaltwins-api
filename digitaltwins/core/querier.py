@@ -1,8 +1,11 @@
+import yaml
+
 from ..utils.config_loader import ConfigLoader
 
 from ..postgres.querier import Querier as PostgresQuerier
 from ..gen3.querier import Querier as Gen3Querier
 from ..seek.querier import Querier as SeekQuerier
+from ..irods.querier import Querier as IRODSQuerier
 
 
 class Querier(object):
@@ -27,6 +30,11 @@ class Querier(object):
             self._seek_querier = SeekQuerier(config_file)
         else:
             self._seek_querier = None
+
+        if self._configs.getboolean("irods", "enabled"):
+            self._irods_querier = IRODSQuerier(config_file)
+        else:
+            self._irods_querier = None
 
     def get_dependencies(self, data, target):
         relationships = self._seek_querier.get_dependencies(data, target)
@@ -134,7 +142,7 @@ class Querier(object):
 
         return results
 
-    def get_sop(self, sop_id):
+    def get_sop(self, sop_id, get_cwl=False):
         if self._configs.getboolean("seek", "enabled"):
             results = self._seek_querier.get_sop(sop_id)
         else:
@@ -168,6 +176,12 @@ class Querier(object):
         results["inputs"] = inputs
         results["outputs"] = outputs
 
+        if get_cwl:
+            file_path = "./" + dataset_uuid + '/primary/workflow.cwl'
+            contents = self._irods_querier.load_file(file_path)
+            contents = yaml.safe_load(contents)
+            results["cwl"] = contents
+
         return results
 
     def get_datasets(self, descriptions=False, categories=list(), keywords=dict()):
@@ -188,4 +202,5 @@ class Querier(object):
     def get_dataset_samples(self, dataset_uuid, sample_type=None):
         results = self._postgre_querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
         return results
+
 

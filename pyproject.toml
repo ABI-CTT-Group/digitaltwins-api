@@ -23,7 +23,7 @@ Homepage = "https://github.com/ABI-CTT-Group/digitaltwins-api"
 
 [tool.setuptools.dynamic]
 version = { attr = "digitaltwins.__version__.__version__" }
-dependencies = { file = "requirements-prod.txt" }
+dependencies = { file = ["requirements-prod.txt"] }
 
 [tool.setuptools]
 packages = ["digitaltwins"]
