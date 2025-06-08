@@ -1,5 +1,6 @@
 from pathlib import Path
 from irods.session import iRODSSession
+from irods.exception import DataObjectDoesNotExist
 
 from ..utils.config_loader import ConfigLoader
 
@@ -29,7 +30,11 @@ class Querier(object):
                           password=self._password,
                           zone=self._zone) as session:
             path = Path(self._project_root) / path
-            obj = session.data_objects.get(str(path))
+
+            try:
+                obj = session.data_objects.get(str(path))
+            except DataObjectDoesNotExist:
+                raise FileNotFoundError(f"The CWL file was not found in iRODS: {path}")
 
             with obj.open('r') as file_obj:
                 contents = file_obj.read()
