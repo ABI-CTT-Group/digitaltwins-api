@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     print("SOP 1:")
     sop_id = 1
-    sop = querier.get_sop(sop_id)
+    sop = querier.get_sop(sop_id, get_cwl=False)
     print(sop)
 
     # Object dependencies can be collected by get_dependencies(data, target). e.g.
