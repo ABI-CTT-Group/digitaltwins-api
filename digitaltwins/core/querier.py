@@ -189,8 +189,15 @@ class Querier(object):
 
         return results
 
-    def get_dataset(self, dataset_uuid):
+    def get_dataset(self, dataset_uuid, get_cwl=False):
         results = self._postgre_querier.get_dataset(dataset_uuid=dataset_uuid)
+
+        if get_cwl:
+            if results.get("category") == "tool":
+                file_path = "./" + dataset_uuid + "/primary/" + results.get("dataset_name") + ".cwl"
+                contents = self._irods_querier.load_file(file_path)
+                contents = yaml.safe_load(contents)
+                results["cwl"] = contents
 
         return results
 
