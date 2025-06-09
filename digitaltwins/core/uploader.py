@@ -20,6 +20,8 @@ class Uploader(object):
 
         if self._configs.getboolean("postgres", "enabled"):
             self._postgre_uploader = PostgresUploader(config_file)
+        else:
+            self._postgre_uploader = None
 
         # if self._configs.getboolean("gen3", "enabled"):
         #     self._gen3_uploader = Gen3Uploader(config_file)
