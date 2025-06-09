@@ -113,7 +113,7 @@ class Querier(object):
         sql = "SELECT * FROM dataset WHERE dataset_uuid='{dataset_uuid}'".format(dataset_uuid=dataset_uuid)
         results = self._query(sql)
 
-        return results
+        return results[0]
 
     def get_dataset_uuid_by_seek_id(self, seek_id):
         sql = "SELECT dataset_uuid FROM dataset WHERE seek_id='{seek_id}'".format(seek_id=seek_id)
