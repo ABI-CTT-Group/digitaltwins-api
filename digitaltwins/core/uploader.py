@@ -4,6 +4,7 @@ from pathlib import Path
 from ..utils.config_loader import ConfigLoader
 
 from ..postgres.uploader import Uploader as PostgresUploader
+from ..irods.uploader import Uploader as IRODSUploader
 
 
 class Uploader(object):
@@ -26,10 +27,13 @@ class Uploader(object):
         # if self._configs.getboolean("gen3", "enabled"):
         #     self._gen3_uploader = Gen3Uploader(config_file)
         #
-        # if self._configs.getboolean("irods", "enabled"):
-        #     self._irods_uploader = IrodsUploader(config_file)
+
+        if self._configs.getboolean("irods", "enabled"):
+            self._irods_uploader = IRODSUploader(config_file)
+        else:
+            self._irods_uploader = None
+
 
     def upload_assay(self, assay_data):
         self._postgre_uploader.upload_assay(assay_data)
-
 
