@@ -2,6 +2,7 @@ import yaml
 
 from ..utils.config_loader import ConfigLoader
 
+
 class Querier(object):
 
     def __init__(self, config_file):
@@ -183,7 +184,8 @@ class Querier(object):
         return results
 
     def get_datasets(self, descriptions=False, categories=list(), keywords=dict()):
-        results = self._postgre_querier.get_datasets(descriptions=descriptions, categories=categories, keywords=keywords)
+        results = self._postgre_querier.get_datasets(descriptions=descriptions, categories=categories,
+                                                     keywords=keywords)
 
         return results
 
@@ -207,5 +209,3 @@ class Querier(object):
     def get_dataset_samples(self, dataset_uuid, sample_type=None):
         results = self._postgre_querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
         return results
-
-
