@@ -2,12 +2,6 @@ import yaml
 
 from ..utils.config_loader import ConfigLoader
 
-from ..postgres.querier import Querier as PostgresQuerier
-from ..gen3.querier import Querier as Gen3Querier
-from ..seek.querier import Querier as SeekQuerier
-from ..irods.querier import Querier as IRODSQuerier
-
-
 class Querier(object):
 
     def __init__(self, config_file):
@@ -17,21 +11,25 @@ class Querier(object):
             raise ValueError("Metadata service conflict. Only one of 'postgres' or 'gen3' can be enabled")
 
         if self._configs.getboolean("postgres", "enabled"):
+            from ..postgres.querier import Querier as PostgresQuerier
             self._postgre_querier = PostgresQuerier(config_file)
         else:
             self._postgre_querier = None
 
         if self._configs.getboolean("gen3", "enabled"):
+            from ..gen3.querier import Querier as Gen3Querier
             self._gen3_querier = Gen3Querier(config_file)
         else:
             self._gen3_querier = None
 
         if self._configs.getboolean("seek", "enabled"):
+            from ..seek.querier import Querier as SeekQuerier
             self._seek_querier = SeekQuerier(config_file)
         else:
             self._seek_querier = None
 
         if self._configs.getboolean("irods", "enabled"):
+            from ..irods.querier import Querier as IRODSQuerier
             self._irods_querier = IRODSQuerier(config_file)
         else:
             self._irods_querier = None
