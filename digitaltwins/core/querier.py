@@ -183,7 +183,12 @@ class Querier(object):
 
         return results
 
-    def get_datasets(self, descriptions=False, categories=list(), keywords=dict()):
+    def get_datasets(self, descriptions=False, categories=None, keywords=None):
+        if keywords is None:
+            keywords = dict()
+        if categories is None:
+            categories = list()
+
         results = self._postgre_querier.get_datasets(descriptions=descriptions, categories=categories,
                                                      keywords=keywords)
 
