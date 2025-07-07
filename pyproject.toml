@@ -26,7 +26,7 @@ version = { attr = "digitaltwins.__version__.__version__" }
 dependencies = { file = ["requirements-prod.txt"] }
 
 [tool.setuptools]
-packages = ["digitaltwins"]
+packages = { find = {} }
 include-package-data = true
 #license-files = ["LICENSE"] # introduced in PEP639. However, as of February 2025, setuptools does not support PEP639 yet
 

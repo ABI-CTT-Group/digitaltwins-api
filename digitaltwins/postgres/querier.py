@@ -88,7 +88,12 @@ class Querier(object):
 
         return results
 
-    def get_datasets(self, descriptions=False, categories=list(), keywords=dict()):
+    def get_datasets(self, descriptions=False, categories=None, keywords=None):
+        if categories is None:
+            categories = list()
+        if keywords is None:
+            keywords = dict()
+
         if len(categories) == 0:
             sql = "SELECT * FROM dataset"
         else:
