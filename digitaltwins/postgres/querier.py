@@ -94,11 +94,6 @@ class Querier(object):
         if keywords is None:
             keywords = dict()
 
-        if keywords is None:
-            keywords = dict()
-        if categories is None:
-            categories = list()
-
         if len(categories) == 0:
             sql = "SELECT * FROM dataset"
         else:
