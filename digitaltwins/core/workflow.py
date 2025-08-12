@@ -25,10 +25,7 @@ class Workflow(object):
         :return:
         :rtype:
         """
-        # get assay params
-        querier = Querier(self._config_file)
-        assay = querier.get_assay(assay_id, get_params=True)
 
-        response, workflow_monitor_url = self._airflow_workflow.run(assay)
+        response, workflow_monitor_url = self._airflow_workflow.run(assay_id)
 
         return response, workflow_monitor_url
