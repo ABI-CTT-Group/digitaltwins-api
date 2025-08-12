@@ -97,6 +97,17 @@ class Uploader(object):
         cohort = assay_data.get("cohort")
         ready = assay_data.get("ready")
 
+        # # todo. check if assay_seek_id exists
+        # # if exists update, otherwise insert
+        # """
+        # sql = f"SELECT EXISTS (SELECT 1 FROM {table} WHERE assay_seek_id = %s)"
+        #
+        # INSERT INTO assay (assay_seek_id, workflow_seek_id, cohort, ready)
+        # VALUES (assay_seek_id, workflow_seek_id, cohort, ready)
+        # ON CONFLICT (assay_seek_id) DO UPDATE
+        # SET workflow_seek_id = workflow_seek_id, cohort = cohort, ready=ready;
+        # """
+
         if assay_uuid:
             sql = r"UPDATE assay SET workflow_seek_id = %s, cohort = %s, ready = %s WHERE assay_uuid = %s RETURNING *;"
             values = (workflow_seek_id, cohort, ready, assay_uuid)

@@ -26,6 +26,8 @@ class Workflow(object):
 
         assay_params = assay.get("params")
 
+        # todo. create assay workspace id and write into the assay table
+
         # get dag_url
         workflow_seek_id = assay_params.get('workflow_seek_id')
         querier = Querier(self._config_file)
