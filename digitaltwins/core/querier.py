@@ -207,6 +207,13 @@ class Querier(object):
 
         return results
 
+    def get_tool(self, tool_id):
+        if self._configs.getboolean("seek", "enabled"):
+            results = self._seek_querier.get_tool(tool_id)
+        else:
+            raise ValueError("Missing metadata service: SEEK")
+
+        return results
 
     def get_datasets(self, descriptions=False, categories=None, keywords=None):
         categories = list(categories) if categories is not None else []

@@ -201,3 +201,9 @@ class Querier(object):
 
         return data
 
+    def get_tool(self, tool_id):
+        url = self._base_url + "/workflows/" + str(tool_id) + ".json"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
