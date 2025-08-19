@@ -21,10 +21,14 @@ class Workflow(object):
         self._username = self._configs.get('username')
         self._password = self._configs.get('password')
 
-    def run(self, assay):
-        assay_seek_id = assay.get("id")
+    def run(self, assay_id):
+        querier = Querier(self._config_file)
+        assay = querier.get_assay(assay_id, get_params=True)
 
+        assay_seek_id = assay_id
         assay_params = assay.get("params")
+
+        # todo. create assay workspace id and write into the assay table
 
         # get dag_url
         workflow_seek_id = assay_params.get('workflow_seek_id')
@@ -60,4 +64,3 @@ class Workflow(object):
         # )
 
         return response, dag_rul_ui
-

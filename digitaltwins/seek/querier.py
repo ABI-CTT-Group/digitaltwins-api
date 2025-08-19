@@ -179,3 +179,31 @@ class Querier(object):
         data = self._format_resp(resp)
 
         return data
+
+    def get_workflows(self):
+        url = self._base_url + "/workflows?filter%5Btag%5D=workflow"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
+
+    def get_workflow(self, workflow_id):
+        url = self._base_url + "/workflows/" + str(workflow_id) + ".json"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
+
+    def get_tools(self):
+        url = self._base_url + "/workflows?filter%5Btag%5D=tool"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
+
+    def get_tool(self, tool_id):
+        url = self._base_url + "/workflows/" + str(tool_id) + ".json"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
