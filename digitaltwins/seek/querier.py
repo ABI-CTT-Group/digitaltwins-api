@@ -179,3 +179,11 @@ class Querier(object):
         data = self._format_resp(resp)
 
         return data
+
+    def get_workflows(self):
+        url = self._base_url + "/workflows?filter%5Btag%5D=workflow"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
+
