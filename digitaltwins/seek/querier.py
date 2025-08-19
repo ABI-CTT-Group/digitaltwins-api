@@ -194,3 +194,10 @@ class Querier(object):
 
         return data
 
+    def get_tools(self):
+        url = self._base_url + "/workflows?filter%5Btag%5D=tool"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
+
