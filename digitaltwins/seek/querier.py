@@ -187,3 +187,10 @@ class Querier(object):
 
         return data
 
+    def get_workflow(self, workflow_id):
+        url = self._base_url + "/workflows/" + str(workflow_id) + ".json"
+        resp = requests.get(url, headers=self._headers)
+        data = self._format_resp(resp)
+
+        return data
+
