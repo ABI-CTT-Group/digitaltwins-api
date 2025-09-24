@@ -212,7 +212,11 @@ class Querier(object):
         sql = ("SELECT * FROM assay "
                "WHERE assay_seek_id = %s")
         resp = self._query(sql, (seek_id,))
-        result = resp[0]
+        try:
+            result = resp[0]
+        except IndexError:
+            result = None
+            return result
         assay_uuid = result.get("assay_uuid")
 
         # inputs
