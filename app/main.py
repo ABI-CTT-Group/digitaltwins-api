@@ -11,6 +11,7 @@ from app.routers import health
 from app.routers import auth
 from app.routers import query
 
+
 def initialise(app):
     origins = [
         # "http://localhost:3000",
@@ -44,4 +45,3 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
-

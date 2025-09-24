@@ -35,6 +35,7 @@ def auth_basic(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     else:
         return True
 
+
 def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
     token = credentials.credentials
     data = {
@@ -53,9 +54,10 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
     else:
         return True
 
+
 def validate_credentials(
-    basic_credentials: HTTPBasicCredentials = Depends(HTTPBasic(auto_error=False)),
-    bearer_credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False))
+        basic_credentials: HTTPBasicCredentials = Depends(HTTPBasic(auto_error=False)),
+        bearer_credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False))
 ):
     if basic_credentials:
         valid = auth_basic(basic_credentials)
@@ -77,6 +79,7 @@ def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     result = get_token(credentials)
     return result
 
+
 @router.post("/token", tags=["auth"])
 def get_token(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     payload = {
@@ -96,6 +99,7 @@ def get_token(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     # token = response_json.get("access_token")
 
     return response.json()
+
 
 @router.get("/verify_token", tags=["auth"])
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
