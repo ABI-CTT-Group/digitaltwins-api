@@ -74,3 +74,14 @@ def get_assays(get_details=False, valid=Depends(validate_credentials)):
 def get_assay(assay_id=None, get_params=False, valid=Depends(validate_credentials)):
     assay = querier.get_assay(assay_id, get_params=get_params)
     return {"assay": assay}
+
+@router.get("/workflows", tags=["query"])
+def get_workflows(valid=Depends(validate_credentials)):
+    workflows = querier.get_workflows()
+    return {"workflows": workflows}
+
+
+@router.get("/workflows/{workflow_id}", tags=["query"])
+def get_workflow(workflow_id=None, valid=Depends(validate_credentials)):
+    workflow = querier.get_workflow(workflow_id)
+    return {"workflow": workflow}
