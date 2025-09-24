@@ -1,7 +1,7 @@
 # uvicorn main:app --reload --port 8010
 # public (listen on all network instances):
 # uvicorn main:app --reload --host 0.0.0.0 --port 8010
-# testing on:
+# API docs:
 #   - Swagger: http://localhost:8010/docs
 #   - Redoc: http://localhost:8010/redoc
 
