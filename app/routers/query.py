@@ -85,3 +85,14 @@ def get_workflows(valid=Depends(validate_credentials)):
 def get_workflow(workflow_id=None, valid=Depends(validate_credentials)):
     workflow = querier.get_workflow(workflow_id)
     return {"workflow": workflow}
+
+@router.get("/tools", tags=["query"])
+def get_tools(valid=Depends(validate_credentials)):
+    tools = querier.get_tools()
+    return {"tools": tools}
+
+
+@router.get("/tools/{tool_id}", tags=["query"])
+def get_tool(tool_id=None, valid=Depends(validate_credentials)):
+    tool = querier.get_tool(tool_id)
+    return {"tool": tool}
