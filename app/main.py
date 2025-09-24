@@ -7,6 +7,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.routers import health
 def initialise(app):
     origins = [
         # "http://localhost:3000",
@@ -30,6 +31,9 @@ def create_app() -> FastAPI:
 
     # initialise app settings
     app = initialise(app)
+
+    # include routers
+    app.include_router(health.router)
 
     return app
 
