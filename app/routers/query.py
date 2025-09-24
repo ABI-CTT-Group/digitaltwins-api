@@ -17,12 +17,14 @@ router = APIRouter()
 querier = Querier(CONFIG_FILE_PATH)
 
 
+
+
 @router.get("/programs", tags=["query"])
-def programs(program_id=None, get_details=False, valid=Depends(validate_credentials)):
-    if program_id:
-        program = querier.get_program(program_id)
-        return {"program": program}
-    else:
-        programs = querier.get_programs(get_details=get_details)
-        return {"programs": programs}
+def programs(get_details=False, valid=Depends(validate_credentials)):
+    programs = querier.get_programs(get_details=get_details)
+    return {"programs": programs}
+@router.get("/programs/{program_id}", tags=["query"])
+def program(program_id=None, valid=Depends(validate_credentials)):
+    program = querier.get_program(program_id)
+    return {"program": program}
 
