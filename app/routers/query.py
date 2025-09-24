@@ -28,3 +28,14 @@ def program(program_id=None, valid=Depends(validate_credentials)):
     program = querier.get_program(program_id)
     return {"program": program}
 
+
+
+@router.get("/projects", tags=["query"])
+def projects(get_details=False, valid=Depends(validate_credentials)):
+    projects = querier.get_projects(get_details=get_details)
+    return {"projects": projects}
+@router.get("/projects/{project_id}", tags=["query"])
+def project(project_id=None, valid=Depends(validate_credentials)):
+    project = querier.get_project(project_id)
+    return {"project": project}
+
