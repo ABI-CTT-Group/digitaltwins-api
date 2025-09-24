@@ -48,3 +48,12 @@ def investigation(investigation_id=None, valid=Depends(validate_credentials)):
     investigation = querier.get_investigation(investigation_id)
     return {"investigation": investigation}
 
+@router.get("/studies", tags=["query"])
+def studies(get_details=False, valid=Depends(validate_credentials)):
+    studies = querier.get_studies(get_details=get_details)
+    return {"studies": studies}
+@router.get("/investigations/{study_id}", tags=["query"])
+def study(study_id=None, valid=Depends(validate_credentials)):
+    study = querier.get_study(study_id)
+    return {"study": study}
+
