@@ -5,8 +5,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 
 from digitaltwins import Querier
-
-from app.routers.auth import validate_credentials
+from .auth import validate_credentials
 
 load_dotenv()
 CONFIG_FILE_PATH = os.getenv("CONFIG_FILE_PATH")
