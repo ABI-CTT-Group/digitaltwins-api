@@ -57,7 +57,7 @@ def get_studies(get_details=False, valid=Depends(validate_credentials)):
     return {"studies": studies}
 
 
-@router.get("/investigations/{study_id}", tags=["query"])
+@router.get("/studies/{study_id}", tags=["query"])
 def get_study(study_id=None, valid=Depends(validate_credentials)):
     study = querier.get_study(study_id)
     return {"study": study}
