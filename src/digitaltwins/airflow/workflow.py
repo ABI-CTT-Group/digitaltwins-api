@@ -18,7 +18,8 @@ class Workflow(object):
         self._configs = ConfigLoader.load_from_ini(config_file)
         self._configs = self._configs["airflow"]
 
-        # get airflow api url and username/password
+        # get airflow configs
+        self._airflow_version = self._configs.get('airflow_version')
         self._airflow_endpoint = self._configs.get('airflow_endpoint')
         self._airflow_api_url = self._configs.get('airflow_api_url')
         self._username = self._configs.get('username')
@@ -44,8 +45,6 @@ class Workflow(object):
         assay_params = assay.get("params")
 
         # todo. create assay workspace id and write into the assay table
-
-        api_token = self.get_api_token()
 
         # get dag_url
         workflow_seek_id = assay_params.get('workflow_seek_id')
@@ -73,6 +72,7 @@ class Workflow(object):
                 data=json.dumps({"conf": params})
             )
         elif self._airflow_version == "3":
+            api_token = self.get_api_token()
             url = f"{self._airflow_api_url}/dags/preprocessor/dagRuns"
             headers = {
                 "Authorization": f"Bearer {api_token}",
