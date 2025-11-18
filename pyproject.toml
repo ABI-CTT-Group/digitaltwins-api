@@ -23,10 +23,12 @@ Homepage = "https://github.com/ABI-CTT-Group/digitaltwins-api"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-#packages = { find = {} }
-packages = ["digitaltwins"]
+#packages = ["digitaltwins"]
 include-package-data = true
 #license-files = ["LICENSE"] # introduced in PEP639. However, as of February 2025, setuptools does not support PEP639 yet
+
+[tool.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.dynamic]
 version = { attr = "digitaltwins.__version__.__version__" }
