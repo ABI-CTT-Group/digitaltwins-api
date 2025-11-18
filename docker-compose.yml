@@ -1,0 +1,18 @@
+services:
+  digitaltwins-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digitaltwins-api
+    ports:
+      - "8010:8000"
+    env_file:
+      - .env-docker
+    volumes:
+      - ./configs-docker.ini:/digitaltwins-api/configs.ini
+
+networks:
+  digitaltwins:
+    driver: bridge
+
+# access api docs: http:localhost:8010/docs
