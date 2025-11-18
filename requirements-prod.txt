@@ -3,3 +3,9 @@ gen3 == 4.26.1
 requests == 2.32.3
 urllib3 == 2.3.0
 python-irodsclient == 3.0.0
+rocrate == 0.14.2
+
+# fastapi
+fastapi==0.116.1
+uvicorn[standard]
+python-multipart==0.0.20
