@@ -6,10 +6,20 @@ services:
     container_name: digitaltwins-api
     ports:
       - "8010:8000"
-    env_file:
-      - .env-docker
+    environment:
+      # api config file path
+      CONFIG_FILE_PATH: ${CONFIG_FILE_PATH:-/digitaltwins-api/configs.ini}
+      # keycloak settings
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://keycloak:8080}
+      REALM: ${REALM:-digitaltwins}
+      ALGORITHM: ${ALGORITHM:-RS256}
+      CLIENT_ID: ${CLIENT_ID:-api}
+      CLIENT_SECRET: ${CLIENT_SECRET:-}
+      REALM_URL: ${REALM_URL:-http://keycloak:8080/realms/digitaltwins}
+      KEYCLOAK_TOKEN_URL: ${KEYCLOAK_TOKEN_URL:-http://keycloak:8080/realms/digitaltwins/protocol/openid-connect/token}
+      KEYCLOAK_INTROSPECT_URL: ${KEYCLOAK_INTROSPECT_URL:-http://host.docker.internal:8080/realms/digitaltwins/protocol/openid-connect/token/introspect}
     volumes:
-      - ./configs-docker.ini:/digitaltwins-api/configs.ini
+      - ./configs.ini:/digitaltwins-api/configs.ini
 
 networks:
   digitaltwins:
