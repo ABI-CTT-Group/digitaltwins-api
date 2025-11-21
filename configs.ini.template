@@ -2,6 +2,7 @@
 metadata_service = postgres
 ;metadata_service = gen3
 [postgres]
+enabled =
 host =
 port =
 database =
@@ -10,6 +11,7 @@ password =
 program =
 projects =
 [gen3]
+enabled =
 endpoint =
 api_key =
 api_key_id =
@@ -18,6 +20,7 @@ ssl_cert =
 program =
 project =
 [irods]
+enabled =
 irods_host =
 irods_port =
 irods_user =
@@ -25,6 +28,26 @@ irods_password =
 irods_zone =
 irods_project_root =
 [seek]
+enabled = true
 host =
 port =
-api_token =
+api_token=
+[airflow]
+enabled = true
+airflow_endpoint = http://airflow-apiserver:8080
+airflow_api_url = http://airflow-apiserver:8080/api/v2
+username =
+password =
+airflow_workspace =
+
+[jupyterlab]
+jupyterlab_url =
+token =
+
+[minio]
+MINIO_HOST=
+MINIO_PORT=
+MINIO_ROOT_USER=
+MINIO_ROOT_PASSWORD=
+MINIO_SERVER_ACCESS_KEY=
+MINIO_SERVER_SECRET_KEY=
