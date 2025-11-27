@@ -3,7 +3,6 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: digitaltwins-api
     ports:
       - "8010:8000"
     environment:
