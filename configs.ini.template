@@ -29,8 +29,8 @@ irods_zone =
 irods_project_root =
 [seek]
 enabled = true
-host =
-port =
+host = http://seek
+port = 3000
 api_token=
 [airflow]
 enabled = true
