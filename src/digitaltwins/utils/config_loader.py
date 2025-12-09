@@ -3,6 +3,29 @@ import configparser
 import os
 from pathlib import Path
 
+from typing import Any, Dict
+
+
+def _coerce_value(s: str) -> Any:
+    v = s.strip()
+    low = v.lower()
+    if low in {"true", "yes", "on"}:
+        return True
+    if low in {"false", "no", "off"}:
+        return False
+    if low in {"none", "null"}:
+        return None
+    if v == "":
+        return ""
+    try:
+        return int(v)
+    except ValueError:
+        pass
+    try:
+        return float(v)
+    except ValueError:
+        pass
+    return v
 
 class ConfigLoader(object):
     def __init__(self, file=None):
@@ -26,3 +49,18 @@ class ConfigLoader(object):
         configs.read(config_file)
 
         return configs
+
+    @staticmethod
+    def configs_to_dict(parser):
+        result: Dict[str, Any] = {}
+
+        for section in parser.sections():
+            parts = section.split(".")
+            target: Dict[str, Any] = result
+            for part in parts:
+                target = target.setdefault(part, {})
+            for opt in parser.options(section):
+                raw = parser.get(section, opt)
+                target[opt] = _coerce_value(raw)
+
+        return result
