@@ -76,7 +76,7 @@ def validate_credentials(
 @router.post("/login", tags=["auth"])
 def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     # validate_credentials(credentials)
-    result = get_token(credentials)
+    result = get_token(basic_credentials=credentials)
     return result
 
 
