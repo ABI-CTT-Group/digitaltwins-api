@@ -104,7 +104,7 @@ def get_token(
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid authentication method",
-            headers={"WWW-Authenticate": "Basic"},
+            headers={"WWW-Authenticate": "Basic, Bearer"},
         )
 
     response = requests.post(KEYCLOAK_TOKEN_URL, data=payload)
