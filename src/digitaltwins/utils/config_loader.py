@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Any, Dict
 
 
-def is_truthy(value):
+def is_truthy(value: Any) -> bool:
     """
     Converts configuration strings (like 'true', '1', 'yes') into a
     Python boolean True, and all other values/None to False.
