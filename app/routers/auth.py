@@ -81,14 +81,31 @@ def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
 
 
 @router.post("/token", tags=["auth"])
-def get_token(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
-    payload = {
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-        "grant_type": "password",
-        "username": credentials.username,
-        "password": credentials.password
-    }
+def get_token(
+        basic_credentials: HTTPBasicCredentials = Depends(HTTPBasic(auto_error=False)),
+        bearer_credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False))
+):
+    if basic_credentials:
+        payload = {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "grant_type": "password",
+            "username": basic_credentials.username,
+            "password": basic_credentials.password
+        }
+    elif bearer_credentials:
+        payload = {
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "grant_type": "refresh_token",
+            "refresh_token": bearer_credentials.credentials
+        }
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid authentication method",
+            headers={"WWW-Authenticate": "Basic"},
+        )
 
     response = requests.post(KEYCLOAK_TOKEN_URL, data=payload)
 
