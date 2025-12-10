@@ -6,6 +6,18 @@ from pathlib import Path
 from typing import Any, Dict
 
 
+def is_truthy(value):
+    """
+    Converts configuration strings (like 'true', '1', 'yes') into a
+    Python boolean True, and all other values/None to False.
+    """
+    # Handles None or empty string gracefully
+    if not value:
+        return False
+
+    # Converts to lowercase and checks against common truthy strings
+    return str(value).lower() in ("true", "1", "yes", "on")
+
 def _coerce_value(s: str) -> Any:
     v = s.strip()
     low = v.lower()
