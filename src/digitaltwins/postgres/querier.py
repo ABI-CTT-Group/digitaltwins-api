@@ -30,6 +30,10 @@ class Querier(object):
             self._user = os.getenv("POSTGRES_USER")
             self._password = os.getenv("POSTGRES_PASSWORD")
 
+        for var in [self._host, self._port, self._database, self._user, self._password]:
+            if not var:
+                raise ValueError("Postgres configuration is incomplete. Please check your configuration file or environment variables.")
+
         self._cur = None
         self._conn = None
 
