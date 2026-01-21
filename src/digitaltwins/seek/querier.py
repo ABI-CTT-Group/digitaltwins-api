@@ -1,6 +1,11 @@
 from ..utils.config_loader import ConfigLoader
 
 import requests
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class Querier(object):
@@ -8,13 +13,21 @@ class Querier(object):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
-        self._configs = ConfigLoader.load_from_ini(config_file)
+        if not config_file and os.getenv("CONFIG_FILE_PATH"):
+            config_file = os.getenv("CONFIG_FILE_PATH")
 
-        configs = self._configs["seek"]
-        self._host = configs["host"]
-        self._port = configs["port"]
-        self._base_url = self._host + ':' + self._port
-        self._api_token = configs["api_token"]
+        if config_file:
+            self._configs = ConfigLoader.load_from_ini(config_file)
+            configs = self._configs["seek"]
+            self._host = configs["host"]
+            self._port = configs["port"]
+            self._base_url = self._host + ':' + self._port
+            self._api_token = configs["api_token"]
+        else:
+            self._host = os.getenv("SEEK_HOST")
+            self._port = os.getenv("SEEK_PORT")
+            self._base_url = self._host + ':' + self._port
+            self._api_token = os.getenv("SEEK_API_TOKEN")
 
         self._headers = {
             "Authorization": "Bearer " + self._api_token,
