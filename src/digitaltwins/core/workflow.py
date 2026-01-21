@@ -2,8 +2,6 @@ from pathlib import Path
 
 from ..utils.config_loader import ConfigLoader
 
-from digitaltwins import Querier
-
 from ..airflow.workflow import Workflow as AirflowWorkflow
 
 
