@@ -21,14 +21,17 @@ class Querier(object):
             configs = self._configs["seek"]
             self._host = configs["host"]
             self._port = configs["port"]
-            self._base_url = self._host + ':' + self._port
             self._api_token = configs["api_token"]
         else:
             self._host = os.getenv("SEEK_HOST")
             self._port = os.getenv("SEEK_PORT")
-            self._base_url = self._host + ':' + self._port
             self._api_token = os.getenv("SEEK_API_TOKEN")
 
+        for required in [self._host, self._port, self._api_token]:
+            if not required:
+                raise ValueError("Airflow configuration is incomplete. Please check your configuration file.")
+
+        self._base_url = self._host + ':' + self._port
         self._headers = {
             "Authorization": "Bearer " + self._api_token,
             "Accept": "application/json"
