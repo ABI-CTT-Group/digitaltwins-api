@@ -1,35 +1,54 @@
 import yaml
+import os
 
-from ..utils.config_loader import ConfigLoader
+from dotenv import load_dotenv
 
+from ..utils.config_loader import ConfigLoader, is_truthy
+
+load_dotenv()
 
 class Querier(object):
 
-    def __init__(self, config_file):
-        self._configs = ConfigLoader.load_from_ini(config_file)
+    def __init__(self, config_file=None):
+        if not config_file and os.getenv("CONFIG_FILE_PATH"):
+            config_file = os.getenv("CONFIG_FILE_PATH")
+        
+        if config_file:
+            self._configs = ConfigLoader.load_from_ini(config_file)
+            self._postgres_enabled = self._configs.getboolean("postgres", "enabled")
+            self._seek_enabled = self._configs.getboolean("seek", "enabled")
+            self._gen3_enabled = self._configs.getboolean("gen3", "enabled")
+            self._irods_enabled = self._configs.getboolean("irods", "enabled")
+            self._minio_enabled = self._configs.getboolean("minio", "enabled")
+        else:
+            self._postgres_enabled = is_truthy(os.getenv("POSTGRES_ENABLED"))
+            self._seek_enabled = is_truthy(os.getenv("SEEK_ENABLED"))
+            self._gen3_enabled = is_truthy(os.getenv("GEN3_ENABLED"))
+            self._irods_enabled = is_truthy(os.getenv("IRODS_ENABLED"))
+            self._minio_enabled = is_truthy(os.getenv("MINIO_ENABLED"))
 
-        if self._configs.getboolean("postgres", "enabled") and self._configs.getboolean("gen3", "enabled"):
+        if self._postgres_enabled and self._gen3_enabled:
             raise ValueError("Metadata service conflict. Only one of 'postgres' or 'gen3' can be enabled")
 
-        if self._configs.getboolean("postgres", "enabled"):
+        if self._postgres_enabled:
             from ..postgres.querier import Querier as PostgresQuerier
             self._postgre_querier = PostgresQuerier(config_file)
         else:
             self._postgre_querier = None
 
-        if self._configs.getboolean("gen3", "enabled"):
+        if self._gen3_enabled:
             from ..gen3.querier import Querier as Gen3Querier
             self._gen3_querier = Gen3Querier(config_file)
         else:
             self._gen3_querier = None
 
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             from ..seek.querier import Querier as SeekQuerier
             self._seek_querier = SeekQuerier(config_file)
         else:
             self._seek_querier = None
 
-        if self._configs.getboolean("irods", "enabled"):
+        if self._irods_enabled:
             from ..irods.querier import Querier as IRODSQuerier
             self._irods_querier = IRODSQuerier(config_file)
         else:
@@ -41,11 +60,11 @@ class Querier(object):
         return relationships
 
     def get_programs(self, get_details=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_programs(get_details)
-        elif self._configs.getboolean("postgres", "enabled"):
+        elif self._postgres_enabled:
             results = self._postgre_querier.get_programs()
-        elif self._configs.getboolean("gen3", "enabled"):
+        elif self._gen3_enabled:
             results = self._gen3_querier.get_programs()
         else:
             raise ValueError("Missing metadata service")
@@ -53,7 +72,7 @@ class Querier(object):
         return results
 
     def get_program(self, program_id):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_program(program_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -61,11 +80,11 @@ class Querier(object):
         return results
 
     def get_projects(self, get_details=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_projects(get_details)
-        elif self._configs.getboolean("postgres", "enabled"):
+        elif self._postgres_enabled:
             results = self._postgre_querier.get_projects()
-        elif self._configs.getboolean("gen3", "enabled"):
+        elif self._gen3_enabled:
             results = self._gen3_querier.get_projects()
         else:
             raise ValueError("Missing metadata service")
@@ -73,7 +92,7 @@ class Querier(object):
         return results
 
     def get_project(self, project_id):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_project(project_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -81,7 +100,7 @@ class Querier(object):
         return results
 
     def get_investigations(self, get_details=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_investigations(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -89,7 +108,7 @@ class Querier(object):
         return results
 
     def get_investigation(self, investigation_id):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_investigation(investigation_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -97,7 +116,7 @@ class Querier(object):
         return results
 
     def get_studies(self, get_details=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_studies(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -105,7 +124,7 @@ class Querier(object):
         return results
 
     def get_study(self, study_id):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_study(study_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -113,7 +132,7 @@ class Querier(object):
         return results
 
     def get_assays(self, get_details=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_assays(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -121,7 +140,7 @@ class Querier(object):
         return results
 
     def get_assay(self, assay_id, get_params=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_assay(assay_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -134,7 +153,7 @@ class Querier(object):
         return results
 
     def get_sops(self, get_details=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_sops(get_details)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -142,7 +161,7 @@ class Querier(object):
         return results
 
     def get_sop(self, sop_id, get_cwl=False):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_sop(sop_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -184,7 +203,7 @@ class Querier(object):
         return results
 
     def get_workflows(self):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_workflows()
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -192,7 +211,7 @@ class Querier(object):
         return results
 
     def get_workflow(self, workflow_id):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_workflow(workflow_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -200,7 +219,7 @@ class Querier(object):
         return results
 
     def get_tools(self):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_tools()
         else:
             raise ValueError("Missing metadata service: SEEK")
@@ -208,7 +227,7 @@ class Querier(object):
         return results
 
     def get_tool(self, tool_id):
-        if self._configs.getboolean("seek", "enabled"):
+        if self._seek_enabled:
             results = self._seek_querier.get_tool(tool_id)
         else:
             raise ValueError("Missing metadata service: SEEK")

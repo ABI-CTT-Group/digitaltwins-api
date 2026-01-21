@@ -1,4 +1,3 @@
-import configparser
 import os
 import time
 from pathlib import Path
@@ -7,6 +6,7 @@ from gen3.submission import Gen3Submission
 from gen3.auth import Gen3Auth, Gen3AuthError
 
 from requests.exceptions import ConnectionError, HTTPError
+from ..utils.config_loader import ConfigLoader
 
 import urllib3
 urllib3.disable_warnings()
@@ -24,10 +24,8 @@ class Querier(object):
         :param auth: Gen3 authentication object created by the Auth class
         :type auth: object
         """
-        config_file = Path(config_file)
-        self._config_file = config_file
-        self._configs = configparser.ConfigParser()
-        self._configs.read(config_file)
+
+        self._configs = ConfigLoader.load_from_ini(config_file)
 
         self._config_dir = self._config_file.parent
         self._cred_file = Path(self._configs["gen3"].get("cred_file"))

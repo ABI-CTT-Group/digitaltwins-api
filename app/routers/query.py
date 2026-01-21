@@ -9,11 +9,8 @@ from .auth import validate_credentials
 
 load_dotenv()
 CONFIG_FILE_PATH = os.getenv("CONFIG_FILE_PATH")
-
-router = APIRouter()
-
 querier = Querier(CONFIG_FILE_PATH)
-
+router = APIRouter()
 
 @router.get("/programs", tags=["query"])
 def get_programs(get_details=False, valid=Depends(validate_credentials)):
