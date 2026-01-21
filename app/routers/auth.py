@@ -16,13 +16,14 @@ router = APIRouter()
 load_dotenv()
 # Keycloak configs
 KEYCLOAK_BASE_URL = os.getenv("KEYCLOAK_BASE_URL")
-REALM = os.getenv("REALM")
-ALGORITHM = os.getenv("ALGORITHM")
-CLIENT_ID = os.getenv("CLIENT_ID")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET")
-REALM_URL = os.getenv("CLIENT_SECRET")
-KEYCLOAK_TOKEN_URL = os.getenv("KEYCLOAK_TOKEN_URL")
-KEYCLOAK_INTROSPECT_URL = os.getenv("KEYCLOAK_INTROSPECT_URL")
+KEYCLOAK_REALM = os.getenv("KEYCLOAK_REALM")
+KEYCLOAK_ALGORITHM = os.getenv("KEYCLOAK_ALGORITHM")
+KEYCLOAK_CLIENT_ID = os.getenv("KEYCLOAK_CLIENT_ID")
+KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
+
+keycloak_realm_url = f"{KEYCLOAK_BASE_URL}/realms/{KEYCLOAK_REALM}"
+keycloak_token_url = f"{keycloak_realm_url}/protocol/openid-connect/token"
+keycloak_introspect_url = f"{keycloak_token_url}/introspect"
 
 
 def auth_basic(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
@@ -40,11 +41,11 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
     token = credentials.credentials
     data = {
         "token": token,
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET
+        "client_id": KEYCLOAK_CLIENT_ID,
+        "client_secret": KEYCLOAK_CLIENT_SECRET
     }
     # verify token by introspection
-    r = requests.post(KEYCLOAK_INTROSPECT_URL, data=data)
+    r = requests.post(keycloak_introspect_url, data=data)
     result = r.json()
     if not result.get("active", False):
         raise HTTPException(
@@ -87,16 +88,16 @@ def get_token(
 ):
     if basic_credentials:
         payload = {
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
+            "client_id": KEYCLOAK_CLIENT_ID,
+            "client_secret": KEYCLOAK_CLIENT_SECRET,
             "grant_type": "password",
             "username": basic_credentials.username,
             "password": basic_credentials.password
         }
     elif bearer_credentials:
         payload = {
-            "client_id": CLIENT_ID,
-            "client_secret": CLIENT_SECRET,
+            "client_id": KEYCLOAK_CLIENT_ID,
+            "client_secret": KEYCLOAK_CLIENT_SECRET,
             "grant_type": "refresh_token",
             "refresh_token": bearer_credentials.credentials
         }
@@ -107,7 +108,7 @@ def get_token(
             headers={"WWW-Authenticate": "Basic, Bearer"},
         )
 
-    response = requests.post(KEYCLOAK_TOKEN_URL, data=payload)
+    response = requests.post(keycloak_token_url, data=payload)
 
     if response.status_code != 200:
         raise HTTPException(status_code=401, detail="Invalid credentials")
