@@ -39,8 +39,8 @@ class Querier(object):
             self._zone = os.getenv("IRODS_ZONE")
             self._project_root = os.getenv("IRODS_PROJECT_ROOT")
 
-        for required_var in [self._host, self._port, self._user, self._password, self._zone, self._project_root]:
-            if not required_var:
+        for required in [self._host, self._port, self._user, self._password, self._zone, self._project_root]:
+            if not required:
                 raise ValueError("iRODS configuration is incomplete. Please check your configuration file or environment variables." )
 
 

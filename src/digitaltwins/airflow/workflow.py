@@ -35,8 +35,8 @@ class Workflow(object):
             self._password = os.getenv("AIRFLOW_PASSWORD")
             self._airflow_api_token = os.getenv("AIRFLOW_API_TOKEN")
 
-        for var in [self._airflow_version, self._airflow_endpoint, self._airflow_api_url, self._username, self._password]:
-            if not var:
+        for required in [self._airflow_version, self._airflow_endpoint, self._airflow_api_url, self._username, self._password]:
+            if not required:
                 raise ValueError("Airflow configuration is incomplete. Please check your configuration file.")
 
     def get_api_token(self):
