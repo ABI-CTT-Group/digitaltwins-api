@@ -21,14 +21,14 @@ class Workflow(object):
             self._configs = ConfigLoader.load_from_ini(config_file)
             self._configs = self._configs["airflow"]
 
-            self._airflow_version = self._configs.get('airflow_version')
+            self._airflow_version = self._configs.get('airflow_version') or self._airflow_version
             self._airflow_endpoint = self._configs.get('airflow_endpoint')
             self._airflow_api_url = self._configs.get('airflow_api_url')
             self._username = self._configs.get('username')
             self._password = self._configs.get('password')
             self._airflow_api_token = self._configs.get('airflow_api_token')
         else:
-            self._airflow_version = os.getenv("AIRFLOW_VERSION")
+            self._airflow_version = os.getenv("AIRFLOW_VERSION") or self._airflow_version
             self._airflow_endpoint = os.getenv("AIRFLOW_ENDPOINT")
             self._airflow_api_url = os.getenv("AIRFLOW_API_URL")
             self._username = os.getenv("AIRFLOW_USERNAME")
