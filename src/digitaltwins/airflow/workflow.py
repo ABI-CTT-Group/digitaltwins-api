@@ -37,7 +37,7 @@ class Workflow(object):
 
         for required in [self._airflow_version, self._airflow_endpoint, self._airflow_api_url, self._username, self._password]:
             if not required:
-                raise ValueError("Airflow configuration is incomplete. Please check your configuration file.")
+                raise ValueError("Airflow configuration is incomplete. Please check your configuration file or environment variables.")
 
     def get_api_token(self):
         url = f"{self._airflow_endpoint}/auth/token"

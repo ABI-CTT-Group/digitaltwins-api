@@ -29,7 +29,7 @@ class Querier(object):
 
         for required in [self._host, self._port, self._api_token]:
             if not required:
-                raise ValueError("Airflow configuration is incomplete. Please check your configuration file.")
+                raise ValueError("SEEK configuration is incomplete. Please check your configuration file or environment variables.")
 
         self._base_url = self._host + ':' + self._port
         self._headers = {
