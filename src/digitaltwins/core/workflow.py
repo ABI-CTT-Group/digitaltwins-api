@@ -1,4 +1,3 @@
-from pathlib import Path
 import os
 
 from dotenv import load_dotenv
@@ -11,7 +10,7 @@ load_dotenv()
 
 
 class Workflow(object):
-    def __init__(self, config_file):
+    def __init__(self, config_file=None):
         if not config_file and os.getenv("CONFIG_FILE_PATH"):
             config_file = os.getenv("CONFIG_FILE_PATH")
 
