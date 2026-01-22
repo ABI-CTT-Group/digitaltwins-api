@@ -6,17 +6,38 @@ services:
     ports:
       - "8010:8000"
     environment:
-      # api config file path
-      CONFIG_FILE_PATH: ${CONFIG_FILE_PATH:-/digitaltwins-api/configs.ini}
-      # keycloak settings
-      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://keycloak:8080}
+      # keycloak
+      KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://localhost:8080}
       REALM: ${REALM:-digitaltwins}
       ALGORITHM: ${ALGORITHM:-RS256}
       CLIENT_ID: ${CLIENT_ID:-api}
       CLIENT_SECRET: ${CLIENT_SECRET:-}
-      REALM_URL: ${REALM_URL:-http://keycloak:8080/realms/digitaltwins}
-      KEYCLOAK_TOKEN_URL: ${KEYCLOAK_TOKEN_URL:-http://keycloak:8080/realms/digitaltwins/protocol/openid-connect/token}
-      KEYCLOAK_INTROSPECT_URL: ${KEYCLOAK_INTROSPECT_URL:-http://host.docker.internal:8080/realms/digitaltwins/protocol/openid-connect/token/introspect}
+      # seek
+      SEEK_ENABLED: ${SEEK_ENABLED:-true}
+      SEEK_HOST: ${SEEK_HOST:-http://localhost}
+      SEEK_PORT: ${SEEK_PORT:-8001}
+      SEEK_API_TOKEN: ${SEEK_API_TOKEN:-}
+      # postgres
+      POSTGRES_ENABLED: ${POSTGRES_ENABLED:-true}
+      POSTGRES_HOST: ${POSTGRES_HOST:-localhost}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      POSTGRES_DB: ${POSTGRES_DB:-digitaltwins}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      # minio
+      MINIO_ENABLED: ${MINIO_ENABLED:-true}
+      MINIO_HOST: ${MINIO_HOST:-localhost}
+      MINIO_PORT: ${MINIO_PORT:-9000}
+      MINIO_SERVER_ACCESS_KEY: ${MINIO_SERVER_ACCESS_KEY:-minioadmin}
+      MINIO_SERVER_SECRET_KEY: ${MINIO_SERVER_SECRET_KEY:-minioadmin}
+      # airflow
+      AIRFLOW_ENABLED: ${AIRFLOW_ENABLED:-true}
+      AIRFLOW_VERSION: ${AIRFLOW_VERSION:-3}
+      AIRFLOW_ENDPOINT: ${AIRFLOW_ENDPOINT:-http://localhost:8080}
+      AIRFLOW_API_URL: ${AIRFLOW_API_URL:-http://localhost:8080/api/v2}
+      AIRFLOW_USERNAME: ${AIRFLOW_USERNAME:-admin}
+      AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-admin}
+#      AIRFLOW_WORKSPACE: ${AIRFLOW_WORKSPACE:-}
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
 
