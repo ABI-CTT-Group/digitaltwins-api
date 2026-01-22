@@ -19,19 +19,16 @@ class Querier(object):
         if config_file:
             self._configs = ConfigLoader.load_from_ini(config_file)
             configs = self._configs["seek"]
-            self._host = configs["host"]
-            self._port = configs["port"]
+            self._base_url = configs["base_url"]
             self._api_token = configs["api_token"]
         else:
-            self._host = os.getenv("SEEK_HOST")
-            self._port = os.getenv("SEEK_PORT")
+            self._base_url = os.getenv("SEEK_BASE_URL")
             self._api_token = os.getenv("SEEK_API_TOKEN")
 
-        for required in [self._host, self._port, self._api_token]:
+        for required in [self._base_url, self._api_token]:
             if not required:
                 raise ValueError("SEEK configuration is incomplete. Please check your configuration file or environment variables.")
 
-        self._base_url = self._host + ':' + self._port
         self._headers = {
             "Authorization": "Bearer " + self._api_token,
             "Accept": "application/json"
