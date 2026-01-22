@@ -14,8 +14,7 @@ services:
       CLIENT_SECRET: ${CLIENT_SECRET:-}
       # seek
       SEEK_ENABLED: ${SEEK_ENABLED:-true}
-      SEEK_HOST: ${SEEK_HOST:-http://localhost}
-      SEEK_PORT: ${SEEK_PORT:-8001}
+      SEEK_BASE_URL: ${SEEK_BASE_URL:-http://localhost:3000}
       SEEK_API_TOKEN: ${SEEK_API_TOKEN:-}
       # postgres
       POSTGRES_ENABLED: ${POSTGRES_ENABLED:-true}
