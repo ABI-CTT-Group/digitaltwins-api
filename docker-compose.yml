@@ -8,10 +8,10 @@ services:
     environment:
       # keycloak
       KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://localhost:8080}
-      REALM: ${REALM:-digitaltwins}
-      ALGORITHM: ${ALGORITHM:-RS256}
-      CLIENT_ID: ${CLIENT_ID:-api}
-      CLIENT_SECRET: ${CLIENT_SECRET:-}
+      KEYCLOAK_REALM: ${KEYCLOAK_REALM:-digitaltwins}
+      KEYCLOAK_ALGORITHM: ${KEYCLOAK_ALGORITHM:-RS256}
+      KEYCLOAK_CLIENT_ID: ${KEYCLOAK_CLIENT_ID:-api}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET:-}
       # seek
       SEEK_ENABLED: ${SEEK_ENABLED:-true}
       SEEK_BASE_URL: ${SEEK_BASE_URL:-http://localhost:3000}
