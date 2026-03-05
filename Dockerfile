@@ -2,6 +2,10 @@ FROM python:3.11-slim
 
 WORKDIR /digitaltwins-api
 
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
 # install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
@@ -11,15 +15,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # copy files
 COPY pyproject.toml .
-#COPY requirements-docker.txt requirements-prod.txt
 COPY requirements-prod.txt .
-#COPY src/digitaltwins src/digitaltwins
+
+# install python dependencies
+RUN pip install --upgrade pip setuptools wheel
+RUN pip install --no-cache-dir -r requirements-prod.txt
+
+# copy application code
 COPY src ./src
 COPY app ./app
 
-# install pythion dependencies
-RUN pip install --upgrade pip setuptools wheel
-RUN pip install --no-cache-dir -r requirements-prod.txt
 RUN pip install --no-cache-dir -e .
 
 # Expose API port
@@ -37,6 +42,3 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 # print docker image folder strcutre
 # sudo docker run --rm digitaltwins-api ls -l /digitaltwins-api
 # sudo docker run --rm digitaltwins-api ls -lR /digitaltwins-api
-
-
-
