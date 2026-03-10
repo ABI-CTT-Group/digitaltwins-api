@@ -166,41 +166,8 @@ class Querier(object):
         else:
             raise ValueError("Missing metadata service: SEEK")
 
-        inputs = list()
-        outputs = list()
-
-        dataset_uuid = self._postgre_querier.get_dataset_uuid_by_seek_id(sop_id)
-        results["dataset_uuid"] = dataset_uuid
-
-        workflow_params = self._postgre_querier.get_workflow(dataset_uuid)
-
-        for param in workflow_params:
-            field_type = param.get("field_type")
-            field_name = param.get("field_name")
-            field_label = param.get("field_label")
-
-            data = {
-                "name": field_name,
-                "category": field_label
-            }
-
-            if field_type == "input":
-                inputs.append(data)
-            elif field_type == "output":
-                outputs.append(data)
-            else:
-                continue
-
-        results["inputs"] = inputs
-        results["outputs"] = outputs
-
-        if get_cwl:
-            file_path = "./" + dataset_uuid + '/primary/workflow.cwl'
-            contents = self._irods_querier.load_file(file_path)
-            contents = yaml.safe_load(contents)
-            results["cwl"] = contents
-
         return results
+
 
     def get_workflows(self):
         if self._seek_enabled:
