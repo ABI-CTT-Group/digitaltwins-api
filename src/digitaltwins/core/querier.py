@@ -160,7 +160,7 @@ class Querier(object):
 
         return results
 
-    def get_sop(self, sop_id, get_cwl=False):
+    def get_sop(self, sop_id):
         if self._seek_enabled:
             results = self._seek_querier.get_sop(sop_id)
         else:
