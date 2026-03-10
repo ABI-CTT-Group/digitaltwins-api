@@ -61,12 +61,8 @@ class Workflow(object):
 
         # get dag_url
         workflow_seek_id = assay_params.get('workflow_seek_id')
-        querier = Querier(self._config_file)
-        workflow = querier.get_sop(sop_id=workflow_seek_id)
-        workflow_dataset_uuid = workflow.get("dataset_uuid")
-        dag_url = f"{self._airflow_api_url}/dags/{workflow_dataset_uuid}/dagRuns"
-        # dag_rul_ui = f"http://0.0.0.0:8080/dags/{workflow_dataset_uuid}/grid"
-        dag_rul_ui = f"{self._airflow_endpoint}/dags/{workflow_dataset_uuid}/grid"
+        dag_url = f"{self._airflow_api_url}/dags/{workflow_seek_id}/dagRuns"
+        dag_url_ui = f"{self._airflow_endpoint}/dags/{workflow_seek_id}/grid"
 
         if self._airflow_version == "2":
             subject_uuid = None
@@ -111,4 +107,4 @@ class Workflow(object):
         else:
             raise Exception(f"Unsupported Airflow version: {self._airflow_version}")
 
-        return response, dag_rul_ui
+        return response, dag_url_ui
