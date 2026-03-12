@@ -58,7 +58,7 @@ class Downloader(object):
             session.data_objects.get(dobj.path, os.path.join(save_dir,dobj.name))
 
         if collection.subcollections:
-           for subcollection in collection.subcollections:
+            for subcollection in collection.subcollections:
                 self._download_collection(session, subcollection.path, save_dir)
         else:
             return
