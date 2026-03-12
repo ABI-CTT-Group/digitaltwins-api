@@ -6,7 +6,9 @@ from gen3.submission import Gen3Submission
 from gen3.auth import Gen3Auth, Gen3AuthError
 
 from requests.exceptions import ConnectionError, HTTPError
-from ..utils.config_loader import ConfigLoader
+
+from dotenv import load_dotenv
+load_dotenv()
 
 import urllib3
 urllib3.disable_warnings()
@@ -17,7 +19,7 @@ class Querier(object):
     Class for querying Gen3.
     Also accepts queries in GraphQL syntax.
     """
-    def __init__(self, config_file):
+    def __init__(self):
         """
         Constructor
 
@@ -25,23 +27,20 @@ class Querier(object):
         :type auth: object
         """
 
-        self._configs = ConfigLoader.load_from_ini(config_file)
+        self._cred_file = os.getenv("GEN3_CRED_FILE")
+        self._ssl_cert = os.getenv("GEN3_SSL_CERT")
 
-        self._config_dir = self._config_file.parent
-        self._cred_file = Path(self._configs["gen3"].get("cred_file"))
-        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
         if self._cred_file:
-            self._cred_file = self._config_dir.joinpath(self._cred_file)
+            self._cred_file = str(Path(self._cred_file).resolve())
         if self._ssl_cert:
-            self._ssl_cert = self._config_dir.joinpath(self._ssl_cert)
-            os.environ["REQUESTS_CA_BUNDLE"] = str(self._ssl_cert.resolve())
+            self._ssl_cert = str(Path(self._ssl_cert).resolve())
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
 
+        self._endpoint = os.getenv("GEN3_ENDPOINT")
+        self._program = os.getenv("GEN3_PROGRAM")
+        self._project = os.getenv("GEN3_PROJECT")
 
-        self._endpoint = self._configs["gen3"].get("endpoint")
-        self._program = self._configs["gen3"].get("program")
-        self._project = self._configs["gen3"].get("project")
-
-        self._auth = Gen3Auth(self._endpoint, str(self._cred_file))
+        self._auth = Gen3Auth(self._endpoint, self._cred_file)
 
         self._querier = Gen3Submission(self._auth)
 
@@ -211,7 +210,7 @@ class Querier(object):
                 experiments = project.get("experiments")
                 for experiment in experiments:
                     submitter_id = experiment.get("submitter_id")
-                    dataset = Dataset(id=submitter_id, program=program_name, project=project_name, config_file=self._config_file)
+                    dataset = Dataset(id=submitter_id, program=program_name, project=project_name)
                     datasets.append(dataset)
 
         return datasets
@@ -239,7 +238,7 @@ class Querier(object):
 
         dataset = None
         if data:
-            dataset = Dataset(dataset_id, program, project, self._config_file)
+            dataset = Dataset(dataset_id, program, project)
         else:
             print("Dataset not found: " + str(dataset_id))
 

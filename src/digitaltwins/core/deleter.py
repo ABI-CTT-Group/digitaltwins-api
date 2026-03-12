@@ -1,4 +1,3 @@
-import configparser
 import os
 from pathlib import Path
 
@@ -10,32 +9,29 @@ from digitaltwins.irods.irods import IRODS
 
 from requests.exceptions import HTTPError
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import urllib3
 urllib3.disable_warnings()
 
 
 class Deleter(object):
-    def __init__(self, config_file):
-        config_file = Path(config_file)
-        self._config_file = config_file
-        self._configs = configparser.ConfigParser()
-        self._configs.read(config_file)
+    def __init__(self):
+        self._gen3_cred_file = os.getenv("GEN3_CRED_FILE")
+        self._ssl_cert = os.getenv("GEN3_SSL_CERT")
 
-
-        self._config_dir = self._config_file.parent
-        self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
-        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
         if self._gen3_cred_file:
-            self._gen3_cred_file = self._config_dir.joinpath(self._gen3_cred_file)
+            self._gen3_cred_file = str(Path(self._gen3_cred_file).resolve())
         if self._ssl_cert:
-            self._ssl_cert = self._config_dir.joinpath(self._ssl_cert)
-            os.environ["REQUESTS_CA_BUNDLE"] = str(self._ssl_cert.resolve())
+            self._ssl_cert = str(Path(self._ssl_cert).resolve())
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
 
-        self._program = self._configs["gen3"].get("program")
-        self._project = self._configs["gen3"].get("project")
-        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
+        self._program = os.getenv("GEN3_PROGRAM")
+        self._project = os.getenv("GEN3_PROJECT")
+        self._gen3_endpoint = os.getenv("GEN3_ENDPOINT")
 
-        self._auth = Gen3Auth(self._gen3_endpoint, refresh_file=str(self._gen3_cred_file))
+        self._auth = Gen3Auth(self._gen3_endpoint, refresh_file=self._gen3_cred_file)
         self._submission = Gen3Submission(self._gen3_endpoint, self._auth)
 
     def delete(self, dataset_id):
@@ -43,13 +39,11 @@ class Deleter(object):
         self.delete_dataset(dataset_id)
 
     def delete_metadata(self, dataset_id):
-        querier = Querier(self._config_file)
+        querier = Querier()
         records = querier.get_dataset_records(dataset_id=dataset_id, program=self._program, project=self._project)
 
         try:
             self._submission.delete_records(program=self._program, project=self._project, uuids=records, batch_size=1000)
-            # for record in records:
-            #     self._submission.delete_record(program=self._program, project=self._project, uuid=record)
         except HTTPError as e:
             print("Connection failed.")
             raise HTTPError("HTTP connection error: Please make sure you have access to the remote server. then "
@@ -58,5 +52,5 @@ class Deleter(object):
             raise ValueError("Connection failed. Please try again. If the error persists, please contact the developers")
     #
     def delete_dataset(self, dataset_id):
-        irods = IRODS(self._configs)
+        irods = IRODS()
         irods.delete(dataset_id)

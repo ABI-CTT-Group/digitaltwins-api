@@ -3,22 +3,25 @@ from pathlib import Path
 
 from irods.session import iRODSSession
 
+from dotenv import load_dotenv
+load_dotenv()
+
+
 class IRODS(object):
     """
     Class for interacting with iRODS server
     """
-    def __init__(self, configs):
+    def __init__(self):
         """
         Constructor
         """
 
-        self._configs = configs["irods"]
-        self._host = self._configs.get("irods_host")
-        self._port = self._configs.get("irods_port")
-        self._user = self._configs.get("irods_user")
-        self._password = self._configs.get("irods_password")
-        self._zone = self._configs.get("irods_zone")
-        self._project_root = self._configs.get("irods_project_root")
+        self._host = os.getenv("IRODS_HOST")
+        self._port = os.getenv("IRODS_PORT")
+        self._user = os.getenv("IRODS_USER")
+        self._password = os.getenv("IRODS_PASSWORD")
+        self._zone = os.getenv("IRODS_ZONE")
+        self._project_root = os.getenv("IRODS_PROJECT_ROOT")
 
     def upload(self, local_dataset_dir):
         with iRODSSession(host=self._host,

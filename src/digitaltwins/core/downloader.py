@@ -1,22 +1,21 @@
-import configparser
 import os
 import shutil
 
+from dotenv import load_dotenv
+load_dotenv()
+
+from ..utils.config_loader import is_truthy
 from ..irods.downloader import Downloader as IRODSDownloader
 
 from digitaltwins import Querier
 
 
 class Downloader(object):
-    def __init__(self, config_file):
-        self._config_file = config_file
-        self._configs = configparser.ConfigParser()
-        self._configs.read(config_file)
-
+    def __init__(self):
         self._irods_downloader = None
 
-        if self._configs.getboolean("irods", "enabled"):
-            self._irods_downloader = IRODSDownloader(self._config_file)
+        if is_truthy(os.getenv("IRODS_ENABLED")):
+            self._irods_downloader = IRODSDownloader()
 
     def download_dataset(self, dataset_id, save_dir="./tmp"):
         if self._irods_downloader:
@@ -31,7 +30,7 @@ class Downloader(object):
             raise EnvironmentError("Missing Downloader. Please check your configurations for data storage.")
 
     def download_assay_inputs(self, assay_id, save_dir="./tmp"):
-        querier = Querier(self._config_file)
+        querier = Querier()
         assay = querier.get_assay(assay_id, get_params=True)
 
         params = assay.get("params")
@@ -45,7 +44,7 @@ class Downloader(object):
             self.download_assay_input(input, assay_inputs_dir)
 
     def download_assay_input(self, assay_input, save_dir="./tmp"):
-        querier = Querier(self._config_file)
+        querier = Querier()
 
         name = assay_input.get("name")
         assay_input_dir = os.path.join(save_dir, name)

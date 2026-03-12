@@ -1,22 +1,21 @@
+import os
 import os.path
 from pathlib import Path
 
 from irods.session import iRODSSession
 
-from ..utils.config_loader import ConfigLoader
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class Downloader(object):
-    def __init__(self, config_file):
-        self._config_file = Path(config_file)
-        self._configs = ConfigLoader.load_from_ini(config_file)["irods"]
-
-        self._host = self._configs.get("irods_host")
-        self._port = self._configs.get("irods_port")
-        self._user = self._configs.get("irods_user")
-        self._password = self._configs.get("irods_password")
-        self._zone = self._configs.get("irods_zone")
-        self._project_root = self._configs.get("irods_project_root")
+    def __init__(self):
+        self._host = os.getenv("IRODS_HOST")
+        self._port = os.getenv("IRODS_PORT")
+        self._user = os.getenv("IRODS_USER")
+        self._password = os.getenv("IRODS_PASSWORD")
+        self._zone = os.getenv("IRODS_ZONE")
+        self._project_root = os.getenv("IRODS_PROJECT_ROOT")
 
     def download(self, collection, save_dir=None):
         """
@@ -59,9 +58,7 @@ class Downloader(object):
             session.data_objects.get(dobj.path, os.path.join(save_dir,dobj.name))
 
         if collection.subcollections:
-           for subcollection in collection.subcollections:
-               self._download_collection(session, subcollection.path, save_dir)
+            for subcollection in collection.subcollections:
+                self._download_collection(session, subcollection.path, save_dir)
         else:
             return
-
-

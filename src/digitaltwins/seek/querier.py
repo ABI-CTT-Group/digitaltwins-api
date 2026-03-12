@@ -1,4 +1,4 @@
-from ..utils.config_loader import ConfigLoader
+
 
 import requests
 import os
@@ -9,21 +9,12 @@ load_dotenv()
 
 
 class Querier(object):
-    def __init__(self, config_file):
+    def __init__(self):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
-        if not config_file and os.getenv("CONFIG_FILE_PATH"):
-            config_file = os.getenv("CONFIG_FILE_PATH")
-
-        if config_file:
-            self._configs = ConfigLoader.load_from_ini(config_file)
-            configs = self._configs["seek"]
-            self._base_url = configs["base_url"]
-            self._api_token = configs["api_token"]
-        else:
-            self._base_url = os.getenv("SEEK_BASE_URL")
-            self._api_token = os.getenv("SEEK_API_TOKEN")
+        self._base_url = os.getenv("SEEK_BASE_URL")
+        self._api_token = os.getenv("SEEK_API_TOKEN")
 
         for required in [self._base_url, self._api_token]:
             if not required:

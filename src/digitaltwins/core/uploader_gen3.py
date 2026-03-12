@@ -1,4 +1,3 @@
-import configparser
 import os
 import re
 import time
@@ -11,30 +10,28 @@ from digitaltwins import MetadataConvertor
 from digitaltwins import MetadataUploader
 from digitaltwins.irods.irods import IRODS
 
+from dotenv import load_dotenv
+load_dotenv()
+
 import urllib3
 urllib3.disable_warnings()
 
 
 class Uploader(object):
-    def __init__(self, config_file):
-        config_file = Path(config_file)
-        self._config_file = config_file
-        self._configs = configparser.ConfigParser()
-        self._configs.read(config_file)
+    def __init__(self):
+        self._gen3_cred_file = os.getenv("GEN3_CRED_FILE")
+        self._ssl_cert = os.getenv("GEN3_SSL_CERT")
 
-        self._config_dir = self._config_file.parent
-        self._gen3_cred_file = Path(self._configs["gen3"].get("cred_file"))
-        self._ssl_cert = self._configs["gen3"].get("ssl_cert")
         if self._gen3_cred_file:
-            self._gen3_cred_file = self._config_dir.joinpath(self._gen3_cred_file)
+            self._gen3_cred_file = str(Path(self._gen3_cred_file).resolve())
         if self._ssl_cert:
-            self._ssl_cert = self._config_dir.joinpath(self._ssl_cert)
-            os.environ["REQUESTS_CA_BUNDLE"] = str(self._ssl_cert.resolve())
+            self._ssl_cert = str(Path(self._ssl_cert).resolve())
+            os.environ["REQUESTS_CA_BUNDLE"] = self._ssl_cert
 
-        self._gen3_endpoint = self._configs["gen3"].get("endpoint")
+        self._gen3_endpoint = os.getenv("GEN3_ENDPOINT")
 
-        self._program = self._configs["gen3"].get("program")
-        self._project = self._configs["gen3"].get("project")
+        self._program = os.getenv("GEN3_PROGRAM")
+        self._project = os.getenv("GEN3_PROJECT")
 
         time_stamp = time.time()
         dirname_tmp = "./tmp_{}".format(time_stamp)
@@ -42,7 +39,6 @@ class Uploader(object):
         self._meta_dir_tmp = self._dir_tmp.joinpath(Path("gen3_tmp"))
 
         self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json"]
-        # self._meta_files = ["experiment.json", "dataset_description.json", "manifest.json", "subjects.json", "samples.json"]
 
         self._dataset_submitter_id_template = "{program}-{project}-dataset-{id}-version-1"
         self._dataset_id_index = 3
@@ -78,7 +74,7 @@ class Uploader(object):
         meta_convertor.execute(source_dir=dataset_dir, dest_dir=meta_dir)
 
         # upload metadata
-        meta_uploader = MetadataUploader(self._gen3_endpoint, str(self._gen3_cred_file))
+        meta_uploader = MetadataUploader(self._gen3_endpoint, self._gen3_cred_file)
 
         for filename in self._meta_files:
             print("Uploading: " + str(filename))
@@ -90,7 +86,7 @@ class Uploader(object):
             shutil.rmtree(meta_dir)
 
     def upload_dataset(self, dataset_dir):
-        irods = IRODS(self._configs)
+        irods = IRODS()
         irods.upload(dataset_dir)
 
     def _verify_dataset(self, dataset_dir):
@@ -108,7 +104,7 @@ class Uploader(object):
             raise ValueError("Max attempts {count} exceeded. Please try submitting again. If the error persists, "
                              "please contact the developers".format(count=count))
         # list datasets
-        querier = Querier(self._config_file)
+        querier = Querier()
 
         datasets = list()
         try:
