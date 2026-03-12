@@ -1,20 +1,18 @@
-import psycopg2
-from pathlib import Path
+import os
 
-from ..utils.config_loader import ConfigLoader
+import psycopg2
+
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class Uploader(object):
-    def __init__(self, config_file):
-        self._config_file = Path(config_file)
-        self._configs = ConfigLoader.load_from_ini(config_file)
-
-        configs_postgres = self._configs["postgres"]
-        self._host = configs_postgres["host"]
-        self._port = configs_postgres["port"]
-        self._database = configs_postgres["database"]
-        self._user = configs_postgres["user"]
-        self._password = configs_postgres["password"]
+    def __init__(self):
+        self._host = os.getenv("POSTGRES_HOST")
+        self._port = os.getenv("POSTGRES_PORT")
+        self._database = os.getenv("POSTGRES_DB")
+        self._user = os.getenv("POSTGRES_USER")
+        self._password = os.getenv("POSTGRES_PASSWORD")
 
         self._cur = None
         self._conn = None

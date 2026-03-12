@@ -5,39 +5,24 @@ from datetime import datetime, timezone
 import requests
 from requests.auth import HTTPBasicAuth
 
-from ..utils.config_loader import ConfigLoader
+from dotenv import load_dotenv
+load_dotenv()
 
 from digitaltwins import Querier
 
 
 class Workflow(object):
-    def __init__(self, config_file=None):
-        self._airflow_version = "3" # default version
-
-        if not config_file and os.getenv("CONFIG_FILE_PATH"):
-            config_file = os.getenv("CONFIG_FILE_PATH")
-
-        if config_file:
-            self._configs = ConfigLoader.load_from_ini(config_file)
-            self._configs = self._configs["airflow"]
-
-            self._airflow_version = self._configs.get('airflow_version') or self._airflow_version
-            self._airflow_endpoint = self._configs.get('airflow_endpoint')
-            self._airflow_api_url = self._configs.get('airflow_api_url')
-            self._username = self._configs.get('username')
-            self._password = self._configs.get('password')
-            self._airflow_api_token = self._configs.get('airflow_api_token')
-        else:
-            self._airflow_version = os.getenv("AIRFLOW_VERSION") or self._airflow_version
-            self._airflow_endpoint = os.getenv("AIRFLOW_ENDPOINT")
-            self._airflow_api_url = os.getenv("AIRFLOW_API_URL")
-            self._username = os.getenv("AIRFLOW_USERNAME")
-            self._password = os.getenv("AIRFLOW_PASSWORD")
-            self._airflow_api_token = os.getenv("AIRFLOW_API_TOKEN")
+    def __init__(self):
+        self._airflow_version = os.getenv("AIRFLOW_VERSION") or "3"
+        self._airflow_endpoint = os.getenv("AIRFLOW_ENDPOINT")
+        self._airflow_api_url = os.getenv("AIRFLOW_API_URL")
+        self._username = os.getenv("AIRFLOW_USERNAME")
+        self._password = os.getenv("AIRFLOW_PASSWORD")
+        self._airflow_api_token = os.getenv("AIRFLOW_API_TOKEN")
 
         for required in [self._airflow_version, self._airflow_endpoint, self._airflow_api_url, self._username, self._password]:
             if not required:
-                raise ValueError("Airflow configuration is incomplete. Please check your configuration file or environment variables.")
+                raise ValueError("Airflow configuration is incomplete. Please check your environment variables.")
 
     def get_api_token(self):
         url = f"{self._airflow_endpoint}/auth/token"
@@ -51,7 +36,7 @@ class Workflow(object):
         return access_token
 
     def run(self, assay_id):
-        querier = Querier(self._config_file)
+        querier = Querier()
         assay = querier.get_assay(assay_id, get_params=True)
 
         assay_seek_id = assay_id

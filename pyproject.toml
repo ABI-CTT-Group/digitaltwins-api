@@ -35,7 +35,7 @@ version = { attr = "digitaltwins.__version__.__version__" }
 dependencies = { file = ["requirements-prod.txt"] }
 
 [tool.setuptools.package-data]
-"digitaltwins" = ["resources/**"]
+"digitaltwins" = []
 
 # notes
 # Validating

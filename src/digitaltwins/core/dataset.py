@@ -2,13 +2,12 @@ from digitaltwins.gen3.querier import Querier
 
 
 class Dataset(object):
-    def __init__(self, id, program, project, config_file):
+    def __init__(self, id, program, project):
         self._program = program
         self._project = project
         self._id = id # submitter_id
 
-        self._configs = config_file
-        self._querier = Querier(self._configs)
+        self._querier = Querier()
 
     def get_program(self):
         return self._program
@@ -168,20 +167,3 @@ class Dataset(object):
             raise ValueError(f"Querying for metadata {metadata} is not supported yet".format(metadata=metadata))
 
         return fields
-
-        # query_string = f"""
-        #         {{
-        #             __type(name: "{metadata}"){{
-        #                 fields{{
-        #                     name
-        #                 }}
-        #             }}
-        #         }}
-        #
-        #         """
-        # fields_dict_list = self._querier.graphql_query(query_string=query_string).get("__type").get("fields")
-        # fields = list()
-        # for fields_dict in fields_dict_list:
-        #     name = fields_dict.get("name")
-        #     fields.append(name)
-

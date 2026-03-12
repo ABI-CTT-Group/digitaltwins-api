@@ -1,6 +1,8 @@
-import configparser
+import os
 import psycopg2
-from pathlib import Path
+
+from dotenv import load_dotenv
+load_dotenv()
 
 
 class Connection(object):
@@ -8,30 +10,16 @@ class Connection(object):
     Class for connecting to the digitaltwins platform.
     """
 
-    def __init__(self, config_file=None, host=None, port=None, database=None, user=None, password=None):
+    def __init__(self, host=None, port=None, database=None, user=None, password=None):
 
         self._cur = None
         self._conn = None
 
-        if config_file:
-
-            self._config_file = Path(config_file)
-            self._configs = configparser.ConfigParser()
-            self._configs.read(config_file)
-            # print(self._configs.sections())
-
-            configs_postgres = self._configs["postgres"]
-            host = configs_postgres["host"]
-            port = configs_postgres["port"]
-            database = configs_postgres["database"]
-            user = configs_postgres["user"]
-            password = configs_postgres["password"]
-
-        self._host = host
-        self._port = port
-        self._database = database
-        self._user = user
-        self._password = password
+        self._host = host or os.getenv("POSTGRES_HOST")
+        self._port = port or os.getenv("POSTGRES_PORT")
+        self._database = database or os.getenv("POSTGRES_DB")
+        self._user = user or os.getenv("POSTGRES_USER")
+        self._password = password or os.getenv("POSTGRES_PASSWORD")
 
 
     def get_cur(self):

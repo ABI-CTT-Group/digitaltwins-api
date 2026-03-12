@@ -4,52 +4,41 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-from ..utils.config_loader import ConfigLoader, is_truthy
+from ..utils.config_loader import is_truthy
 
 class Querier(object):
 
-    def __init__(self, config_file=None):
-        if not config_file and os.getenv("CONFIG_FILE_PATH"):
-            config_file = os.getenv("CONFIG_FILE_PATH")
-        
-        if config_file:
-            self._configs = ConfigLoader.load_from_ini(config_file)
-            self._postgres_enabled = self._configs.getboolean("postgres", "enabled")
-            self._seek_enabled = self._configs.getboolean("seek", "enabled")
-            self._gen3_enabled = self._configs.getboolean("gen3", "enabled")
-            self._irods_enabled = self._configs.getboolean("irods", "enabled")
-            self._minio_enabled = self._configs.getboolean("minio", "enabled")
-        else:
-            self._postgres_enabled = is_truthy(os.getenv("POSTGRES_ENABLED"))
-            self._seek_enabled = is_truthy(os.getenv("SEEK_ENABLED"))
-            self._gen3_enabled = is_truthy(os.getenv("GEN3_ENABLED"))
-            self._irods_enabled = is_truthy(os.getenv("IRODS_ENABLED"))
-            self._minio_enabled = is_truthy(os.getenv("MINIO_ENABLED"))
+    def __init__(self):
+        self._postgres_enabled = is_truthy(os.getenv("POSTGRES_ENABLED"))
+        self._seek_enabled = is_truthy(os.getenv("SEEK_ENABLED"))
+        self._gen3_enabled = is_truthy(os.getenv("GEN3_ENABLED"))
+        self._irods_enabled = is_truthy(os.getenv("IRODS_ENABLED"))
+        self._minio_enabled = is_truthy(os.getenv("MINIO_ENABLED"))
 
         if self._postgres_enabled and self._gen3_enabled:
             raise ValueError("Metadata service conflict. Only one of 'postgres' or 'gen3' can be enabled")
 
         if self._postgres_enabled:
             from ..postgres.querier import Querier as PostgresQuerier
-            self._postgre_querier = PostgresQuerier(config_file)
+            self._postgre_querier = PostgresQuerier()
         else:
             self._postgre_querier = None
 
         if self._gen3_enabled:
             from ..gen3.querier import Querier as Gen3Querier
-            self._gen3_querier = Gen3Querier(config_file)
+            self._gen3_querier = Gen3Querier()
         else:
             self._gen3_querier = None
 
         if self._seek_enabled:
             from ..seek.querier import Querier as SeekQuerier
-            self._seek_querier = SeekQuerier(config_file)
+            self._seek_querier = SeekQuerier()
         else:
             self._seek_querier = None
 
         if self._irods_enabled:
             from ..irods.querier import Querier as IRODSQuerier
-            self._irods_querier = IRODSQuerier(config_file)
+            self._irods_querier = IRODSQuerier()
         else:
             self._irods_querier = None
 

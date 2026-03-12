@@ -1,5 +1,7 @@
-import configparser
-from pathlib import Path
+import os
+
+from dotenv import load_dotenv
+load_dotenv()
 
 from ..postgres.querier import Querier as PostgresQuerier
 from ..gen3.querier import Querier as Gen3Querier
@@ -10,25 +12,19 @@ class QuerierFactory:
     static factory
     """
     @staticmethod
-    def create(config_file):
+    def create():
         """
         static method for creating Querier instance
-        by the value of the metadata service field in the given configuration file
+        by the value of the METADATA_SERVICE environment variable
 
-        :param config_file: path to the configuration file
-        :type config_file: str or Path
         :return: a Querier instance
         :rtype: PostgresQuerier or Gen3Querier
         """
-        config_file = Path(config_file)
-        configs = configparser.ConfigParser()
-        configs.read(config_file)
-
-        metadata_service = configs["general"]["metadata_service"]
+        metadata_service = os.getenv("METADATA_SERVICE")
         if metadata_service == "postgres":
-            return PostgresQuerier(config_file)
+            return PostgresQuerier()
         elif metadata_service == "gen3":
-            return Gen3Querier(config_file)
+            return Gen3Querier()
         else:
             raise ValueError("Unknown metadata service")
 

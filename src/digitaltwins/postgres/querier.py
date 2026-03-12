@@ -1,4 +1,4 @@
-from ..utils.config_loader import ConfigLoader
+
 
 import psycopg2
 import os
@@ -8,27 +8,15 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Querier(object):
-    def __init__(self, config_file):
+    def __init__(self):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
-        if not config_file and os.getenv("CONFIG_FILE_PATH"):
-            config_file = os.getenv("CONFIG_FILE_PATH")
-
-        if config_file:
-            self._configs = ConfigLoader.load_from_ini(config_file)
-            configs_postgres = self._configs["postgres"]
-            self._host = configs_postgres["host"]
-            self._port = configs_postgres["port"]
-            self._database = configs_postgres["database"]
-            self._user = configs_postgres["user"]
-            self._password = configs_postgres["password"]
-        else:
-            self._host = os.getenv("POSTGRES_HOST")
-            self._port = os.getenv("POSTGRES_PORT")
-            self._database = os.getenv("POSTGRES_DB")
-            self._user = os.getenv("POSTGRES_USER")
-            self._password = os.getenv("POSTGRES_PASSWORD")
+        self._host = os.getenv("POSTGRES_HOST")
+        self._port = os.getenv("POSTGRES_PORT")
+        self._database = os.getenv("POSTGRES_DB")
+        self._user = os.getenv("POSTGRES_USER")
+        self._password = os.getenv("POSTGRES_PASSWORD")
 
         for required in [self._host, self._port, self._database, self._user, self._password]:
             if not required:
