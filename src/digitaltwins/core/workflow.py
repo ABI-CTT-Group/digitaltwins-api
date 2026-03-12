@@ -1,12 +1,11 @@
 import os
 
 from dotenv import load_dotenv
+load_dotenv()
 
 from ..utils.config_loader import ConfigLoader, is_truthy
 
 from ..airflow.workflow import Workflow as AirflowWorkflow
-
-load_dotenv()
 
 
 class Workflow(object):
