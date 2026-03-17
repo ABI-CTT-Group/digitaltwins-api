@@ -130,12 +130,14 @@ class Querier(object):
     def get_assay(self, assay_id, get_configs=False):
         if self._seek_enabled:
             results = self._seek_querier.get_assay(assay_id)
+            workflows = list()
             # get workflows
             sops = results.get("relationships").get("sops").get("data")
             for sop in sops:
                 sop_id = sop.get("id")
                 sop = self._seek_querier.get_sop(sop_id)
-                results["relationships"]["workflows"] = sop.get("relationships").get("workflows")
+                workflows.append(sop.get("relationships").get("workflows").get("data"))
+            results["relationships"]["workflows"] = workflows
         else:
             raise ValueError("Missing metadata service: SEEK")
 
