@@ -136,7 +136,7 @@ class Querier(object):
         if get_configs:
             #  "created" means the actual assay has been created in the platform/postgres
             results_created_assay = self._postgre_querier.get_assay(seek_id=assay_id)
-            results["params"] = results_created_assay
+            results["configs"] = results_created_assay
 
         return results
 
