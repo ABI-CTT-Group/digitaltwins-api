@@ -31,7 +31,7 @@ class Downloader(object):
 
     def download_assay_inputs(self, assay_id, save_dir="./tmp"):
         querier = Querier()
-        assay = querier.get_assay(assay_id, get_params=True)
+        assay = querier.get_assay(assay_id, get_configs=True)
 
         params = assay.get("params")
         assay_uuid = params.get("assay_uuid")
