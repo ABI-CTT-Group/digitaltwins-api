@@ -175,7 +175,7 @@ def get_assay(assay_id=None, get_params=False, valid=Depends(validate_credential
     Returns:
         dict: A dictionary containing the assay details under the 'assay' key.
     """
-    assay = querier.get_assay(assay_id, get_params=get_params)
+    assay = querier.get_assay(assay_id, get_configs=get_params)
     return {"assay": assay}
 
 @router.get("/workflows", tags=["query"])

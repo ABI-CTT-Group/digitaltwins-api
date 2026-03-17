@@ -127,13 +127,13 @@ class Querier(object):
 
         return results
 
-    def get_assay(self, assay_id, get_params=False):
+    def get_assay(self, assay_id, get_configs=False):
         if self._seek_enabled:
             results = self._seek_querier.get_assay(assay_id)
         else:
             raise ValueError("Missing metadata service: SEEK")
 
-        if get_params:
+        if get_configs:
             #  "created" means the actual assay has been created in the platform/postgres
             results_created_assay = self._postgre_querier.get_assay(seek_id=assay_id)
             results["params"] = results_created_assay

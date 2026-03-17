@@ -37,7 +37,7 @@ class Workflow(object):
 
     def run(self, assay_id):
         querier = Querier()
-        assay = querier.get_assay(assay_id, get_params=True)
+        assay = querier.get_assay(assay_id, get_configs=True)
 
         assay_seek_id = assay_id
         assay_params = assay.get("params")
