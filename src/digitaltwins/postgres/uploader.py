@@ -14,6 +14,22 @@ class Uploader(object):
         self._user = os.getenv("POSTGRES_USER")
         self._password = os.getenv("POSTGRES_PASSWORD")
 
+        missing_vars = [
+            name
+            for name, value in [
+                ("POSTGRES_HOST", self._host),
+                ("POSTGRES_PORT", self._port),
+                ("POSTGRES_DB", self._database),
+                ("POSTGRES_USER", self._user),
+                ("POSTGRES_PASSWORD", self._password),
+            ]
+            if not value
+        ]
+        if missing_vars:
+            raise ValueError(
+                "Missing required environment variables for PostgreSQL connection: "
+                + ", ".join(missing_vars)
+            )
         self._cur = None
         self._conn = None
 
