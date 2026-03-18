@@ -37,6 +37,8 @@ services:
       AIRFLOW_USERNAME: ${AIRFLOW_USERNAME:-admin}
       AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-admin}
 #      AIRFLOW_WORKSPACE: ${AIRFLOW_WORKSPACE:-}
+    networks:
+      - digitaltwins
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
 
