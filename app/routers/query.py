@@ -14,8 +14,7 @@ from digitaltwins import Querier
 from .auth import validate_credentials
 
 load_dotenv()
-CONFIG_FILE_PATH = os.getenv("CONFIG_FILE_PATH")
-querier = Querier(CONFIG_FILE_PATH)
+querier = Querier()
 router = APIRouter()
 
 @router.get("/programs", tags=["query"])
