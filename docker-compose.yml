@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8010:8000"
+      - "${API_BIND_ADDRESS:-0.0.0.0}:8010:8000"
     environment:
       # keycloak
       KEYCLOAK_BASE_URL: ${KEYCLOAK_BASE_URL:-http://localhost:8080}
@@ -42,8 +42,8 @@ services:
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
 
-networks:
-  digitaltwins:
-    driver: bridge
+#networks:
+#  digitaltwins:
+#    driver: bridge
 
 # access api docs: http:localhost:8010/docs
