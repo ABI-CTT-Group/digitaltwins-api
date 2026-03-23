@@ -42,6 +42,7 @@ services:
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
 
+# Defined in the including docker-compose file
 #networks:
 #  digitaltwins:
 #    driver: bridge
