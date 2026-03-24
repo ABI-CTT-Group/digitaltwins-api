@@ -41,6 +41,12 @@ services:
       - digitaltwins
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/docs" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
 
 networks:
   digitaltwins:
