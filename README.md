@@ -111,16 +111,23 @@ The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to
    
    ```commandline
    git clone https://github.com/ABI-CTT-Group/digitaltwins-api.git
+   cd digitaltwins-api
    ```
    
 2. **Setting up a virtual environment (optional but recommended)**
    
    See step 1 in the user installation instructions. 
    
-3. **Installing dependencies via pip**
+3. **Install from `pyproject.toml` in editable mode**
    
    ```
-   pip install -r requirements.txt
+   python -m pip install -e .
+   ```
+
+4. **Install developer dependencies (optional)**
+
+   ```
+   python -m pip install -r requirements-dev.txt
    ```
    
 ## Using the DigitalTWINS platform
