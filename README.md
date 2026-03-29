@@ -6,7 +6,7 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 [![Stargazers][stars-shield]][stars-url]
 [![GitHub issues-closed](https://img.shields.io/github/issues-closed/ABI-CTT-Group/digitaltwins-api.svg)](https://GitHub.com/ABI-CTT-Group/digitaltwins-api/issues?q=is%3Aissue+is%3Aclosed)
 [![apache License][license-shield]][license-url]
-[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](code_of_conduct.md)
+[![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg)](CODE_OF_CONDUCT.md)
 [![PyPI version fury.io](https://badge.fury.io/py/digitaltwins.svg)](https://pypi.python.org/pypi/digitaltwins)
 <!--* [![Issues][issues-shield]][issues-url] -->
 <!--* [![DOI](https://zenodo.org/badge/XXXX.svg)](https://zenodo.org/badge/latestdoi/XXXXX) -->
@@ -20,13 +20,12 @@ A Python tool for interacting with the 12 LABOURS DigitalTWINS (Digital Translat
 [license-shield]: https://img.shields.io/github/license/ABI-CTT-Group/digitaltwins-api.svg?style=flat-square
 [license-url]: https://github.com/ABI-CTT-Group/digitaltwins-api/blob/master/LICENSE
 [lines-of-code-shield]: https://img.shields.io/tokei/lines/github/ABI-CTT-Group/digitaltwins-api
-[lines-of-code-url]: #
 
 ## Table of contents
 * [Introduction](#introduction)
-* [Setting up the DigitalTWINS platform API](#setting-up-the-digitaltwins-platform-API)
-* [Using the DigitalTWINS Platform API](#using-the-digitalwins-platform-api)
-* [Reporting issues](#reporting-issues)
+* [Installing the DigitalTWINS platform API](#installing-the-digitaltwins-platform-api)
+* [Using the DigitalTWINS platform](#using-the-digitaltwins-platform)
+* [Reporting Issues](#reporting-issues)
 * [Contributing](#contributing)
 * [License](#license)
 * [Team](#team)
@@ -111,23 +110,30 @@ The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to
    
    ```commandline
    git clone https://github.com/ABI-CTT-Group/digitaltwins-api.git
+   cd digitaltwins-api
    ```
    
 2. **Setting up a virtual environment (optional but recommended)**
    
    See step 1 in the user installation instructions. 
    
-3. **Installing dependencies via pip**
+3. **Install from `pyproject.toml` in editable mode**
    
    ```
-   pip install -r requirements.txt
+   python -m pip install -e .
+   ```
+
+4. **Install developer dependencies (optional)**
+
+   ```
+   python -m pip install -r requirements-dev.txt
    ```
    
 ## Using the DigitalTWINS platform
 
 Please see the [documentation for workshop 1](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/workshop_1_describing_and_storing_data.md), which describes how to use the 12 LABOURS DigitalTWINS platform and its API.
 
-## Reporting issues 
+## Reporting Issues
 To report an issue or suggest a new feature, please use the [issues page](https://github.com/ABI-CTT-Group/digitaltwins-api/issues). Issue templates are provided to allow users to report bugs, and documentation or feature requests. Please check existing issues before submitting a new one.
 
 ## Contributing
