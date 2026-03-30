@@ -7,6 +7,7 @@ from ..utils.config_loader import is_truthy
 
 from ..postgres.uploader import Uploader as PostgresUploader
 from ..irods.uploader import Uploader as IRODSUploader
+from ..minio.uploader import Uploader as MinioUploader
 
 
 class Uploader(object):
@@ -14,6 +15,7 @@ class Uploader(object):
         self._postgres_enabled = is_truthy(os.getenv("POSTGRES_ENABLED"))
         self._gen3_enabled = is_truthy(os.getenv("GEN3_ENABLED"))
         self._irods_enabled = is_truthy(os.getenv("IRODS_ENABLED"))
+        self._minio_enabled = is_truthy(os.getenv("MINIO_ENABLED"))
 
         if self._postgres_enabled and self._gen3_enabled:
             raise ValueError("Metadata service conflict. Only one of 'postgres' or 'gen3' can be enabled")
@@ -35,6 +37,11 @@ class Uploader(object):
             self._irods_uploader = IRODSUploader()
         else:
             self._irods_uploader = None
+
+        if self._minio_enabled :
+            self._minio_uploader = MinioUploader()
+        else:
+            self._minio_uploader = None
 
 
     def upload_assay(self, assay_data):
