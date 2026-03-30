@@ -8,7 +8,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import health, auth, query
+from .routers import health, auth, query, upload
 
 def initialise(app):
     origins = [
@@ -38,6 +38,7 @@ def create_app() -> FastAPI:
     app.include_router(health.router)
     app.include_router(auth.router)
     app.include_router(query.router)
+    app.include_router(upload.router)
 
     return app
 
