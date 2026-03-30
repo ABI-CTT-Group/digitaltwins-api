@@ -25,8 +25,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       # minio
       MINIO_ENABLED: ${MINIO_ENABLED:-true}
-      MINIO_HOST: ${MINIO_HOST:-localhost}
-      MINIO_PORT: ${MINIO_PORT:-9000}
+      MINIO_ENDPOINT: ${MINIO_ENDPOINT:-http://localhost:9000}
       MINIO_SERVER_ACCESS_KEY: ${MINIO_SERVER_ACCESS_KEY:-minioadmin}
       MINIO_SERVER_SECRET_KEY: ${MINIO_SERVER_SECRET_KEY:-minioadmin}
       # airflow

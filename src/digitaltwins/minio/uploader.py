@@ -10,16 +10,14 @@ logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
 
 class Uploader(object):
     def __init__(self):
-        self._host = os.getenv("MINIO_HOST")
-        self._port = os.getenv("MINIO_PORT")
+        self._endpoint = os.getenv("MINIO_ENDPOINT")
         self._access_key = os.getenv("MINIO_SERVER_ACCESS_KEY")
         self._secret_key = os.getenv("MINIO_SERVER_SECRET_KEY")
 
         missing_vars = [
             name
             for name, value in [
-                ("MINIO_HOST", self._host),
-                ("MINIO_PORT", self._port),
+                ("MINIO_ENDPOINT", self._endpoint),
                 ("MINIO_SERVER_ACCESS_KEY", self._access_key),
                 ("MINIO_SERVER_SECRET_KEY", self._secret_key),
             ]
@@ -32,16 +30,14 @@ class Uploader(object):
                 + ", ".join(missing_vars)
             )
 
-        endpoint_url = f"{self._host.rstrip('/')}:{self._port}"
-
         try:
             self.s3_client = boto3.client(
                 's3',
-                endpoint_url=endpoint_url,
+                endpoint_url=self._endpoint,
                 aws_access_key_id=self._access_key,
                 aws_secret_access_key=self._secret_key
             )
-            logging.info(f"Connected to MinIO at {endpoint_url}")
+            logging.info(f"Connected to MinIO at {self._endpoint}")
         except Exception as e:
             logging.error(f"Failed to initialize MinIO client: {e}")
             raise
