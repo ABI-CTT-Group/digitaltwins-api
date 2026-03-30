@@ -231,7 +231,6 @@ class Uploader(object):
         dataset_path: str,
         category: str,
         save_json: bool = False,
-        project_uuid: Optional[str] = None,
     ) -> str:
         """Upload a SPARC SDS dataset to Postgres and MinIO.
 
@@ -250,9 +249,6 @@ class Uploader(object):
                 MinIO bucket name).
             save_json: When ``True``, each parsed ``.xlsx`` file is also
                 saved as a ``.json`` file alongside the original.
-            project_uuid: Optional UUID of the parent project.  Required
-                if a row should be inserted into the ``dataset`` table
-                (which has a ``NOT NULL`` constraint on ``project_uuid``).
 
         Returns:
             The generated ``dataset_uuid`` as a string.
