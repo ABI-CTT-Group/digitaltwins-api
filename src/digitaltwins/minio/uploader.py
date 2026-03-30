@@ -3,7 +3,7 @@ import boto3
 from botocore.exceptions import ClientError
 
 from dotenv import load_dotenv
-load_dotenv(".env")
+load_dotenv()
 
 import logging
 logging.basicConfig(level=logging.INFO, format='%(levelname)s: %(message)s')
