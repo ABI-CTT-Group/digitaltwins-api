@@ -19,3 +19,6 @@ from .core.querier import Querier
 from .core.uploader import Uploader
 from .core.downloader import Downloader
 from .core.workflow import Workflow
+
+# from .minio.uploader import Uploader as MinIOUploader
+from .core.uploader import Uploader

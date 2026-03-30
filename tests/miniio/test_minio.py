@@ -1,11 +1,11 @@
 from pathlib import Path
-from digitaltwins import MinIOUploader
+from digitaltwins.minio.uploader import Uploader
 
 if __name__ == "__main__":
     bucket_name = "measurements"
     test_file = Path("./tests/miniio/data/test.txt")
 
-    uploader = MinIOUploader()
+    uploader = Uploader()
     uploader.bucket_exists(bucket_name)
 
     # Upload a file
