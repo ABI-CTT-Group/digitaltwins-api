@@ -503,7 +503,7 @@ def _insert_subject(
     subject_id = record.get("subject_id")
 
     # All keys in the record are now DB column names (from mapping)
-    db_record = {k: v for k, v in record.items() if k != "subject_id"}
+    db_record = {k: v for k, v in record.items() if k.lower() != "subject_id"}
     columns = list(db_record.keys())
     values = list(db_record.values())
     placeholders = ", ".join(["%s"] * len(values))
@@ -539,7 +539,7 @@ def _insert_sample(
     db_record = {
         k: v
         for k, v in record.items()
-        if k not in ("sample_id", "subject_id")
+        if k.lower() not in ("sample_id", "subject_id", "was_derived_from_sample", "wasderivedfromsample")
     }
 
     columns = list(db_record.keys())
