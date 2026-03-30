@@ -42,13 +42,15 @@ class Uploader(object):
             logging.error(f"Failed to initialize MinIO client: {e}")
             raise
 
-    def bucket_exists(self, bucket_name: str = None) -> bool:
+    def bucket_exists(self, bucket_name: str) -> bool:
         """
         Checks if a specific bucket exists on the MinIO server.
 
-        :param bucket_name: The name of the bucket to check. Defaults to the initialized bucket.
+        :param bucket_name: The name of the bucket to check.
         :return: True if the bucket exists, False otherwise.
         """
+        if not bucket_name:
+            raise ValueError("bucket_name is required and cannot be empty.")
         try:
             self.s3_client.head_bucket(Bucket=bucket_name)
             logging.info(f"Bucket '{bucket_name}' exists.")
