@@ -4,7 +4,7 @@ import os
 import logging
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, ConnectionClosedError, EndpointConnectionError
 
 from dotenv import load_dotenv
 
@@ -102,3 +102,80 @@ class Deleter(object):
 
         logger.info("Total objects deleted for dataset %s: %d", dataset_uuid, total_deleted)
         return total_deleted
+
+    def delete_bucket(self, bucket_name: str) -> dict:
+        """Delete a bucket only when it exists and is empty.
+
+        Returns a structured response with status values:
+        ``success``, ``not_found``, ``not_empty``, ``permission_denied``,
+        or ``connection_error``.
+        """
+
+        def _result(status: str, deleted: bool, message: str, error_code: str | None = None) -> dict:
+            payload = {
+                "bucket_name": bucket_name,
+                "status": status,
+                "deleted": deleted,
+                "message": message,
+            }
+            if error_code:
+                payload["error_code"] = error_code
+            return payload
+
+        if not bucket_name:
+            return _result("invalid_request", False, "Bucket name must be provided")
+
+        # 1) Check that the bucket exists and is accessible.
+        try:
+            self.s3_client.head_bucket(Bucket=bucket_name)
+        except (EndpointConnectionError, ConnectionClosedError) as e:
+            logger.error("Connection error while checking bucket '%s': %s", bucket_name, e)
+            return _result("connection_error", False, "Unable to reach MinIO endpoint")
+        except ClientError as e:
+            code = e.response.get("Error", {}).get("Code", "")
+            if code in {"404", "NoSuchBucket", "NotFound"}:
+                return _result("not_found", False, f"Bucket '{bucket_name}' does not exist", code)
+            if code in {"403", "AccessDenied", "AllAccessDisabled"}:
+                return _result("permission_denied", False, f"Access denied for bucket '{bucket_name}'", code)
+            if code in {"RequestTimeout", "RequestTimeoutException", "NetworkingError"}:
+                return _result("connection_error", False, "Network issue while checking bucket", code)
+            raise RuntimeError(f"Failed to check bucket '{bucket_name}': {e}") from e
+
+        # 2) Ensure bucket is empty before deleting.
+        try:
+            listing = self.s3_client.list_objects_v2(Bucket=bucket_name, MaxKeys=1)
+            if listing.get("KeyCount", 0) > 0:
+                return _result("not_empty", False, f"Bucket '{bucket_name}' is not empty")
+        except (EndpointConnectionError, ConnectionClosedError) as e:
+            logger.error("Connection error while listing bucket '%s': %s", bucket_name, e)
+            return _result("connection_error", False, "Unable to reach MinIO endpoint")
+        except ClientError as e:
+            code = e.response.get("Error", {}).get("Code", "")
+            if code in {"403", "AccessDenied", "AllAccessDisabled"}:
+                return _result("permission_denied", False, f"Access denied for bucket '{bucket_name}'", code)
+            if code in {"404", "NoSuchBucket", "NotFound"}:
+                return _result("not_found", False, f"Bucket '{bucket_name}' does not exist", code)
+            if code in {"RequestTimeout", "RequestTimeoutException", "NetworkingError"}:
+                return _result("connection_error", False, "Network issue while listing bucket", code)
+            raise RuntimeError(f"Failed to inspect bucket '{bucket_name}': {e}") from e
+
+        # 3) Delete empty bucket.
+        try:
+            self.s3_client.delete_bucket(Bucket=bucket_name)
+            logger.info("Deleted empty bucket '%s'", bucket_name)
+            return _result("success", True, f"Bucket '{bucket_name}' deleted")
+        except (EndpointConnectionError, ConnectionClosedError) as e:
+            logger.error("Connection error while deleting bucket '%s': %s", bucket_name, e)
+            return _result("connection_error", False, "Unable to reach MinIO endpoint")
+        except ClientError as e:
+            code = e.response.get("Error", {}).get("Code", "")
+            if code in {"BucketNotEmpty"}:
+                return _result("not_empty", False, f"Bucket '{bucket_name}' is not empty", code)
+            if code in {"404", "NoSuchBucket", "NotFound"}:
+                return _result("not_found", False, f"Bucket '{bucket_name}' does not exist", code)
+            if code in {"403", "AccessDenied", "AllAccessDisabled"}:
+                return _result("permission_denied", False, f"Access denied for bucket '{bucket_name}'", code)
+            if code in {"RequestTimeout", "RequestTimeoutException", "NetworkingError"}:
+                return _result("connection_error", False, "Network issue while deleting bucket", code)
+            raise RuntimeError(f"Failed to delete bucket '{bucket_name}': {e}") from e
+
