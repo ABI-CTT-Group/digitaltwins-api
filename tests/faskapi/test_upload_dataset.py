@@ -13,7 +13,7 @@ app.dependency_overrides[validate_credentials] = lambda: True
 client = TestClient(app)
 
 def test_upload_raw():
-    dataset_dir = Path("/home/clin864/Projects/digitaltwins-api/resources/example_sds_dataset")
+    dataset_dir = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset")
     
     files = []
     for filepath in dataset_dir.rglob("*"):
@@ -24,7 +24,7 @@ def test_upload_raw():
             )
     
     print(f"Uploading {len(files)} files...")
-    response = client.post("/upload/dataset", files=files, params={"category": "test-category"})
+    response = client.post("/dataset", files=files, params={"category": "test-category"})
     print("RAW Status:", response.status_code)
     try:
         print("RAW Response:", response.json())
@@ -32,14 +32,14 @@ def test_upload_raw():
         print("RAW Response decode failed:", e, response.text)
 
 def test_upload_zip():
-    dataset_zip = Path("/home/clin864/Projects/digitaltwins-api/resources/example_sds_dataset.zip")
+    dataset_zip = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset.zip")
     
     files = [
         ("files", (dataset_zip.name, open(dataset_zip, "rb"), "application/zip"))
     ]
     
     print(f"\nUploading zip file...")
-    response = client.post("/upload/dataset", files=files, params={"category": "test-category"})
+    response = client.post("/dataset", files=files, params={"category": "test-category"})
     print("ZIP Status:", response.status_code)
     try:
         print("ZIP Response:", response.json())
