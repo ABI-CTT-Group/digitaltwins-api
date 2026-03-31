@@ -5,7 +5,7 @@ from digitaltwins.minio.deleter import Deleter
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 def test_upload():
-    bucket_name = "measurements"
+    bucket_name = "test"
 
     uploader = Uploader()
     uploader.bucket_exists(bucket_name)
