@@ -14,6 +14,7 @@ client = TestClient(app)
 
 def test_upload_raw():
     dataset_dir = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset")
+    bucket_name = "test"
     
     files = []
     for filepath in dataset_dir.rglob("*"):
@@ -24,7 +25,7 @@ def test_upload_raw():
             )
     
     print(f"Uploading {len(files)} files...")
-    response = client.post("/dataset", files=files, params={"category": "test-category"})
+    response = client.post("/dataset", files=files, params={"category": bucket_name})
     print("RAW Status:", response.status_code)
     try:
         print("RAW Response:", response.json())
@@ -33,13 +34,14 @@ def test_upload_raw():
 
 def test_upload_zip():
     dataset_zip = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset.zip")
+    bucket_name = "test"
     
     files = [
         ("files", (dataset_zip.name, open(dataset_zip, "rb"), "application/zip"))
     ]
     
     print(f"\nUploading zip file...")
-    response = client.post("/dataset", files=files, params={"category": "test-category"})
+    response = client.post("/dataset", files=files, params={"category": bucket_name})
     print("ZIP Status:", response.status_code)
     try:
         print("ZIP Response:", response.json())
