@@ -19,7 +19,7 @@ def get_uploader() -> Uploader:
     """
     return Uploader()
 
-@router.post("/upload/dataset", tags=["upload"])
+@router.post("/dataset", tags=["upload"])
 async def upload_dataset(
     files: List[UploadFile] = File(
         ...,
