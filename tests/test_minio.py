@@ -28,5 +28,5 @@ def test_delete_bucket():
 
 
 if __name__ == "__main__":
-    # test_upload()
+    test_upload()
     test_delete_bucket()
