@@ -1,5 +1,9 @@
+import sys
 from pathlib import Path
 from fastapi.testclient import TestClient
+
+# Ensure the project root is on sys.path so `app` can be imported when running directly
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from app.main import app
 from app.routers.auth import validate_credentials
