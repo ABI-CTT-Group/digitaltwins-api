@@ -24,7 +24,7 @@ KEYCLOAK_CLIENT_SECRET = os.getenv("KEYCLOAK_CLIENT_SECRET")
 
 keycloak_realm_url = f"{KEYCLOAK_BASE_URL}/realms/{KEYCLOAK_REALM}"
 keycloak_token_url = f"{keycloak_realm_url}/protocol/openid-connect/token"
-keycloak_introspect_url = f"{keycloak_token_url}/introspect"
+# keycloak_introspect_url = f"{keycloak_token_url}/introspect"
 
 # Cache the public key to avoid fetching it on every request
 _cached_public_key: str | None = None
