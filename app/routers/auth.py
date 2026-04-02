@@ -156,9 +156,12 @@ def get_token(
     response = requests.post(keycloak_token_url, data=payload)
 
     if response.status_code != 200:
-        error_detail = response.json()
+        try:
+            error_detail = response.json()
+        except ValueError:
+            error_detail = response.text
         print(f"[auth] Keycloak token error ({response.status_code}): {error_detail}")
-        raise HTTPException(status_code=401, detail=error_detail)
+        raise HTTPException(status_code=response.status_code, detail=error_detail)
 
     response_json = response.json()
     # token = response_json.get("access_token")
