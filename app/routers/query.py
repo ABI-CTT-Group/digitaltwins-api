@@ -4,8 +4,6 @@ Query Routings.
 This module provides various API endpoints for querying digital twins resources, such as
 programs, projects, investigations, studies, assays, workflows, and tools via the Querier.
 """
-import os
-
 from dotenv import load_dotenv
 from fastapi import APIRouter
 from fastapi import Depends
