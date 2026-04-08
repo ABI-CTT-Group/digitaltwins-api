@@ -18,7 +18,7 @@ querier = Querier()
 router = APIRouter()
 
 @router.get("/programs", tags=["query"])
-def get_programs(get_details=False, valid=Depends(validate_credentials)):
+def get_programs(get_details: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a list of programs.
 
@@ -50,7 +50,7 @@ def get_program(program_id=None, valid=Depends(validate_credentials)):
 
 
 @router.get("/projects", tags=["query"])
-def get_projects(get_details=False, valid=Depends(validate_credentials)):
+def get_projects(get_details: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a list of projects.
 
@@ -82,7 +82,7 @@ def get_project(project_id=None, valid=Depends(validate_credentials)):
 
 
 @router.get("/investigations", tags=["query"])
-def get_investigations(get_details=False, valid=Depends(validate_credentials)):
+def get_investigations(get_details: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a list of investigations.
 
@@ -114,7 +114,7 @@ def get_investigation(investigation_id=None, valid=Depends(validate_credentials)
 
 
 @router.get("/studies", tags=["query"])
-def get_studies(get_details=False, valid=Depends(validate_credentials)):
+def get_studies(get_details: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a list of studies.
 
@@ -146,7 +146,7 @@ def get_study(study_id=None, valid=Depends(validate_credentials)):
 
 
 @router.get("/assays", tags=["query"])
-def get_assays(get_details=False, valid=Depends(validate_credentials)):
+def get_assays(get_details: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a list of assays.
 
@@ -162,7 +162,7 @@ def get_assays(get_details=False, valid=Depends(validate_credentials)):
 
 
 @router.get("/assays/{assay_id}", tags=["query"])
-def get_assay(assay_id=None, get_params=False, valid=Depends(validate_credentials)):
+def get_assay(assay_id=None, get_params: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a specific assay by its ID, with optional parameters.
 
