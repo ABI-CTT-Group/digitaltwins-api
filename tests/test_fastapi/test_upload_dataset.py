@@ -12,10 +12,9 @@ app.dependency_overrides[validate_credentials] = lambda: True
 
 client = TestClient(app)
 
-def test_upload_raw():
+def test_upload(bucket_name):
     dataset_dir = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset")
-    bucket_name = "test"
-    
+
     files = []
     for filepath in dataset_dir.rglob("*"):
         if filepath.is_file():
@@ -32,10 +31,9 @@ def test_upload_raw():
     except Exception as e:
         print("RAW Response decode failed:", e, response.text)
 
-def test_upload_zip():
+def test_upload_zip(bucket_name):
     dataset_zip = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset.zip")
-    bucket_name = "test"
-    
+
     files = [
         ("files", (dataset_zip.name, open(dataset_zip, "rb"), "application/zip"))
     ]
@@ -49,5 +47,5 @@ def test_upload_zip():
         print("ZIP Response decode failed:", e, response.text)
 
 if __name__ == "__main__":
-    test_upload_raw()
-    test_upload_zip()
+    test_upload(bucket_name="measurement")
+    test_upload_zip(bucket_name="test")
