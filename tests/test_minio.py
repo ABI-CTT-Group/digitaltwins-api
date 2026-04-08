@@ -5,9 +5,7 @@ from digitaltwins.minio.downloader import Downloader
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
-def test_upload():
-    bucket_name = "test"
-
+def test_upload(bucket_name):
     uploader = Uploader()
     uploader.bucket_exists(bucket_name)
 
@@ -20,9 +18,7 @@ def test_upload():
     uploader.upload_folder(str(test_folder), bucket_name, test_folder.name, overwrite=False)
 
 
-def test_delete_bucket():
-    bucket_name = "test"
-
+def test_delete_bucket(bucket_name):
     deleter = Deleter()
     resp = deleter.delete_bucket(bucket_name)
     print(resp)
@@ -45,6 +41,6 @@ def test_download():
 
 
 if __name__ == "__main__":
-    test_upload()
-    test_download()
-    test_delete_bucket()
+    # test_upload(bucket_name="")
+    # test_download()
+    test_delete_bucket(bucket_name="")
