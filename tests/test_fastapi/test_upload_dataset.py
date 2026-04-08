@@ -45,6 +45,6 @@ def test_upload_zip(bucket_name, dataset_path):
         print("ZIP Response decode failed:", e, response.text)
 
 if __name__ == "__main__":
-    dataset_path = SCRIPT_DIR / "tests/data/example_sds_dataset"
+    dataset_path = SCRIPT_DIR / "../data/example_duke_sds"
     test_upload(bucket_name="measurement", dataset_path=dataset_path)
-    test_upload_zip(bucket_name="test", dataset_path=dataset_path)
+    # test_upload_zip(bucket_name="test", dataset_path=dataset_path)
