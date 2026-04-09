@@ -14,7 +14,9 @@ client = TestClient(app)
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 
-def test_upload(bucket_name, dataset_path):
+def test_upload():
+    bucket_name="measurement"
+    dataset_path = SCRIPT_DIR / "./data/example_duke_sds"
     files = []
     for filepath in dataset_path.rglob("*"):
         if filepath.is_file():
@@ -32,6 +34,8 @@ def test_upload(bucket_name, dataset_path):
         print("RAW Response decode failed:", e, response.text)
 
 def test_upload_zip(bucket_name, dataset_path):
+    bucket_name="measurement"
+    dataset_path = SCRIPT_DIR / "./data/example_sds_dataset.zip"
     files = [
         ("files", (dataset_path.name, open(dataset_path, "rb"), "application/zip"))
     ]
@@ -43,8 +47,3 @@ def test_upload_zip(bucket_name, dataset_path):
         print("ZIP Response:", response.json())
     except Exception as e:
         print("ZIP Response decode failed:", e, response.text)
-
-if __name__ == "__main__":
-    dataset_path = SCRIPT_DIR / "../data/example_duke_sds"
-    test_upload(bucket_name="measurement", dataset_path=dataset_path)
-    # test_upload_zip(bucket_name="test", dataset_path=dataset_path)
