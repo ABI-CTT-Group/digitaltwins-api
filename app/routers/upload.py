@@ -3,9 +3,10 @@
 import tempfile
 import traceback
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
 from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from pydantic import BaseModel, ConfigDict
 
 from src.digitaltwins.core.uploader import Uploader
 from .auth import validate_credentials
@@ -18,6 +19,35 @@ def get_uploader() -> Uploader:
     Build an Uploader() instance for dependency injection.
     """
     return Uploader()
+
+
+# --- Pydantic Models for Assay Upload ---
+
+class AssayInputModel(BaseModel):
+    name: str = ""
+    category: str = ""
+    dataset_uuid: str = ""
+    sample_type: str = ""
+
+class AssayOutputModel(BaseModel):
+    name: str = ""
+    category: str = ""
+    dataset_name: str = ""
+    sample_name: str = ""
+
+class AssayDataModel(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    assay_uuid: Optional[str] = ""
+    assay_seek_id: int
+    workflow_seek_id: int
+    cohort: int
+    ready: bool
+    inputs: Optional[List[AssayInputModel]] = []
+    outputs: Optional[List[AssayOutputModel]] = []
+
+# ----------------------------------------
+
 
 @router.post("/dataset", tags=["upload"])
 async def upload_dataset(
@@ -114,4 +144,35 @@ async def upload_dataset(
     return {
         "message": "Dataset uploaded successfully.",
         "dataset_uuid": dataset_uuid,
+    }
+
+
+@router.post("/assay", tags=["upload"])
+async def configure_assay(
+    assay_data: AssayDataModel,
+    uploader: Uploader = Depends(get_uploader),
+    _valid: bool = Depends(validate_credentials),
+) -> dict[str, Any]:
+    """Configure an assay through PostgreSQL.
+    
+    Accepts an AssayDataModel JSON payload containing the assay configuration
+    as well as inputs and outputs mapping. Directly invokes
+    `uploader.configure_assay(assay_data.model_dump())` to persist the 
+    configuration in the PostgreSQL database.
+    """
+    try:
+        # Convert Pydantic payload to dictionary string exactly as the DB layer expects
+        payload = assay_data.model_dump()
+        assay_uuid = uploader.configure_assay(payload)
+
+    except Exception as exc:
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to configure assay: {exc}",
+        ) from exc
+
+    return {
+        "message": "Assay configured successfully.",
+        "assay_uuid": assay_uuid,
     }

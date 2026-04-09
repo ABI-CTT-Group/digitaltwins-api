@@ -102,61 +102,83 @@ class Uploader(object):
         self._disconnect()
 
 
-    def upload_assay(self, assay_data):
-        self._connect()
+    def configure_assay(self, assay_data):
+        """Upload or update an assay and its inputs/outputs to PostgreSQL.
 
-        assay_uuid = assay_data.get("assay_uuid")
+        If ``assay_uuid`` is provided in *assay_data* the existing record is
+        updated; otherwise a new record is inserted and the generated UUID is
+        used for subsequent input/output rows.
+
+        Returns:
+            str: The ``assay_uuid`` of the inserted or updated assay.
+        """
+        assay_uuid = assay_data.get("assay_uuid") or None
         assay_seek_id = assay_data.get("assay_seek_id")
         workflow_seek_id = assay_data.get("workflow_seek_id")
         cohort = assay_data.get("cohort")
         ready = assay_data.get("ready")
 
-        # # todo. check if assay_seek_id exists
-        # # if exists update, otherwise insert
-        # """
-        # sql = f"SELECT EXISTS (SELECT 1 FROM {table} WHERE assay_seek_id = %s)"
-        #
-        # INSERT INTO assay (assay_seek_id, workflow_seek_id, cohort, ready)
-        # VALUES (assay_seek_id, workflow_seek_id, cohort, ready)
-        # ON CONFLICT (assay_seek_id) DO UPDATE
-        # SET workflow_seek_id = workflow_seek_id, cohort = cohort, ready=ready;
-        # """
+        self._connect()
+        try:
+            # --- Check if assay_seek_id already exists if assay_uuid is missing ---
+            if not assay_uuid and assay_seek_id is not None:
+                self._cur.execute("SELECT assay_uuid FROM assay WHERE assay_seek_id = %s LIMIT 1;", (assay_seek_id,))
+                existing_row = self._cur.fetchone()
+                if existing_row:
+                    assay_uuid = str(existing_row[0])
 
-        if assay_uuid:
-            sql = r"UPDATE assay SET workflow_seek_id = %s, cohort = %s, ready = %s WHERE assay_uuid = %s RETURNING *;"
-            values = (workflow_seek_id, cohort, ready, assay_uuid)
-            column_names, inserted = self._exec(sql, values)
-        else:
-            sql = r"""INSERT INTO assay (assay_seek_id, workflow_seek_id, cohort, ready) VALUES (%s, %s, %s, %s) RETURNING *;"""
-            values = (assay_seek_id, workflow_seek_id, cohort, ready)
-            column_names, inserted = self._exec(sql, values)
-            inserted_record = dict(zip(column_names, inserted[0]))
+            # --- upsert assay record ---
+            if assay_uuid:
+                sql = (
+                    "UPDATE assay SET workflow_seek_id = %s, cohort = %s, "
+                    "ready = %s WHERE assay_uuid = %s RETURNING *;"
+                )
+                self._cur.execute(sql, (workflow_seek_id, cohort, ready, assay_uuid))
+            else:
+                sql = (
+                    "INSERT INTO assay (assay_seek_id, workflow_seek_id, cohort, ready) "
+                    "VALUES (%s, %s, %s, %s) RETURNING *;"
+                )
+                self._cur.execute(sql, (assay_seek_id, workflow_seek_id, cohort, ready))
+
+            row = self._cur.fetchone()
+            column_names = [desc[0] for desc in self._cur.description]
+            inserted_record = dict(zip(column_names, row))
             assay_uuid = inserted_record.get("assay_uuid")
 
-        if assay_uuid:
-            self._delete_assay_inputs_outputs(assay_uuid)
-        # inputs
-        inputs = assay_data.get("inputs")
-        for input in inputs:
-            sql = r"""INSERT INTO assay_input (assay_uuid, name, dataset_uuid, sample_type, category) VALUES (%s, %s, %s, %s, %s) RETURNING *;"""
-            values = (assay_uuid, input.get("name"), input.get("dataset_uuid"), input.get("sample_type"), input.get("category"))
-            column_names, inserted = self._exec(sql, values)
+            # --- clear old inputs/outputs for this assay ---
+            self._cur.execute("DELETE FROM assay_input WHERE assay_uuid = %s", (assay_uuid,))
+            self._cur.execute("DELETE FROM assay_output WHERE assay_uuid = %s", (assay_uuid,))
 
-        # outputs
-        outputs = assay_data.get("outputs")
-        for output in outputs:
-            sql = r"""INSERT INTO assay_output (assay_uuid, name, dataset_name, sample_name, category) VALUES (%s, %s, %s, %s, %s) RETURNING *;"""
-            values = (assay_uuid, output.get("name"), output.get("dataset_name"),
-                      output.get("sample_name"), output.get("category"))
-            column_names, inserted = self._exec(sql, values)
+            # --- insert inputs ---
+            for inp in assay_data.get("inputs") or []:
+                sql = (
+                    "INSERT INTO assay_input (assay_uuid, name, dataset_uuid, sample_type, category) "
+                    "VALUES (%s, %s, %s, %s, %s) RETURNING *;"
+                )
+                self._cur.execute(sql, (
+                    assay_uuid, inp.get("name"), inp.get("dataset_uuid"),
+                    inp.get("sample_type"), inp.get("category"),
+                ))
 
-        self._disconnect()
+            # --- insert outputs ---
+            for out in assay_data.get("outputs") or []:
+                sql = (
+                    "INSERT INTO assay_output (assay_uuid, name, dataset_name, sample_name, category) "
+                    "VALUES (%s, %s, %s, %s, %s) RETURNING *;"
+                )
+                self._cur.execute(sql, (
+                    assay_uuid, out.get("name"), out.get("dataset_name"),
+                    out.get("sample_name"), out.get("category"),
+                ))
 
-        # testing: multiple input
-        # values = [(item['name'], item['dataset_uuid'], item['sample_type'], item['category']) for item in inputs]
-        #
-        # args = ','.join(self._cur.mogrify("(%s,%s,%s,%s)", i).decode('utf-8')
-        #                 for i in values)
-        # sql = "INSERT INTO assay_input (name, dataset_uuid, sample_type, category) VALUES " + (args)
-        # self._exec(sql, values)
+            self._conn.commit()
+        except Exception:
+            if self._conn:
+                self._conn.rollback()
+            raise
+        finally:
+            self._disconnect()
+
+        return str(assay_uuid)
 
