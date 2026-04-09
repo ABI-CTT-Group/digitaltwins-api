@@ -12,14 +12,13 @@ app.dependency_overrides[validate_credentials] = lambda: True
 
 client = TestClient(app)
 
-def test_upload_raw():
-    dataset_dir = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset")
-    bucket_name = "test"
-    
+SCRIPT_DIR = Path(__file__).resolve().parent
+
+def test_upload(bucket_name, dataset_path):
     files = []
-    for filepath in dataset_dir.rglob("*"):
+    for filepath in dataset_path.rglob("*"):
         if filepath.is_file():
-            rel_path = filepath.relative_to(dataset_dir.parent)
+            rel_path = filepath.relative_to(dataset_path.parent)
             files.append(
                 ("files", (str(rel_path), open(filepath, "rb"), "application/octet-stream"))
             )
@@ -32,12 +31,9 @@ def test_upload_raw():
     except Exception as e:
         print("RAW Response decode failed:", e, response.text)
 
-def test_upload_zip():
-    dataset_zip = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset.zip")
-    bucket_name = "test"
-    
+def test_upload_zip(bucket_name, dataset_path):
     files = [
-        ("files", (dataset_zip.name, open(dataset_zip, "rb"), "application/zip"))
+        ("files", (dataset_path.name, open(dataset_path, "rb"), "application/zip"))
     ]
     
     print(f"\nUploading zip file...")
@@ -49,5 +45,6 @@ def test_upload_zip():
         print("ZIP Response decode failed:", e, response.text)
 
 if __name__ == "__main__":
-    test_upload_raw()
-    test_upload_zip()
+    dataset_path = SCRIPT_DIR / "../data/example_duke_sds"
+    test_upload(bucket_name="measurement", dataset_path=dataset_path)
+    # test_upload_zip(bucket_name="test", dataset_path=dataset_path)

@@ -460,9 +460,10 @@ class Uploader(object):
                 )
         logger.info("Inserted dataset_mapping rows for dataset %s", dataset_uuid)
 
-    def upload_assay(self, assay_data):
+    def configure_assay(self, assay_data):
         if self._postgres_enabled:
-            self._postgres_uploader.upload_assay(assay_data)
+            return self._postgres_uploader.configure_assay(assay_data)
+        return None
 
 
 # ------------------------------------------------------------------
