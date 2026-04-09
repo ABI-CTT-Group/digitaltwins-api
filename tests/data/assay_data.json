@@ -1,14 +1,14 @@
 {
   "assay_uuid": "",
-  "assay_seek_id": 24,
-  "workflow_seek_id": 23,
+  "assay_seek_id": 1,
+  "workflow_seek_id": 1,
   "cohort": 2,
   "ready": true,
   "inputs": [
     {
       "name": "dicom_input",
       "category": "measurement",
-      "dataset_uuid": "8fde6388-33a2-11f1-91fa-0242ac130004",
+      "dataset_uuid": "cd77671c-33f7-11f1-b0c1-ce8482733eb4",
       "sample_type": "ax dyn pre"
     }
   ],
