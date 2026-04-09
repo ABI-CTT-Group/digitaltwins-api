@@ -16,7 +16,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 
 def test_upload():
     bucket_name="measurement"
-    dataset_path = SCRIPT_DIR / "../data/example_duke_sds"
+    dataset_path = SCRIPT_DIR / "./data/example_duke_sds"
     files = []
     for filepath in dataset_path.rglob("*"):
         if filepath.is_file():
@@ -35,7 +35,7 @@ def test_upload():
 
 def test_upload_zip(bucket_name, dataset_path):
     bucket_name="measurement"
-    dataset_path = SCRIPT_DIR / "../data/example_sds_dataset.zip"
+    dataset_path = SCRIPT_DIR / "./data/example_sds_dataset.zip"
     files = [
         ("files", (dataset_path.name, open(dataset_path, "rb"), "application/zip"))
     ]
