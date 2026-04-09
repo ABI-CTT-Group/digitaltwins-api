@@ -161,19 +161,19 @@ def get_assays(get_details: bool = False, valid=Depends(validate_credentials)):
 
 
 @router.get("/assays/{assay_id}", tags=["query"])
-def get_assay(assay_id=None, get_params: bool = False, valid=Depends(validate_credentials)):
+def get_assay(assay_id=None, get_configs: bool = False, valid=Depends(validate_credentials)):
     """
     Retrieve a specific assay by its ID, with optional parameters.
 
     Args:
         assay_id (str, optional): The ID of the assay to retrieve.
-        get_params (bool, optional): If True, retrieves additional parameters related to the assay. Defaults to False.
+        get_configs (bool, optional): If True, retrieves additional parameters related to the assay. Defaults to False.
         valid (bool): Ensures valid credentials are provided.
 
     Returns:
         dict: A dictionary containing the assay details under the 'assay' key.
     """
-    assay = querier.get_assay(assay_id, get_configs=get_params)
+    assay = querier.get_assay(assay_id, get_configs=get_configs)
     return {"assay": assay}
 
 @router.get("/workflows", tags=["query"])

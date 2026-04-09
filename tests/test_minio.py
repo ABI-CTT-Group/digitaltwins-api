@@ -6,8 +6,8 @@ from digitaltwins.minio.downloader import Downloader
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 def test_upload():
-    bucket_name=""
-    bucket_name="airflow-workspace/test_run/inputs/"
+    bucket_name="measurement"
+    prefix = None
 
     uploader = Uploader()
     uploader.bucket_exists(bucket_name)
@@ -18,7 +18,11 @@ def test_upload():
 
     # Upload a folder
     test_folder = SCRIPT_DIR / "./data/example_duke_sds"
-    uploader.upload_folder(str(test_folder), bucket_name, test_folder.name, overwrite=False)
+    if prefix:
+        prefix = prefix + "/" + test_folder.name
+    else:
+        prefix = test_folder.name
+    uploader.upload_folder(str(test_folder), bucket_name, prefix, overwrite=False)
 
 
 def test_delete_bucket():

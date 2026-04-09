@@ -25,7 +25,7 @@ app.dependency_overrides[validate_credentials] = lambda: True
 
 client = TestClient(app)
 
-def test_assay_endpoint():
+def test_configure_assay():
     script_dir = Path(__file__).resolve().parent
     assay_data_path = script_dir / "data" / "assay_data.json"
     
@@ -56,4 +56,4 @@ def test_assay_endpoint():
         print(f"❌ Failed: {response.status_code} - {response.text}")
 
 if __name__ == "__main__":
-    test_assay_endpoint()
+    test_configure_assay()
