@@ -28,7 +28,7 @@ def test_delete_nonexistent_dataset():
 
 def test_upload_then_delete():
     """Upload a dataset and then delete it; both should succeed."""
-    dataset_dir = Path("/home/clin864/Projects/digitaltwins-api/tests/data/example_sds_dataset")
+    dataset_dir = Path("/tests/data/example_sds_dataset")
     if not dataset_dir.exists():
         print("SKIP: example dataset not found at", dataset_dir)
         return
@@ -70,7 +70,7 @@ def test_delete_existing_dataset():
     Set the DATASET_UUID environment variable before running, or enter it
     interactively when prompted::
 
-        DATASET_UUID=<uuid> python tests/faskapi/test_delete_dataset.py
+        DATASET_UUID=<uuid> python tests/faskapi/test_delete_dataset_api.py
     """
     dataset_uuid = os.getenv("DATASET_UUID") or input("Enter dataset UUID to delete: ").strip()
     if not dataset_uuid:
