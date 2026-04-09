@@ -20,7 +20,7 @@ starlette.requests.Request.form = _patched_form  # type: ignore[method-assign]
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import health, auth, query, upload, delete, download
+from .routers import health, auth, query, upload, delete, download, workflow
 
 def initialise(app):
     origins = [
@@ -53,6 +53,7 @@ def create_app() -> FastAPI:
     app.include_router(upload.router)
     app.include_router(delete.router)
     app.include_router(download.router)
+    app.include_router(workflow.router)
 
     return app
 
