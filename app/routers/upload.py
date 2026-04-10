@@ -41,7 +41,7 @@ class AssayDataModel(BaseModel):
     assay_uuid: Optional[str] = ""
     assay_seek_id: int
     workflow_seek_id: int
-    cohort: int
+    cohort: List[str]
     ready: bool
     inputs: Optional[List[AssayInputModel]] = []
     outputs: Optional[List[AssayOutputModel]] = []
