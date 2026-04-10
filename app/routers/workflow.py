@@ -25,6 +25,9 @@ AIRFLOW_ENDPOINT = os.getenv("AIRFLOW_ENDPOINT")
 AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
 AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
+HOSTNAME = os.getenv("HOSTNAME")
+AIRFLOW_EXPOSE_PORT = os.getenv("AIRFLOW_PORT")
+
 PREPROCESSOR_DAG_ID = "preprocessor"
 
 def _get_api_token():
@@ -85,7 +88,7 @@ def run_assay(assay_id: int, valid=Depends(validate_credentials)):
     response = _trigger_dag(PREPROCESSOR_DAG_ID, conf)
 
     assay = get_assay(assay_id, get_configs=False)
-    
+
     workflow_seek_id = None
     try:
         workflows = assay.get("assay", {}).get("relationships", {}).get("workflows", [])
@@ -94,9 +97,11 @@ def run_assay(assay_id: int, valid=Depends(validate_credentials)):
     except (IndexError, AttributeError, TypeError):
         pass
 
+    monitor_base_url = f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
+
     if workflow_seek_id:
-        monitor_url = f"{AIRFLOW_ENDPOINT}/dags/workflow_{workflow_seek_id}"
+        monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
     else:
-        monitor_url = f"{AIRFLOW_ENDPOINT}/dags/{PREPROCESSOR_DAG_ID}"
+        monitor_url = f"{monitor_base_url}/dags/{PREPROCESSOR_DAG_ID}"
 
     return {"dag_run": response.json(), "monitor_url": monitor_url}
