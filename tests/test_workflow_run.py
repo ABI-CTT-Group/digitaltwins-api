@@ -18,3 +18,6 @@ def test_workflow_run():
         print(json.dumps(response.json(), indent=2))
     except:
         print(response.text)
+
+    # if run it in airflow interface. set json config to:
+    # {"assay_id": 1}
