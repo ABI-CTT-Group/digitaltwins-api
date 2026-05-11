@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 import requests
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from requests import Response
 
 from .auth import validate_credentials
@@ -30,7 +31,8 @@ AIRFLOW_EXPOSE_PORT = os.getenv("AIRFLOW_PORT")
 
 PREPROCESSOR_DAG_ID = "preprocessor"
 
-def _get_api_token():
+def _get_service_account_token() -> str:
+    """Get an Airflow JWT using the shared service account credentials."""
     url = f"{AIRFLOW_ENDPOINT}/auth/token"
     headers = {"Content-Type": "application/json"}
     payload = {
@@ -38,13 +40,60 @@ def _get_api_token():
         "password": AIRFLOW_PASSWORD
     }
     response = requests.post(url, headers=headers, json=payload)
-    access_token = response.json().get("access_token")
-    return access_token
+    response.raise_for_status()
+    return response.json().get("access_token")
 
-def _trigger_dag(dag_id: str, conf: dict) -> Response:
-    """Trigger an Airflow DAG run via the Airflow REST API v2 (Airflow 3)."""
+
+def _exchange_keycloak_token(keycloak_token: str) -> str | None:
+    """
+    Exchange a Keycloak Bearer token for an Airflow JWT scoped to that user.
+
+    Calls the /keycloak/token/exchange endpoint added to Airflow by the
+    keycloak_token_exchange plugin. Returns None if the exchange fails so
+    callers can fall back to the service account.
+    """
+    url = f"{AIRFLOW_ENDPOINT}/keycloak/exchange"
+    try:
+        response = requests.post(
+            url,
+            headers={"Authorization": f"Bearer {keycloak_token}"},
+            timeout=10,
+        )
+        if response.status_code == 200:
+            return response.json().get("access_token")
+        print(f"[workflow] Keycloak token exchange failed ({response.status_code}): {response.text}")
+        return None
+    except Exception as e:
+        print(f"[workflow] Keycloak token exchange error: {e}")
+        return None
+
+
+def _get_api_token(user_keycloak_token: str = None) -> str:
+    """
+    Get an Airflow API token.
+
+    If a user Keycloak token is provided, attempts to exchange it for a
+    user-scoped Airflow token (so the DAG run is attributed to that user).
+    Falls back to the service account token if exchange fails or no user
+    token is given.
+    """
+    if user_keycloak_token:
+        token = _exchange_keycloak_token(user_keycloak_token)
+        if token:
+            return token
+        print("[workflow] Falling back to service account token")
+    return _get_service_account_token()
+
+
+def _trigger_dag(dag_id: str, conf: dict, user_keycloak_token: str = None) -> Response:
+    """
+    Trigger an Airflow DAG run via the Airflow REST API v2 (Airflow 3).
+
+    If user_keycloak_token is provided the run will be attributed to that
+    user in Airflow (via token exchange). Falls back to the service account.
+    """
     url = f"{AIRFLOW_ENDPOINT}/api/v2/dags/{dag_id}/dagRuns"
-    api_token = _get_api_token()
+    api_token = _get_api_token(user_keycloak_token)
     headers = {
         "Authorization": f"Bearer {api_token}",
         "Accept": "application/json",
@@ -53,10 +102,9 @@ def _trigger_dag(dag_id: str, conf: dict) -> Response:
     logical_date = datetime.now(timezone.utc).isoformat()
 
     payload = {
-        "logical_date": logical_date,  # required
+        "logical_date": logical_date,
         "conf": conf
     }
-    # payload = conf
     response = requests.post(url, headers=headers, json=payload)
     if response.status_code == 200:
         print("Triggered DAG Run:", response.json())
@@ -67,7 +115,11 @@ def _trigger_dag(dag_id: str, conf: dict) -> Response:
 
 
 @router.post("/assays/{assay_id}/run", tags=["workflow"])
-def run_assay(assay_id: int, valid=Depends(validate_credentials)):
+def run_assay(
+    assay_id: int,
+    valid=Depends(validate_credentials),
+    bearer_credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+):
     """
     Trigger the *preprocessor* Airflow DAG for a given assay.
 
@@ -84,8 +136,9 @@ def run_assay(assay_id: int, valid=Depends(validate_credentials)):
             detail="Airflow integration is disabled (AIRFLOW_ENABLED=false).",
         )
 
+    user_token = bearer_credentials.credentials if bearer_credentials else None
     conf = {"assay_id": assay_id}
-    response = _trigger_dag(PREPROCESSOR_DAG_ID, conf)
+    response = _trigger_dag(PREPROCESSOR_DAG_ID, conf, user_keycloak_token=user_token)
 
     assay = get_assay(assay_id, get_configs=False)
 
