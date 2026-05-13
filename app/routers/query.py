@@ -23,8 +23,9 @@ def clear_cache(valid=Depends(validate_credentials)):
     Call this after making changes in SEEK so the dashboard reflects them immediately
     rather than waiting for the TTL to expire.
     """
-    count = len(querier._cache)
-    querier._cache.clear()
+    cache = querier._seek_querier._cache if querier._seek_querier else {}
+    count = len(cache)
+    cache.clear()
     return {"cleared": count}
 
 
