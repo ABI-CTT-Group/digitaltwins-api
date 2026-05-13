@@ -22,59 +22,33 @@ class Querier(object):
             if not required:
                 raise ValueError("Postgres configuration is incomplete. Please check your configuration file or environment variables.")
 
-        self._cur = None
-        self._conn = None
-
-    def _connect(self):
-        self._conn = psycopg2.connect(
+    def _query(self, sql, values=None):
+        # Connection and cursor are local to this call — not stored on self.
+        # Storing them as instance state caused race conditions when concurrent
+        # requests shared the same Querier singleton.
+        conn = psycopg2.connect(
             host=self._host,
             port=self._port,
             database=self._database,
             user=self._user,
             password=self._password)
-        # create a cursor
-        self._cur = self._conn.cursor()
-
-    def _disconnect(self):
-        self._cur.close()
-        self._conn.close()
-
-    def _query(self, sql, values=None):
-        self._connect()
-
-        if values:
-            self._cur.execute(sql, values)
-        else:
-            self._cur.execute(sql)
-
-        resp = self._cur.fetchall()
-
-        self._disconnect()
-
-        results = self._format_results(resp)
-
+        cur = conn.cursor()
+        try:
+            if values:
+                cur.execute(sql, values)
+            else:
+                cur.execute(sql)
+            resp = cur.fetchall()
+            results = self._format_results(cur, resp)
+        finally:
+            cur.close()
+            conn.close()
         return results
 
-    def _format_results(self, results):
-        column_names = []
-
-        # Iterate over the cursor description to extract column names
-        for desc in self._cur.description:
-            column_name = desc[0]  # Get the column name from the description tuple
-            column_names.append(column_name)  # Add the column name to the list
-
-        results_formated = []
-        for result in results:
-            row_dict = {}
-            for i in range(len(result)):
-                column_name = column_names[i]
-                row_value = result[i]
-                # Add the column name and value to the dictionary
-                row_dict[column_name] = row_value
-            # Convert the dictionary to a JSON object and add it to the list
-            # datasets_formated.append(json.dumps(row_dict))
-            results_formated.append(row_dict)
-        return results_formated
+    @staticmethod
+    def _format_results(cur, results):
+        column_names = [desc[0] for desc in cur.description]
+        return [dict(zip(column_names, row)) for row in results]
 
     def get_programs(self):
         """

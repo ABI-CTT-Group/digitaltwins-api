@@ -2,10 +2,13 @@
 
 import requests
 import os
+import time
 
 from dotenv import load_dotenv
 
 load_dotenv()
+
+_CACHE_TTL = 60  # seconds — how long to serve cached SEEK responses before re-fetching
 
 
 class Querier(object):
@@ -24,6 +27,28 @@ class Querier(object):
             "Authorization": "Bearer " + self._api_token,
             "Accept": "application/json"
         }
+
+        # Persistent session so TCP connections to SEEK are reused across calls
+        # rather than opened and closed on every request.
+        self._session = requests.Session()
+        self._session.headers.update(self._headers)
+
+        # Simple URL-keyed TTL cache. SEEK data (programmes, projects, etc.)
+        # changes rarely — serving from cache eliminates round-trips to SEEK
+        # for repeated navigation within the TTL window.
+        self._cache: dict = {}
+
+    def _get(self, url: str):
+        """Fetch url via the persistent session, returning cached data when fresh."""
+        now = time.time()
+        if url in self._cache:
+            data, ts = self._cache[url]
+            if now - ts < _CACHE_TTL:
+                return data
+        resp = self._session.get(url)
+        data = self._format_resp(resp)
+        self._cache[url] = (data, now)
+        return data
 
     @staticmethod
     def _format_resp(resp):
@@ -47,9 +72,7 @@ class Querier(object):
         :return: a list of program names
         :rtype: list
         """
-        url = self._base_url + "/programmes"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
+        data = self._get(self._base_url + "/programmes")
 
         if get_details:
             for idx, record in enumerate(data):
@@ -61,16 +84,10 @@ class Querier(object):
         return data
 
     def get_program(self, program_id):
-        url = self._base_url + "/programmes/" + str(program_id)
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/programmes/" + str(program_id))
 
     def get_projects(self, get_details=False):
-        url = self._base_url + "/projects"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
+        data = self._get(self._base_url + "/projects")
 
         if get_details:
             for idx, record in enumerate(data):
@@ -82,16 +99,10 @@ class Querier(object):
         return data
 
     def get_project(self, project_id):
-        url = self._base_url + "/projects/" + str(project_id)
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/projects/" + str(project_id))
 
     def get_investigations(self, get_details=False):
-        url = self._base_url + "/investigations"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
+        data = self._get(self._base_url + "/investigations")
 
         if get_details:
             for idx, record in enumerate(data):
@@ -103,16 +114,10 @@ class Querier(object):
         return data
 
     def get_investigation(self, investigation_id):
-        url = self._base_url + "/investigations/" + str(investigation_id)
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/investigations/" + str(investigation_id))
 
     def get_studies(self, get_details=False):
-        url = self._base_url + "/studies"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
+        data = self._get(self._base_url + "/studies")
 
         if get_details:
             for idx, record in enumerate(data):
@@ -124,16 +129,10 @@ class Querier(object):
         return data
 
     def get_study(self, study_id):
-        url = self._base_url + "/studies/" + str(study_id)
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/studies/" + str(study_id))
 
     def get_assays(self, get_details=False):
-        url = self._base_url + "/assays"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
+        data = self._get(self._base_url + "/assays")
 
         if get_details:
             for idx, record in enumerate(data):
@@ -145,11 +144,7 @@ class Querier(object):
         return data
 
     def get_assay(self, assay_id):
-        url = self._base_url + "/assays/" + str(assay_id)
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/assays/" + str(assay_id))
 
     def get_sops(self, get_details=False):
         """
@@ -157,9 +152,7 @@ class Querier(object):
         :return:
         :rtype:
         """
-        url = self._base_url + "/sops"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
+        data = self._get(self._base_url + "/sops")
 
         if get_details:
             for idx, record in enumerate(data):
@@ -178,36 +171,16 @@ class Querier(object):
         :return:
         :rtype:
         """
-        url = self._base_url + "/sops/" + str(sop_id)
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/sops/" + str(sop_id))
 
     def get_workflows(self):
-        url = self._base_url + "/workflows?filter%5Btag%5D=workflow"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/workflows?filter%5Btag%5D=workflow")
 
     def get_workflow(self, workflow_id):
-        url = self._base_url + "/workflows/" + str(workflow_id) + ".json"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/workflows/" + str(workflow_id) + ".json")
 
     def get_tools(self):
-        url = self._base_url + "/workflows?filter%5Btag%5D=tool"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/workflows?filter%5Btag%5D=tool")
 
     def get_tool(self, tool_id):
-        url = self._base_url + "/workflows/" + str(tool_id) + ".json"
-        resp = requests.get(url, headers=self._headers)
-        data = self._format_resp(resp)
-
-        return data
+        return self._get(self._base_url + "/workflows/" + str(tool_id) + ".json")

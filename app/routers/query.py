@@ -16,6 +16,18 @@ load_dotenv()
 querier = Querier()
 router = APIRouter()
 
+@router.post("/cache/clear", tags=["cache"])
+def clear_cache(valid=Depends(validate_credentials)):
+    """
+    Invalidate the in-memory SEEK response cache.
+    Call this after making changes in SEEK so the dashboard reflects them immediately
+    rather than waiting for the TTL to expire.
+    """
+    count = len(querier._cache)
+    querier._cache.clear()
+    return {"cleared": count}
+
+
 @router.get("/programs", tags=["query"])
 def get_programs(get_details: bool = False, valid=Depends(validate_credentials)):
     """

@@ -28,6 +28,10 @@ AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
 HOSTNAME = os.getenv("HOSTNAME")
 AIRFLOW_EXPOSE_PORT = os.getenv("AIRFLOW_PORT")
+# Public-facing base URL for Airflow (e.g. https://example.com/airflow).
+# Set this when Airflow is served via a reverse proxy rather than directly on AIRFLOW_PORT.
+# If unset, falls back to http://HOSTNAME:AIRFLOW_PORT.
+AIRFLOW_PUBLIC_URL = os.getenv("AIRFLOW_PUBLIC_URL")
 
 PREPROCESSOR_DAG_ID = "preprocessor"
 
@@ -150,7 +154,7 @@ def run_assay(
     except (IndexError, AttributeError, TypeError):
         pass
 
-    monitor_base_url = f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
+    monitor_base_url = AIRFLOW_PUBLIC_URL.rstrip('/') if AIRFLOW_PUBLIC_URL else f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
 
     if workflow_seek_id:
         monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
