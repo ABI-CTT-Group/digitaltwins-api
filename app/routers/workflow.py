@@ -4,7 +4,6 @@ Workflow Router.
 This module provides endpoints to trigger Airflow DAG runs for assay processing.
 """
 import os
-import uuid
 from datetime import datetime, timezone
 
 import requests
@@ -85,23 +84,41 @@ def run_assay(assay_id: int, valid=Depends(validate_credentials)):
         )
 
     conf = {"assay_id": assay_id}
-    response = _trigger_dag(PREPROCESSOR_DAG_ID, conf)
-
     assay = get_assay(assay_id, get_configs=False)
+    tags = assay.get("assay").get("attributes").get("tags")
 
-    workflow_seek_id = None
-    try:
-        workflows = assay.get("assay", {}).get("relationships", {}).get("workflows", [])
-        if workflows and isinstance(workflows, list) and workflows[0]:
-            workflow_seek_id = workflows[0][0].get("id")
-    except (IndexError, AttributeError, TypeError):
+    if "script" in tags:
+        # run airflow
+        response = _trigger_dag(PREPROCESSOR_DAG_ID, conf)
+
+        workflow_seek_id = None
+        try:
+            workflows = assay.get("assay", {}).get("relationships", {}).get("workflows", [])
+            if workflows and isinstance(workflows, list) and workflows[0]:
+                workflow_seek_id = workflows[0][0].get("id")
+        except (IndexError, AttributeError, TypeError):
+            pass
+
+        monitor_base_url = f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
+
+        if workflow_seek_id:
+            monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
+        else:
+            monitor_url = f"{monitor_base_url}/dags/{PREPROCESSOR_DAG_ID}"
+
+        return {"dag_run": response.json(), "monitor_url": monitor_url}
+    elif "notebook" in tags:
+        # run jupyter notebook
+        # preprocessing
+        # download data into workspace
         pass
-
-    monitor_base_url = f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
-
-    if workflow_seek_id:
-        monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
+        # get url
+        JUPYTER_EXPOSE_PORT = 8008
+        monitor_base_url = f"http://{HOSTNAME}:{JUPYTER_EXPOSE_PORT}"
+        monitor_url = f"{monitor_base_url}/lab/workspaces/auto-0/tree/work/assays/assay_{assay_id}"
+        return {"url": monitor_url}
     else:
-        monitor_url = f"{monitor_base_url}/dags/{PREPROCESSOR_DAG_ID}"
-
-    return {"dag_run": response.json(), "monitor_url": monitor_url}
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Assay must have either 'script' or 'notebook' tag to determine workflow.",
+        )
