@@ -4,7 +4,6 @@ Workflow Router.
 This module provides endpoints to trigger Airflow DAG runs for assay processing.
 """
 import os
-import uuid
 from datetime import datetime, timezone
 
 import requests
