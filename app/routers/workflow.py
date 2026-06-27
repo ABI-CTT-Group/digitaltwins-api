@@ -4,7 +4,6 @@ Workflow Router.
 This module provides endpoints to trigger Airflow DAG runs for assay processing.
 """
 import os
-import uuid
 from datetime import datetime, timezone
 
 import requests
@@ -142,23 +141,35 @@ def run_assay(
 
     user_token = bearer_credentials.credentials if bearer_credentials else None
     conf = {"assay_id": assay_id}
-    response = _trigger_dag(PREPROCESSOR_DAG_ID, conf, user_keycloak_token=user_token)
-
     assay = get_assay(assay_id, get_configs=False)
+    tags = assay.get("assay").get("attributes").get("tags")
 
-    workflow_seek_id = None
-    try:
-        workflows = assay.get("assay", {}).get("relationships", {}).get("workflows", [])
-        if workflows and isinstance(workflows, list) and workflows[0]:
-            workflow_seek_id = workflows[0][0].get("id")
-    except (IndexError, AttributeError, TypeError):
-        pass
+    if "script" in tags:
+        # run airflow, attributing the run to the calling user where possible
+        response = _trigger_dag(PREPROCESSOR_DAG_ID, conf, user_keycloak_token=user_token)
 
-    monitor_base_url = AIRFLOW_PUBLIC_URL.rstrip('/') if AIRFLOW_PUBLIC_URL else f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
+        workflow_seek_id = None
+        try:
+            workflows = assay.get("assay", {}).get("relationships", {}).get("workflows", [])
+            if workflows and isinstance(workflows, list) and workflows[0]:
+                workflow_seek_id = workflows[0][0].get("id")
+        except (IndexError, AttributeError, TypeError):
+            pass
 
-    if workflow_seek_id:
-        monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
+        monitor_base_url = AIRFLOW_PUBLIC_URL.rstrip('/') if AIRFLOW_PUBLIC_URL else f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
+
+        if workflow_seek_id:
+            monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
+        else:
+            monitor_url = f"{monitor_base_url}/dags/{PREPROCESSOR_DAG_ID}"
+
+        return {"dag_run": response.json(), "monitor_url": monitor_url}
+    elif "notebook" in tags:
+        jupyterhub_url = os.getenv("JUPYTERHUB_PUBLIC_URL", "").rstrip('/')
+        monitor_url = f"{jupyterhub_url}/hub/user-redirect/lab/tree/work/assays/assay_{assay_id}"
+        return {"url": monitor_url}
     else:
-        monitor_url = f"{monitor_base_url}/dags/{PREPROCESSOR_DAG_ID}"
-
-    return {"dag_run": response.json(), "monitor_url": monitor_url}
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Assay must have either 'script' or 'notebook' tag to determine workflow.",
+        )
