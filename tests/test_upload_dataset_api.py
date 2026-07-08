@@ -15,7 +15,7 @@ client = TestClient(app)
 SCRIPT_DIR = Path(__file__).resolve().parent
 
 def test_upload():
-    bucket_name="measurement"
+    bucket_name="measurements"
     dataset_path = SCRIPT_DIR / "./data/example_duke_sds"
     files = []
     for filepath in dataset_path.rglob("*"):
