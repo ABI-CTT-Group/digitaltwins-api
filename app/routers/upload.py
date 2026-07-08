@@ -62,7 +62,7 @@ async def upload_dataset(
     ),
     category: str = Query(
         ...,
-        description="Dataset category used as the MinIO bucket name (e.g. 'primary').",
+        description="Dataset category including measurements, models, tools & workflows",
     ),
     uploader: Uploader = Depends(get_uploader),
     _valid: bool = Depends(validate_credentials),
