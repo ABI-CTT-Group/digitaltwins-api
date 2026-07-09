@@ -39,7 +39,7 @@ services:
       #      AIRFLOW_WORKSPACE: ${AIRFLOW_WORKSPACE:-}
       AIRFLOW_PORT: ${AIRFLOW_PORT:-8080}
     networks:
-      - digitaltwins
+      - digitaltwins-platform
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
     healthcheck:
@@ -50,7 +50,8 @@ services:
       start_period: 30s
 
 networks:
-  digitaltwins:
+  digitaltwins-platform:
     driver: bridge
+    name: digitaltwins-platform
 
 # access api docs: http:localhost:8010/docs
