@@ -52,6 +52,6 @@ services:
 networks:
   digitaltwins-platform:
     driver: bridge
-    name: digitaltwins-platform
+    name: ${PROJECT_NAME}
 
 # access api docs: http:localhost:8010/docs
