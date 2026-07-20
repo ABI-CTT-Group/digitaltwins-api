@@ -4,6 +4,7 @@ from datetime import datetime, timezone
 
 import requests
 from requests.auth import HTTPBasicAuth
+from requests import RequestException
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -24,6 +25,14 @@ class Workflow(object):
             if not required:
                 raise ValueError("Airflow configuration is incomplete. Please check your environment variables.")
 
+    def _post(self, url, **kwargs):
+        try:
+            response = requests.post(url, timeout=30, **kwargs)
+            response.raise_for_status()
+            return response
+        except RequestException as exc:
+            raise RuntimeError(f"Airflow request failed for {url}: {exc}") from exc
+
     def get_api_token(self):
         url = f"{self._airflow_endpoint}/auth/token"
         headers = {"Content-Type": "application/json"}
@@ -31,8 +40,13 @@ class Workflow(object):
             "username": self._username,
             "password": self._password
         }
-        response = requests.post(url, headers=headers, json=payload)
-        access_token = response.json().get("access_token")
+        response = self._post(url, headers=headers, json=payload)
+        try:
+            access_token = response.json().get("access_token")
+        except ValueError as exc:
+            raise RuntimeError("Airflow returned a non-JSON token response") from exc
+        if not access_token:
+            raise RuntimeError("Airflow token response did not include an access_token")
         return access_token
 
     def run(self, assay_id):
@@ -59,7 +73,7 @@ class Workflow(object):
             }
 
             preprocessor_dag_url = f"{self._airflow_api_url}/dags/preprocessor/dagRuns"
-            response = requests.post(
+            response = self._post(
                 preprocessor_dag_url,
                 auth=HTTPBasicAuth(self._username, self._password),
                 headers={"Content-Type": "application/json"},

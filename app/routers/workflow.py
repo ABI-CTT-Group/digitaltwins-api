@@ -36,8 +36,20 @@ def _get_api_token():
         "username": AIRFLOW_USERNAME,
         "password": AIRFLOW_PASSWORD
     }
-    response = requests.post(url, headers=headers, json=payload)
-    access_token = response.json().get("access_token")
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
+        access_token = response.json().get("access_token")
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Unable to reach Airflow auth endpoint: {exc}",
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Airflow returned a non-JSON token response.",
+        ) from exc
     return access_token
 
 def _trigger_dag(dag_id: str, conf: dict) -> Response:
@@ -56,11 +68,20 @@ def _trigger_dag(dag_id: str, conf: dict) -> Response:
         "conf": conf
     }
     # payload = conf
-    response = requests.post(url, headers=headers, json=payload)
-    if response.status_code == 200:
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
         print("Triggered DAG Run:", response.json())
-    else:
-        raise Exception(f"Airflow API Error {response.status_code}: {response.text}")
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Airflow API Error: {exc}",
+        ) from exc
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Airflow returned a non-JSON DAG run response.",
+        ) from exc
 
     return response
 
