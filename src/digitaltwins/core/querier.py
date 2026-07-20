@@ -49,7 +49,14 @@ class Querier(object):
 
     def get_programs(self, get_details=False):
         if self._seek_enabled:
-            results = self._seek_querier.get_programs(get_details)
+            try:
+                results = self._seek_querier.get_programs(get_details)
+            except RuntimeError as exc:
+                if self._postgres_enabled and not get_details:
+                    print(f"[query] SEEK programs failed, falling back to Postgres: {exc}")
+                    results = self._postgre_querier.get_programs()
+                else:
+                    raise
         elif self._postgres_enabled:
             results = self._postgre_querier.get_programs()
         elif self._gen3_enabled:
@@ -69,7 +76,14 @@ class Querier(object):
 
     def get_projects(self, get_details=False):
         if self._seek_enabled:
-            results = self._seek_querier.get_projects(get_details)
+            try:
+                results = self._seek_querier.get_projects(get_details)
+            except RuntimeError as exc:
+                if self._postgres_enabled and not get_details:
+                    print(f"[query] SEEK projects failed, falling back to Postgres: {exc}")
+                    results = self._postgre_querier.get_projects()
+                else:
+                    raise
         elif self._postgres_enabled:
             results = self._postgre_querier.get_projects()
         elif self._gen3_enabled:

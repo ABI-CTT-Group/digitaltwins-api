@@ -34,10 +34,21 @@ def get_keycloak_public_key() -> str:
     """Fetch and cache the Keycloak realm public key."""
     global _cached_public_key
     if _cached_public_key is None:
-        r = requests.get(keycloak_realm_url, verify=False)
-        r.raise_for_status()
-        raw_key = r.json().get("public_key")
-        _cached_public_key = f"-----BEGIN PUBLIC KEY-----\n{raw_key}\n-----END PUBLIC KEY-----"
+        try:
+            r = requests.get(keycloak_realm_url, verify=False, timeout=10)
+            r.raise_for_status()
+            raw_key = r.json().get("public_key")
+            _cached_public_key = f"-----BEGIN PUBLIC KEY-----\n{raw_key}\n-----END PUBLIC KEY-----"
+        except requests.RequestException as exc:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Unable to reach Keycloak realm: {exc}",
+            ) from exc
+        except ValueError as exc:
+            raise HTTPException(
+                status_code=status.HTTP_502_BAD_GATEWAY,
+                detail="Keycloak returned a non-JSON realm document.",
+            ) from exc
     return _cached_public_key
 
 
@@ -91,6 +102,8 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail=str(e2),
             )
+    except HTTPException:
+        raise
     except Exception as e:
         print(f"[auth] Bearer token verification error: {e}")
         raise HTTPException(
@@ -153,7 +166,13 @@ def get_token(
             headers={"WWW-Authenticate": "Basic, Bearer"},
         )
 
-    response = requests.post(keycloak_token_url, data=payload)
+    try:
+        response = requests.post(keycloak_token_url, data=payload, timeout=10)
+    except requests.RequestException as exc:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Unable to reach Keycloak token endpoint: {exc}",
+        ) from exc
 
     if response.status_code != 200:
         try:
@@ -163,10 +182,13 @@ def get_token(
         print(f"[auth] Keycloak token error ({response.status_code}): {error_detail}")
         raise HTTPException(status_code=response.status_code, detail=error_detail)
 
-    response_json = response.json()
-    # token = response_json.get("access_token")
-
-    return response.json()
+    try:
+        return response.json()
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_502_BAD_GATEWAY,
+            detail="Keycloak returned a non-JSON token response.",
+        ) from exc
 
 
 @router.get("/verify_token", tags=["auth"])
