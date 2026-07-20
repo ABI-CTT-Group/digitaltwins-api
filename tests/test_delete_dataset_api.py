@@ -4,8 +4,13 @@ import os
 import sys
 from pathlib import Path
 
-# Ensure the project root is on sys.path so `app` can be imported when running directly
-sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+# # Ensure the project root is on sys.path so `app` can be imported when running directly
+# sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+
+# Ensure the project root and src are on sys.path so `app` and `digitaltwins` can be imported
+project_root = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(project_root))
+sys.path.insert(0, str(project_root / "src"))
 
 from fastapi.testclient import TestClient
 
