@@ -39,6 +39,8 @@ services:
       AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-admin}
       #      AIRFLOW_WORKSPACE: ${AIRFLOW_WORKSPACE:-}
       AIRFLOW_PORT: ${AIRFLOW_PORT:-8080}
+      # JupyterHub
+      JUPYTERHUB_PUBLIC_URL: ${JUPYTERHUB_PUBLIC_URL:-http://localhost/jupyter}
     networks:
       - digitaltwins-platform
     volumes:

@@ -61,7 +61,7 @@ def auth_basic(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
             detail=result
         )
     else:
-        return True
+        return credentials.username
 
 
 def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
@@ -75,13 +75,13 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
     # of which client originally issued it.
     try:
         public_key_pem = get_keycloak_public_key()
-        jose_jwt.decode(
+        payload = jose_jwt.decode(
             token,
             public_key_pem,
             algorithms=[KEYCLOAK_ALGORITHM],
             options={"verify_aud": False},
         )
-        return True
+        return payload.get("preferred_username") or payload.get("username") or "unknown"
     except JWTError as e:
         # Public key may have rotated — clear cache and retry once
         global _cached_public_key
@@ -89,13 +89,13 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
         print(f"[auth] Bearer token verification failed (will retry with fresh key): {e}")
         try:
             public_key_pem = get_keycloak_public_key()
-            jose_jwt.decode(
+            payload = jose_jwt.decode(
                 token,
                 public_key_pem,
                 algorithms=[KEYCLOAK_ALGORITHM],
                 options={"verify_aud": False},
             )
-            return True
+            return payload.get("preferred_username") or payload.get("username") or "unknown"
         except JWTError as e2:
             print(f"[auth] Bearer token verification failed: {e2}")
             raise HTTPException(
@@ -119,11 +119,11 @@ def validate_credentials(
     print(f"basic_credentials: {basic_credentials}")
     print(f"bearer_credentials: {bearer_credentials}")
     if basic_credentials:
-        valid = auth_basic(basic_credentials)
-        return valid
+        username = auth_basic(basic_credentials)
+        return username
     elif bearer_credentials:
-        valid = auth_bearer(bearer_credentials)
-        return valid
+        username = auth_bearer(bearer_credentials)
+        return username
     else:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -193,4 +193,5 @@ def get_token(
 
 @router.get("/verify_token", tags=["auth"])
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
-    return {"active": auth_bearer(credentials)}
+    username = auth_bearer(credentials)
+    return {"active": bool(username)}
