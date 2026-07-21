@@ -27,6 +27,8 @@ AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 HOSTNAME = os.getenv("HOSTNAME")
 AIRFLOW_EXPOSE_PORT = os.getenv("AIRFLOW_PORT")
 
+JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL")
+
 PREPROCESSOR_DAG_ID = "preprocessor"
 
 def _get_api_token():
@@ -87,7 +89,7 @@ def _trigger_dag(dag_id: str, conf: dict) -> Response:
 
 
 @router.post("/assays/{assay_id}/run", tags=["workflow"])
-def run_assay(assay_id: int, valid=Depends(validate_credentials)):
+def run_assay(assay_id: int, username=Depends(validate_credentials)):
     """
     Trigger the *preprocessor* Airflow DAG for a given assay.
 
@@ -129,14 +131,10 @@ def run_assay(assay_id: int, valid=Depends(validate_credentials)):
 
         return {"dag_run": response.json(), "monitor_url": monitor_url}
     elif "notebook" in tags:
-        # run jupyter notebook
-        # preprocessing
-        # download data into workspace
-        pass
         # get url
-        JUPYTER_EXPOSE_PORT = 8008
-        monitor_base_url = f"http://{HOSTNAME}:{JUPYTER_EXPOSE_PORT}"
-        monitor_url = f"{monitor_base_url}/lab/workspaces/auto-0/tree/work/assays/assay_{assay_id}"
+        # e.g., http://localhost/jupyter/user/admin/lab/tree/assay_3
+        monitor_base_url = JUPYTERHUB_PUBLIC_URL
+        monitor_url = f"{monitor_base_url}/user/{username}/lab/tree/assay_{assay_id}"
         return {"url": monitor_url}
     else:
         raise HTTPException(
