@@ -33,12 +33,13 @@ services:
       # airflow
       AIRFLOW_ENABLED: ${AIRFLOW_ENABLED:-true}
       AIRFLOW_VERSION: ${AIRFLOW_VERSION:-3}
-      AIRFLOW_ENDPOINT: ${AIRFLOW_ENDPOINT:-http://airflow-apiserver:8080}
-      AIRFLOW_API_URL: ${AIRFLOW_API_URL:-http://localhost:8080/api/v2}
+      AIRFLOW_ENDPOINT: ${AIRFLOW_ENDPOINT:-http://airflow-apiserver:8080/airflow}
+      AIRFLOW_API_URL: ${AIRFLOW_API_URL:-http://airflow-apiserver:8080/airflow/api/v2}
       AIRFLOW_USERNAME: ${AIRFLOW_USERNAME:-admin}
       AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-admin}
       #      AIRFLOW_WORKSPACE: ${AIRFLOW_WORKSPACE:-}
       AIRFLOW_PORT: ${AIRFLOW_PORT:-8080}
+      AIRFLOW_BASE_URL: ${AIRFLOW__API__BASE_URL:-http://localhost/airflow}
       # JupyterHub
       JUPYTERHUB_PUBLIC_URL: ${JUPYTERHUB_PUBLIC_URL:-http://localhost/jupyter}
     networks:

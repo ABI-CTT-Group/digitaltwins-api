@@ -25,7 +25,7 @@ AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
 AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
 HOSTNAME = os.getenv("HOSTNAME")
-AIRFLOW_EXPOSE_PORT = os.getenv("AIRFLOW_PORT")
+AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")
 
 JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL")
 
@@ -122,7 +122,7 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
         except (IndexError, AttributeError, TypeError):
             pass
 
-        monitor_base_url = f"http://{HOSTNAME}:{AIRFLOW_EXPOSE_PORT}"
+        monitor_base_url = AIRFLOW_BASE_URL
 
         if workflow_seek_id:
             monitor_url = f"{monitor_base_url}/dags/workflow_{workflow_seek_id}"
