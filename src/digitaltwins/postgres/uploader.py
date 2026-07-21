@@ -127,7 +127,7 @@ class Uploader(object):
                 if existing_row:
                     assay_uuid = str(existing_row[0])
 
-            # --- upsert assay record ---
+            # --- insert/update assay record ---
             if assay_uuid:
                 sql = (
                     "UPDATE assay SET workflow_seek_id = %s, cohort = %s, "
