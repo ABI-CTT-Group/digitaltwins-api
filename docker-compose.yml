@@ -37,7 +37,6 @@ services:
       AIRFLOW_API_URL: ${AIRFLOW_API_URL:-http://airflow-apiserver:8080/airflow/api/v2}
       AIRFLOW_USERNAME: ${AIRFLOW_USERNAME:-admin}
       AIRFLOW_PASSWORD: ${AIRFLOW_PASSWORD:-admin}
-      #      AIRFLOW_WORKSPACE: ${AIRFLOW_WORKSPACE:-}
       AIRFLOW_PORT: ${AIRFLOW_PORT:-8080}
       AIRFLOW_BASE_URL: ${AIRFLOW__API__BASE_URL:-http://localhost/airflow}
       # JupyterHub
