@@ -4,9 +4,9 @@ Workflow Router.
 This module provides endpoints to trigger Airflow DAG runs for assay processing.
 """
 import os
-import shutil
 import tempfile
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 from dotenv import load_dotenv
@@ -33,6 +33,15 @@ HOSTNAME = os.getenv("HOSTNAME")
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")
 JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL")
 DEFAULT_BUCKET = "airflow-workspace"
+WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auckland"))
+
+
+def _workflow_local_timestamp() -> str:
+    try:
+        tz = ZoneInfo(WORKFLOW_TIMEZONE)
+    except ZoneInfoNotFoundError:
+        tz = timezone.utc
+    return datetime.now(tz).strftime("%Y%m%d_%H%M%S")
 
 
 def _get_api_token():
@@ -147,15 +156,17 @@ def _discover_samples(configs: dict) -> list[dict]:
     return samples_list
 
 
-def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str:
+def _create_sds_output(
+    configs: dict, samples: list[dict], temp_dir: str
+) -> tuple[str, dict[tuple[str, str], dict[str, str]]]:
     assay_id = configs.get("assay_id")
     dataset_name = "output_dataset"
     outputs = configs.get("outputs", [])
     if outputs and len(outputs) > 0 and outputs[0].get("dataset_name"):
         dataset_name = outputs[0].get("dataset_name")
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    s3_prefix = f"assay_{assay_id}_{timestamp}/{dataset_name}"
+    timestamp = _workflow_local_timestamp()
+    s3_prefix = f"assay_{assay_id}/{timestamp}/{dataset_name}"
 
     # init sparc-me dataset
     dataset = Dataset()
@@ -177,6 +188,8 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
     except Exception as e:
         print(f"Warning: Failed to set subjects metadata: {e}")
 
+    output_mappings: dict[tuple[str, str], dict[str, str]] = {}
+
     try:
         samples_meta = dataset.get_metadata("samples")
         samples_meta.clear_values("subject id")
@@ -187,24 +200,24 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
         sample_ids = []
         sample_types = []
         
-        subject_sample_counter = {}
-        output_mappings = {}
+        subject_sample_counter: dict[str, int] = {}
         
         for sample in samples:
+            subject_key = sample["subject_id"]
+            sample_key = sample["sample_id"]
             sub_id = sample["subject_id"].replace("sub-", "")
-            input_sam_id = sample["sample_id"].replace("sam-", "")
             
             if sub_id not in subject_sample_counter:
                 subject_sample_counter[sub_id] = 1
                 
-            output_mappings[(sub_id, input_sam_id)] = {}
+            output_mappings[(subject_key, sample_key)] = {}
             
             for out in outputs:
                 out_name = out.get("name", "")
                 sample_type = out.get("sample_name", "unknown")
                 
                 new_sam_id = str(subject_sample_counter[sub_id])
-                output_mappings[(sub_id, input_sam_id)][out_name] = new_sam_id
+                output_mappings[(subject_key, sample_key)][out_name] = new_sam_id
                 subject_sample_counter[sub_id] += 1
                 
                 subject_ids.append(sub_id)
@@ -227,13 +240,14 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
         now = datetime.now(timezone.utc).isoformat()
         
         for sample in samples:
+            subject_key = sample["subject_id"]
+            sample_key = sample["sample_id"]
             sub_id = sample["subject_id"].replace("sub-", "")
-            input_sam_id = sample["sample_id"].replace("sam-", "")
             
             for out in outputs:
                 out_name = out.get("name", "")
                 sample_type = out.get("sample_name", "")
-                new_sam_id = output_mappings[(sub_id, input_sam_id)][out_name]
+                new_sam_id = output_mappings[(subject_key, sample_key)][out_name]
                 
                 base_dir = f"sub-{sub_id}/sam-{new_sam_id}"
                 
@@ -267,10 +281,11 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
     # create sample subdirectories in primary
     primary_dir = os.path.join(temp_dir, "primary")
     for sample in samples:
+        subject_key = sample["subject_id"]
+        sample_key = sample["sample_id"]
         sub_id = sample["subject_id"].replace("sub-", "")
-        input_sam_id = sample["sample_id"].replace("sam-", "")
         
-        for out_name, new_sam_id in output_mappings[(sub_id, input_sam_id)].items():
+        for out_name, new_sam_id in output_mappings[(subject_key, sample_key)].items():
             sample_dir = os.path.join(primary_dir, f"sub-{sub_id}", f"sam-{new_sam_id}")
             os.makedirs(sample_dir, exist_ok=True)
 
@@ -287,10 +302,11 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
             "primary/", "derivative/", "docs/", "code/", "protocol/", "source/"
         ]
         for sample in samples:
+            subject_key = sample["subject_id"]
+            sample_key = sample["sample_id"]
             sub_id = sample["subject_id"].replace("sub-", "")
-            input_sam_id = sample["sample_id"].replace("sam-", "")
             
-            for out_name, new_sam_id in output_mappings[(sub_id, input_sam_id)].items():
+            for out_name, new_sam_id in output_mappings[(subject_key, sample_key)].items():
                 empty_dirs.append(f"primary/sub-{sub_id}/sam-{new_sam_id}/")
             
         for d in empty_dirs:
@@ -350,20 +366,20 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
         # Trigger per-sample
         results = []
         for idx, sample in enumerate(samples):
-            sub_id = sample["subject_id"].replace("sub-", "")
-            sam_id = sample["sample_id"].replace("sam-", "")
+            subject_id = sample["subject_id"]
+            sample_id = sample["sample_id"]
             
             output_prefixes = {}
-            if (sub_id, sam_id) in output_mappings:
-                for out_name, new_sam_id in output_mappings[(sub_id, sam_id)].items():
-                    output_prefixes[out_name] = f"{s3_prefix}/primary/sub-{sub_id}/sam-{new_sam_id}"
+            if (subject_id, sample_id) in output_mappings:
+                for out_name, new_sam_id in output_mappings[(subject_id, sample_id)].items():
+                    output_prefixes[out_name] = f"{s3_prefix}/primary/{subject_id}/sam-{new_sam_id}"
             
             run_id = f"{dag_id}/run_{idx}"
             
             payload_conf = {
                 "bucket": DEFAULT_BUCKET,
-                "subject_id": sub_id,
-                "sample_id": sam_id,
+                "subject_id": subject_id,
+                "sample_id": sample_id,
                 "dataset_uuid": sample["dataset_uuid"],
                 "sample_type": sample.get("sample_type", ""),
                 "input_name": sample.get("input_name", "input"),
@@ -375,14 +391,14 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
             try:
                 response = _trigger_dag(dag_id, payload_conf)
                 results.append({
-                    "subject_id": sub_id,
-                    "sample_id": sam_id,
+                    "subject_id": subject_id,
+                    "sample_id": sample_id,
                     "dag_run": response.json(),
                 })
             except Exception as e:
                 results.append({
-                    "subject_id": sub_id,
-                    "sample_id": sam_id,
+                    "subject_id": subject_id,
+                    "sample_id": sample_id,
                     "error": str(e)
                 })
 
