@@ -156,6 +156,17 @@ def _discover_samples(configs: dict) -> list[dict]:
     return samples_list
 
 
+def _build_output_name_by_sample_type(outputs: list[dict]) -> dict[str, str]:
+    """Map sample type labels (e.g. nifti/nrrd) to assay output names."""
+    output_name_by_sample_type: dict[str, str] = {}
+    for output in outputs:
+        out_name = str(output.get("name", "")).strip()
+        sample_name = str(output.get("sample_name", "")).strip().lower()
+        if out_name and sample_name and sample_name not in output_name_by_sample_type:
+            output_name_by_sample_type[sample_name] = out_name
+    return output_name_by_sample_type
+
+
 def _create_sds_output(
     configs: dict, samples: list[dict], temp_dir: str
 ) -> tuple[str, dict[tuple[str, str], dict[str, str]]]:
@@ -357,6 +368,7 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="workflow_seek_id missing from configs.",
             )
+        output_name_by_sample_type = _build_output_name_by_sample_type(configs.get("outputs", []))
 
         dag_id = f"workflow_{workflow_seek_id}"
         
@@ -384,6 +396,7 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
                 "sample_type": sample.get("sample_type", ""),
                 "input_name": sample.get("input_name", "input"),
                 "output_prefixes": output_prefixes,
+                "output_name_by_sample_type": output_name_by_sample_type,
                 "run_id": run_id,
                 "run_index": idx,
             }
