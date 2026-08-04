@@ -154,8 +154,8 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
     if outputs and len(outputs) > 0 and outputs[0].get("dataset_name"):
         dataset_name = outputs[0].get("dataset_name")
 
-    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
-    s3_prefix = f"assay_{assay_id}_{timestamp}/{dataset_name}"
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    s3_prefix = f"assay_{assay_id}/{timestamp}/{dataset_name}"
 
     # init sparc-me dataset
     dataset = Dataset()
@@ -191,20 +191,21 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
         output_mappings = {}
         
         for sample in samples:
+            subject_key = sample["subject_id"]
+            sample_key = sample["sample_id"]
             sub_id = sample["subject_id"].replace("sub-", "")
-            input_sam_id = sample["sample_id"].replace("sam-", "")
             
             if sub_id not in subject_sample_counter:
                 subject_sample_counter[sub_id] = 1
                 
-            output_mappings[(sub_id, input_sam_id)] = {}
+            output_mappings[(subject_key, sample_key)] = {}
             
             for out in outputs:
                 out_name = out.get("name", "")
                 sample_type = out.get("sample_name", "unknown")
                 
                 new_sam_id = str(subject_sample_counter[sub_id])
-                output_mappings[(sub_id, input_sam_id)][out_name] = new_sam_id
+                output_mappings[(subject_key, sample_key)][out_name] = new_sam_id
                 subject_sample_counter[sub_id] += 1
                 
                 subject_ids.append(sub_id)
@@ -227,13 +228,14 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
         now = datetime.now(timezone.utc).isoformat()
         
         for sample in samples:
+            subject_key = sample["subject_id"]
+            sample_key = sample["sample_id"]
             sub_id = sample["subject_id"].replace("sub-", "")
-            input_sam_id = sample["sample_id"].replace("sam-", "")
             
             for out in outputs:
                 out_name = out.get("name", "")
                 sample_type = out.get("sample_name", "")
-                new_sam_id = output_mappings[(sub_id, input_sam_id)][out_name]
+                new_sam_id = output_mappings[(subject_key, sample_key)][out_name]
                 
                 base_dir = f"sub-{sub_id}/sam-{new_sam_id}"
                 
@@ -267,10 +269,11 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
     # create sample subdirectories in primary
     primary_dir = os.path.join(temp_dir, "primary")
     for sample in samples:
+        subject_key = sample["subject_id"]
+        sample_key = sample["sample_id"]
         sub_id = sample["subject_id"].replace("sub-", "")
-        input_sam_id = sample["sample_id"].replace("sam-", "")
         
-        for out_name, new_sam_id in output_mappings[(sub_id, input_sam_id)].items():
+        for out_name, new_sam_id in output_mappings[(subject_key, sample_key)].items():
             sample_dir = os.path.join(primary_dir, f"sub-{sub_id}", f"sam-{new_sam_id}")
             os.makedirs(sample_dir, exist_ok=True)
 
@@ -287,10 +290,11 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
             "primary/", "derivative/", "docs/", "code/", "protocol/", "source/"
         ]
         for sample in samples:
+            subject_key = sample["subject_id"]
+            sample_key = sample["sample_id"]
             sub_id = sample["subject_id"].replace("sub-", "")
-            input_sam_id = sample["sample_id"].replace("sam-", "")
             
-            for out_name, new_sam_id in output_mappings[(sub_id, input_sam_id)].items():
+            for out_name, new_sam_id in output_mappings[(subject_key, sample_key)].items():
                 empty_dirs.append(f"primary/sub-{sub_id}/sam-{new_sam_id}/")
             
         for d in empty_dirs:
@@ -350,20 +354,20 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
         # Trigger per-sample
         results = []
         for idx, sample in enumerate(samples):
-            sub_id = sample["subject_id"].replace("sub-", "")
-            sam_id = sample["sample_id"].replace("sam-", "")
+            subject_id = sample["subject_id"]
+            sample_id = sample["sample_id"]
             
             output_prefixes = {}
-            if (sub_id, sam_id) in output_mappings:
-                for out_name, new_sam_id in output_mappings[(sub_id, sam_id)].items():
-                    output_prefixes[out_name] = f"{s3_prefix}/primary/sub-{sub_id}/sam-{new_sam_id}"
+            if (subject_id, sample_id) in output_mappings:
+                for out_name, new_sam_id in output_mappings[(subject_id, sample_id)].items():
+                    output_prefixes[out_name] = f"{s3_prefix}/primary/{subject_id}/sam-{new_sam_id}"
             
             run_id = f"{dag_id}/run_{idx}"
             
             payload_conf = {
                 "bucket": DEFAULT_BUCKET,
-                "subject_id": sub_id,
-                "sample_id": sam_id,
+                "subject_id": subject_id,
+                "sample_id": sample_id,
                 "dataset_uuid": sample["dataset_uuid"],
                 "sample_type": sample.get("sample_type", ""),
                 "input_name": sample.get("input_name", "input"),
@@ -375,14 +379,14 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
             try:
                 response = _trigger_dag(dag_id, payload_conf)
                 results.append({
-                    "subject_id": sub_id,
-                    "sample_id": sam_id,
+                    "subject_id": subject_id,
+                    "sample_id": sample_id,
                     "dag_run": response.json(),
                 })
             except Exception as e:
                 results.append({
-                    "subject_id": sub_id,
-                    "sample_id": sam_id,
+                    "subject_id": subject_id,
+                    "sample_id": sample_id,
                     "error": str(e)
                 })
 
