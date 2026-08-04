@@ -156,7 +156,9 @@ def _discover_samples(configs: dict) -> list[dict]:
     return samples_list
 
 
-def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str:
+def _create_sds_output(
+    configs: dict, samples: list[dict], temp_dir: str
+) -> tuple[str, dict[tuple[str, str], dict[str, str]]]:
     assay_id = configs.get("assay_id")
     dataset_name = "output_dataset"
     outputs = configs.get("outputs", [])
@@ -186,6 +188,8 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
     except Exception as e:
         print(f"Warning: Failed to set subjects metadata: {e}")
 
+    output_mappings: dict[tuple[str, str], dict[str, str]] = {}
+
     try:
         samples_meta = dataset.get_metadata("samples")
         samples_meta.clear_values("subject id")
@@ -196,8 +200,7 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
         sample_ids = []
         sample_types = []
         
-        subject_sample_counter = {}
-        output_mappings = {}
+        subject_sample_counter: dict[str, int] = {}
         
         for sample in samples:
             subject_key = sample["subject_id"]
