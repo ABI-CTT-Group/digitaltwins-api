@@ -17,3 +17,6 @@ openpyxl==3.1.5
 
 # keycloak auth
 python-jose[cryptography]==3.3.0
+
+# sparc dataset structure (SDS)
+sparc-me
