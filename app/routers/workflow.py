@@ -6,6 +6,7 @@ This module provides endpoints to trigger Airflow DAG runs for assay processing.
 import os
 import tempfile
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 from dotenv import load_dotenv
@@ -32,6 +33,15 @@ HOSTNAME = os.getenv("HOSTNAME")
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")
 JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL")
 DEFAULT_BUCKET = "airflow-workspace"
+WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auckland"))
+
+
+def _workflow_local_timestamp() -> str:
+    try:
+        tz = ZoneInfo(WORKFLOW_TIMEZONE)
+    except ZoneInfoNotFoundError:
+        tz = timezone.utc
+    return datetime.now(tz).strftime("%Y%m%d_%H%M%S")
 
 
 def _get_api_token():
@@ -153,7 +163,7 @@ def _create_sds_output(configs: dict, samples: list[dict], temp_dir: str) -> str
     if outputs and len(outputs) > 0 and outputs[0].get("dataset_name"):
         dataset_name = outputs[0].get("dataset_name")
 
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    timestamp = _workflow_local_timestamp()
     s3_prefix = f"assay_{assay_id}/{timestamp}/{dataset_name}"
 
     # init sparc-me dataset
