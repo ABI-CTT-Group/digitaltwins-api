@@ -1,7 +1,6 @@
 import json
 from fastapi.testclient import TestClient
 from app.main import app
-import pytest
 from app.routers.auth import validate_credentials
 
 def override_validate_credentials():
