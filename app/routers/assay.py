@@ -29,7 +29,7 @@ router = APIRouter()
 
 # Airflow configs
 AIRFLOW_ENABLED = os.getenv("AIRFLOW_ENABLED", "false").lower() == "true"
-AIRFLOW_ENDPOINT = os.getenv("AIRFLOW_ENDPOINT")
+AIRFLOW_ENDPOINT = os.getenv("AIRFLOW_ENDPOINT", "http://airflow-apiserver:8080/airflow")
 AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
 AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
