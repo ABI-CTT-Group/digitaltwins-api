@@ -454,16 +454,12 @@ def download_workspace_dataset(
     
     downloader = MinioDownloader()
     prefix_base = f"assay_{assay_id}/"
-    tmp_dir: Optional[str] = None
+    tmp_dir = tempfile.mkdtemp()
     
     try:
-        if not timestamp:
-            timestamp = downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
-            
-        target_prefix = f"{prefix_base}{timestamp}/"
-        
-        tmp_dir = tempfile.mkdtemp()
-        zip_path = os.path.join(tmp_dir, f"assay_{assay_id}_{timestamp}.zip")
+        resolved_timestamp = timestamp or downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
+        target_prefix = f"{prefix_base}{resolved_timestamp}/"
+        zip_path = os.path.join(tmp_dir, f"assay_{assay_id}_{resolved_timestamp}.zip")
         
         save_dir = os.path.join(tmp_dir, "data")
         
@@ -478,22 +474,19 @@ def download_workspace_dataset(
                     zf.write(file_path, arcname)
                     
     except FileNotFoundError as exc:
-        if tmp_dir is not None:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         ) from exc
     except ConnectionError as exc:
-        if tmp_dir is not None:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Storage backend unavailable: {exc}",
         ) from exc
     except Exception as exc:
-        if tmp_dir is not None:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
+        shutil.rmtree(tmp_dir, ignore_errors=True)
         import traceback
         traceback.print_exc()
         raise HTTPException(
@@ -507,13 +500,12 @@ def download_workspace_dataset(
                 while chunk := f.read(8192):
                     yield chunk
         finally:
-            if tmp_dir is not None:
-                shutil.rmtree(tmp_dir, ignore_errors=True)
+            shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return StreamingResponse(
         _stream_and_cleanup(),
         media_type="application/zip",
         headers={
-            "Content-Disposition": f'attachment; filename="assay_{assay_id}_{timestamp}.zip"',
+            "Content-Disposition": f'attachment; filename="assay_{assay_id}_{resolved_timestamp}.zip"',
         },
     )
