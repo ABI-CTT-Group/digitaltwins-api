@@ -1,5 +1,7 @@
 """Upload router definitions."""
 
+import os
+import shutil
 import tempfile
 import traceback
 from pathlib import Path
@@ -10,6 +12,7 @@ from pydantic import BaseModel, ConfigDict
 
 from src.digitaltwins.core.uploader import Uploader
 from .auth import validate_credentials
+from .query import querier
 
 router = APIRouter()
 
@@ -175,4 +178,102 @@ async def configure_assay(
     return {
         "message": "Assay configured successfully.",
         "assay_uuid": assay_uuid,
+    }
+
+@router.post("/assays/{assay_id}/workspace/dataset/upload", tags=["upload"])
+async def upload_workspace_datasets(
+    assay_id: int,
+    timestamp: Optional[str] = None,
+    uploader: Uploader = Depends(get_uploader),
+    _valid: bool = Depends(validate_credentials),
+) -> dict[str, Any]:
+    """Upload datasets from the workspace bucket to the platform.
+
+    Args:
+        assay_id: The ID of the assay.
+        timestamp: Optional timestamp to specify a historical run. If omitted, the latest is used.
+    
+    Returns:
+        A dictionary containing the uploaded dataset UUIDs.
+    """
+    from digitaltwins.minio.downloader import Downloader as MinioDownloader
+    
+    try:
+        # 1. Fetch assay configs to get category mapping
+        assay_data = querier.get_assay(assay_id, get_configs=True)
+        configs = assay_data.get("configs", {})
+        outputs = configs.get("outputs", [])
+        
+        category_map = {}
+        for out in outputs:
+            ds_name = out.get("dataset_name")
+            cat = out.get("category", "workflows")
+            if ds_name:
+                category_map[ds_name] = cat
+                
+        # 2. Get latest timestamp folder if not provided
+        minio_downloader = MinioDownloader()
+        DEFAULT_BUCKET = "airflow-workspace"
+        prefix_base = f"assay_{assay_id}/"
+        
+        if not timestamp:
+            timestamp = minio_downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
+            
+        target_prefix = f"{prefix_base}{timestamp}/"
+        
+        # 3. Download the specific folder to a temporary directory
+        tmp_dir = tempfile.mkdtemp()
+        save_dir = os.path.join(tmp_dir, "data")
+        minio_downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
+        
+        # 4. Iterate subdirectories and upload each
+        uploaded_datasets = []
+        
+        for item in os.listdir(save_dir):
+            item_path = os.path.join(save_dir, item)
+            if os.path.isdir(item_path):
+                # determine category
+                category = category_map.get(item, "workflows")
+                
+                # upload
+                dataset_uuid = uploader.upload_dataset(
+                    dataset_path=item_path,
+                    category=category,
+                )
+                uploaded_datasets.append({
+                    "dataset_name": item,
+                    "dataset_uuid": dataset_uuid,
+                    "category": category
+                })
+                
+    except FileNotFoundError as exc:
+        if 'tmp_dir' in locals():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except ConnectionError as exc:
+        if 'tmp_dir' in locals():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Storage backend unavailable: {exc}",
+        ) from exc
+    except Exception as exc:
+        if 'tmp_dir' in locals():
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error while uploading datasets: {exc}",
+        ) from exc
+        
+    # Cleanup
+    if 'tmp_dir' in locals():
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    return {
+        "message": f"Successfully uploaded {len(uploaded_datasets)} datasets.",
+        "datasets": uploaded_datasets,
     }
