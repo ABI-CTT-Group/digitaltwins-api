@@ -4,13 +4,17 @@ Workflow Router.
 This module provides endpoints to trigger Airflow DAG runs for assay processing.
 """
 import os
+import shutil
 import tempfile
+import zipfile
 from datetime import datetime, timezone
+from typing import Optional
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
 from dotenv import load_dotenv
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.responses import StreamingResponse
 from requests import Response
 
 from sparc_me import Dataset
@@ -429,3 +433,79 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Assay must have either 'script' or 'notebook' tag to determine workflow.",
         )
+
+
+@router.get("/assays/{assay_id}/workspace/dataset/download", tags=["assay", "download"])
+def download_workspace_dataset(
+    assay_id: int,
+    timestamp: Optional[str] = None,
+    _valid: bool = Depends(validate_credentials),
+) -> StreamingResponse:
+    """Download the workspace dataset for an assay.
+
+    Args:
+        assay_id: The ID of the assay.
+        timestamp: Optional timestamp to download a specific historical run. If omitted, the latest is used.
+
+    Returns:
+        A streaming ZIP archive containing the dataset files.
+    """
+    from digitaltwins.minio.downloader import Downloader as MinioDownloader
+    
+    downloader = MinioDownloader()
+    prefix_base = f"assay_{assay_id}/"
+    tmp_dir = tempfile.mkdtemp()
+    
+    try:
+        resolved_timestamp = timestamp or downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
+        target_prefix = f"{prefix_base}{resolved_timestamp}/"
+        zip_path = os.path.join(tmp_dir, f"assay_{assay_id}_{resolved_timestamp}.zip")
+        
+        save_dir = os.path.join(tmp_dir, "data")
+        
+        # Download the specific folder
+        downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
+        
+        with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
+            for root, _, files in os.walk(save_dir):
+                for file in files:
+                    file_path = os.path.join(root, file)
+                    arcname = os.path.relpath(file_path, save_dir)
+                    zf.write(file_path, arcname)
+                    
+    except FileNotFoundError as exc:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except ConnectionError as exc:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Storage backend unavailable: {exc}",
+        ) from exc
+    except Exception as exc:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error while downloading dataset: {exc}",
+        ) from exc
+
+    def _stream_and_cleanup():
+        try:
+            with open(zip_path, "rb") as f:
+                while chunk := f.read(8192):
+                    yield chunk
+        finally:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    return StreamingResponse(
+        _stream_and_cleanup(),
+        media_type="application/zip",
+        headers={
+            "Content-Disposition": f'attachment; filename="assay_{assay_id}_{resolved_timestamp}.zip"',
+        },
+    )

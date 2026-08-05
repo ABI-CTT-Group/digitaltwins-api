@@ -152,3 +152,91 @@ class Downloader(object):
             total_downloaded, dataset_uuid, save_dir,
         )
         return total_downloaded
+
+    def get_latest_timestamp_folder(self, bucket_name: str, prefix: str) -> str:
+        """Find the latest timestamp folder under a specific prefix.
+
+        Args:
+            bucket_name: The bucket to search in.
+            prefix: The prefix (e.g., 'assay_1/').
+
+        Returns:
+            The latest timestamp folder name (e.g., '20260805_131413').
+
+        Raises:
+            FileNotFoundError: If no timestamp folders are found.
+            RuntimeError: If a MinIO error occurs.
+        """
+        if not prefix.endswith("/"):
+            prefix += "/"
+
+        try:
+            paginator = self.s3_client.get_paginator("list_objects_v2")
+            folders = []
+            for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix, Delimiter="/"):
+                for cp in page.get("CommonPrefixes", []):
+                    folder_name = cp["Prefix"][len(prefix):].strip("/")
+                    if folder_name:
+                        folders.append(folder_name)
+
+            if not folders:
+                raise FileNotFoundError(f"No timestamp folders found in '{bucket_name}/{prefix}'")
+
+            # Since format is YYYYMMDD_HHMMSS, we can sort lexicographically
+            folders.sort()
+            return folders[-1]
+
+        except ClientError as e:
+            raise RuntimeError(f"Error listing objects in bucket '{bucket_name}': {e}") from e
+        except (EndpointConnectionError, ConnectionClosedError) as e:
+            raise ConnectionError(f"Unable to reach MinIO endpoint: {e}") from e
+
+    def download_folder(self, bucket_name: str, prefix: str, save_dir: str) -> int:
+        """Download all objects with a specific prefix from a specific bucket.
+
+        Args:
+            bucket_name: The bucket to download from.
+            prefix: The prefix (e.g., 'assay_1/20260805_131413/').
+            save_dir: Local directory to save downloaded files into.
+
+        Returns:
+            The total number of files downloaded.
+
+        Raises:
+            FileNotFoundError: If no objects match the prefix in the bucket.
+            ConnectionError: If the MinIO endpoint is unreachable.
+            RuntimeError: If a download operation fails.
+        """
+        total_downloaded = 0
+
+        try:
+            paginator = self.s3_client.get_paginator("list_objects_v2")
+            for page in paginator.paginate(Bucket=bucket_name, Prefix=prefix):
+                for obj in page.get("Contents", []):
+                    key = obj["Key"]
+                    if key.endswith("/"):  # Skip empty directories
+                        continue
+                        
+                    # Maintain structure relative to the prefix
+                    rel_path = os.path.relpath(key, prefix) if prefix else key
+                    local_path = os.path.join(save_dir, rel_path)
+                    os.makedirs(os.path.dirname(local_path), exist_ok=True)
+
+                    self.s3_client.download_file(bucket_name, key, local_path)
+                    total_downloaded += 1
+                    logger.debug("Downloaded %s/%s → %s", bucket_name, key, local_path)
+
+        except (EndpointConnectionError, ConnectionClosedError) as e:
+            raise ConnectionError(f"Lost connection to MinIO while downloading from bucket '{bucket_name}': {e}") from e
+        except ClientError as e:
+            raise RuntimeError(f"Error downloading from bucket '{bucket_name}': {e}") from e
+
+        if total_downloaded == 0:
+            raise FileNotFoundError(f"No objects found for prefix '{prefix}' in bucket '{bucket_name}'")
+
+        logger.info(
+            "Downloaded %d file(s) from %s/%s to %s",
+            total_downloaded, bucket_name, prefix, save_dir,
+        )
+        return total_downloaded
+
