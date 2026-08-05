@@ -454,6 +454,7 @@ def download_workspace_dataset(
     
     downloader = MinioDownloader()
     prefix_base = f"assay_{assay_id}/"
+    tmp_dir: Optional[str] = None
     
     try:
         if not timestamp:
@@ -477,21 +478,21 @@ def download_workspace_dataset(
                     zf.write(file_path, arcname)
                     
     except FileNotFoundError as exc:
-        if 'tmp_dir' in locals():
+        if tmp_dir is not None:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         ) from exc
     except ConnectionError as exc:
-        if 'tmp_dir' in locals():
+        if tmp_dir is not None:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Storage backend unavailable: {exc}",
         ) from exc
     except Exception as exc:
-        if 'tmp_dir' in locals():
+        if tmp_dir is not None:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         import traceback
         traceback.print_exc()
@@ -506,7 +507,8 @@ def download_workspace_dataset(
                 while chunk := f.read(8192):
                     yield chunk
         finally:
-            shutil.rmtree(tmp_dir, ignore_errors=True)
+            if tmp_dir is not None:
+                shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return StreamingResponse(
         _stream_and_cleanup(),
