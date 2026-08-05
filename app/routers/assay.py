@@ -329,7 +329,7 @@ def _create_sds_output(
     return s3_prefix, output_mappings
 
 
-@router.post("/assays/{assay_id}/run", tags=["workflow"])
+@router.post("/assays/{assay_id}/run", tags=["assay"])
 def run_assay(assay_id: int, username=Depends(validate_credentials)):
     """
     Trigger the assay processing.
