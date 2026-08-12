@@ -19,7 +19,7 @@ from requests import Response
 
 from sparc_me import Dataset
 
-from .auth import validate_credentials
+from .auth import validate_credentials, keycloak_token_url, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
 from .query import get_assay, querier
 from digitaltwins.minio.uploader import Uploader
 
@@ -30,8 +30,6 @@ router = APIRouter()
 # Airflow configs
 AIRFLOW_ENABLED = os.getenv("AIRFLOW_ENABLED", "false").lower() == "true"
 AIRFLOW_ENDPOINT = os.getenv("AIRFLOW_ENDPOINT", "http://airflow-apiserver:8080/airflow")
-AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
-AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
 HOSTNAME = os.getenv("HOSTNAME")
 AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")
@@ -49,25 +47,24 @@ def _workflow_local_timestamp() -> str:
 
 
 def _get_api_token():
-    url = f"{AIRFLOW_ENDPOINT}/auth/token"
-    headers = {"Content-Type": "application/json"}
     payload = {
-        "username": AIRFLOW_USERNAME,
-        "password": AIRFLOW_PASSWORD
+        "client_id": KEYCLOAK_CLIENT_ID,
+        "client_secret": KEYCLOAK_CLIENT_SECRET,
+        "grant_type": "client_credentials"
     }
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response = requests.post(keycloak_token_url, data=payload, timeout=30)
         response.raise_for_status()
         access_token = response.json().get("access_token")
     except requests.RequestException as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Unable to reach Airflow auth endpoint: {exc}",
+            detail=f"Unable to reach Keycloak token endpoint: {exc}",
         ) from exc
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Airflow returned a non-JSON token response.",
+            detail="Keycloak returned a non-JSON token response.",
         ) from exc
     return access_token
 
