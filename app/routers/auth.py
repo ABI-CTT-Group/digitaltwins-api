@@ -61,7 +61,7 @@ def auth_basic(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
             detail=result
         )
     else:
-        return credentials.username
+        return {"username": credentials.username, "token": result["access_token"]}
 
 
 def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
@@ -81,7 +81,8 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
             algorithms=[KEYCLOAK_ALGORITHM],
             options={"verify_aud": False},
         )
-        return payload.get("preferred_username") or payload.get("username") or "unknown"
+        username = payload.get("preferred_username") or payload.get("username") or "unknown"
+        return {"username": username, "token": token}
     except JWTError as e:
         # Public key may have rotated — clear cache and retry once
         global _cached_public_key
@@ -95,7 +96,8 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
                 algorithms=[KEYCLOAK_ALGORITHM],
                 options={"verify_aud": False},
             )
-            return payload.get("preferred_username") or payload.get("username") or "unknown"
+            username = payload.get("preferred_username") or payload.get("username") or "unknown"
+            return {"username": username, "token": token}
         except JWTError as e2:
             print(f"[auth] Bearer token verification failed: {e2}")
             raise HTTPException(
@@ -193,5 +195,5 @@ def get_token(
 
 @router.get("/verify_token", tags=["auth"])
 def verify_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
-    username = auth_bearer(credentials)
-    return {"active": bool(username)}
+    result = auth_bearer(credentials)
+    return {"active": bool(result.get("username"))}

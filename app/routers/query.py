@@ -13,17 +13,22 @@ from digitaltwins import Querier
 from .auth import validate_credentials
 
 load_dotenv()
-querier = Querier()
 router = APIRouter()
 
+
+def get_querier(credentials: dict = Depends(validate_credentials)) -> Querier:
+    """Create a per-request Querier using the authenticated user's Keycloak token."""
+    return Querier(api_token=credentials["token"])
+
+
 @router.get("/programs", tags=["query"])
-def get_programs(get_details: bool = False, valid=Depends(validate_credentials)):
+def get_programs(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of programs.
 
     Args:
         get_details (bool, optional): If True, returns detailed information about each program. Defaults to False.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of programs under the 'programs' key.
@@ -33,13 +38,13 @@ def get_programs(get_details: bool = False, valid=Depends(validate_credentials))
 
 
 @router.get("/programs/{program_id}", tags=["query"])
-def get_program(program_id=None, valid=Depends(validate_credentials)):
+def get_program(program_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific program by its ID.
 
     Args:
         program_id (str, optional): The ID of the program to retrieve.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the program details under the 'program' key.
@@ -49,13 +54,13 @@ def get_program(program_id=None, valid=Depends(validate_credentials)):
 
 
 @router.get("/projects", tags=["query"])
-def get_projects(get_details: bool = False, valid=Depends(validate_credentials)):
+def get_projects(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of projects.
 
     Args:
         get_details (bool, optional): If True, returns detailed information about each project. Defaults to False.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of projects under the 'projects' key.
@@ -65,13 +70,13 @@ def get_projects(get_details: bool = False, valid=Depends(validate_credentials))
 
 
 @router.get("/projects/{project_id}", tags=["query"])
-def get_project(project_id=None, valid=Depends(validate_credentials)):
+def get_project(project_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific project by its ID.
 
     Args:
         project_id (str, optional): The ID of the project to retrieve.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the project details under the 'project' key.
@@ -81,13 +86,13 @@ def get_project(project_id=None, valid=Depends(validate_credentials)):
 
 
 @router.get("/investigations", tags=["query"])
-def get_investigations(get_details: bool = False, valid=Depends(validate_credentials)):
+def get_investigations(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of investigations.
 
     Args:
         get_details (bool, optional): If True, returns detailed information about each investigation. Defaults to False.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of investigations under the 'investigations' key.
@@ -97,13 +102,13 @@ def get_investigations(get_details: bool = False, valid=Depends(validate_credent
 
 
 @router.get("/investigations/{investigation_id}", tags=["query"])
-def get_investigation(investigation_id=None, valid=Depends(validate_credentials)):
+def get_investigation(investigation_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific investigation by its ID.
 
     Args:
         investigation_id (str, optional): The ID of the investigation to retrieve.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the investigation details under the 'investigation' key.
@@ -113,13 +118,13 @@ def get_investigation(investigation_id=None, valid=Depends(validate_credentials)
 
 
 @router.get("/studies", tags=["query"])
-def get_studies(get_details: bool = False, valid=Depends(validate_credentials)):
+def get_studies(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of studies.
 
     Args:
         get_details (bool, optional): If True, returns detailed information about each study. Defaults to False.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of studies under the 'studies' key.
@@ -129,13 +134,13 @@ def get_studies(get_details: bool = False, valid=Depends(validate_credentials)):
 
 
 @router.get("/studies/{study_id}", tags=["query"])
-def get_study(study_id=None, valid=Depends(validate_credentials)):
+def get_study(study_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific study by its ID.
 
     Args:
         study_id (str, optional): The ID of the study to retrieve.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the study details under the 'study' key.
@@ -145,13 +150,13 @@ def get_study(study_id=None, valid=Depends(validate_credentials)):
 
 
 @router.get("/assays", tags=["query"])
-def get_assays(get_details: bool = False, valid=Depends(validate_credentials)):
+def get_assays(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of assays.
 
     Args:
         get_details (bool, optional): If True, returns detailed information about each assay. Defaults to False.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of assays under the 'assays' key.
@@ -161,14 +166,14 @@ def get_assays(get_details: bool = False, valid=Depends(validate_credentials)):
 
 
 @router.get("/assays/{assay_id}", tags=["query"])
-def get_assay(assay_id=None, get_configs: bool = False, valid=Depends(validate_credentials)):
+def get_assay(assay_id=None, get_configs: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific assay by its ID, with optional parameters.
 
     Args:
         assay_id (str, optional): The ID of the assay to retrieve.
         get_configs (bool, optional): If True, retrieves additional parameters related to the assay. Defaults to False.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the assay details under the 'assay' key.
@@ -177,12 +182,12 @@ def get_assay(assay_id=None, get_configs: bool = False, valid=Depends(validate_c
     return {"assay": assay}
 
 @router.get("/workflows", tags=["query"])
-def get_workflows(valid=Depends(validate_credentials)):
+def get_workflows(querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of workflows.
 
     Args:
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of workflows under the 'workflows' key.
@@ -192,13 +197,13 @@ def get_workflows(valid=Depends(validate_credentials)):
 
 
 @router.get("/workflows/{workflow_id}", tags=["query"])
-# def get_workflow(workflow_id=None, valid=Depends(validate_credentials)):
-def get_workflow(workflow_id=None):
+def get_workflow(workflow_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific workflow by its ID.
 
     Args:
         workflow_id (str, optional): The ID of the workflow to retrieve.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the workflow details under the 'workflow' key.
@@ -207,12 +212,12 @@ def get_workflow(workflow_id=None):
     return {"workflow": workflow}
 
 @router.get("/tools", tags=["query"])
-def get_tools(valid=Depends(validate_credentials)):
+def get_tools(querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of tools.
 
     Args:
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of tools under the 'tools' key.
@@ -222,13 +227,13 @@ def get_tools(valid=Depends(validate_credentials)):
 
 
 @router.get("/tools/{tool_id}", tags=["query"])
-def get_tool(tool_id=None, valid=Depends(validate_credentials)):
+def get_tool(tool_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific tool by its ID.
 
     Args:
         tool_id (str, optional): The ID of the tool to retrieve.
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the tool details under the 'tool' key.
@@ -242,7 +247,7 @@ def get_datasets(
     descriptions: bool = False,
     categories: Optional[List[str]] = Query(default=None),
     keywords: Optional[str] = Query(default=None, description="JSON string of keyword filters, e.g. '{\"key\": \"value\"}'"),
-    valid=Depends(validate_credentials),
+    querier: Querier = Depends(get_querier),
 ):
     """
     Retrieve a list of datasets.
@@ -251,7 +256,7 @@ def get_datasets(
         descriptions (bool, optional): If True, includes description fields for each dataset. Defaults to False.
         categories (List[str], optional): Filter datasets by one or more categories (e.g. "workflow", "primary").
         keywords (str, optional): JSON-encoded dict of keyword filters (e.g. '{"organ": "heart"}').
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of datasets under the 'datasets' key.
@@ -282,7 +287,7 @@ def get_datasets(
 def get_dataset(
     dataset_uuid: str,
     get_cwl: bool = False,
-    valid=Depends(validate_credentials),
+    querier: Querier = Depends(get_querier),
 ):
     """
     Retrieve a specific dataset by its UUID.
@@ -290,7 +295,7 @@ def get_dataset(
     Args:
         dataset_uuid (str): The UUID of the dataset to retrieve. Example: abdc7a8a-33ce-11f1-a982-0242ac120007
         get_cwl (bool, optional): If True, also fetches and returns the associated CWL file (tool datasets only).
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the dataset details under the 'dataset' key.
@@ -302,14 +307,14 @@ def get_dataset(
 @router.get("/datasets/{dataset_uuid}/sample-types", tags=["datasets"])
 def get_dataset_sample_types(
     dataset_uuid: str,
-    valid=Depends(validate_credentials),
+    querier: Querier = Depends(get_querier),
 ):
     """
     Retrieve all sample types present in a dataset.
 
     Args:
         dataset_uuid (str): The UUID of the dataset. Example: abdc7a8a-33ce-11f1-a982-0242ac120007
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of sample types under the 'sample_types' key.
@@ -322,7 +327,7 @@ def get_dataset_sample_types(
 def get_dataset_samples(
     dataset_uuid: str,
     sample_type: Optional[str] = Query(default=None, description="Filter samples by type, e.g. 'ax dyn pre'"),
-    valid=Depends(validate_credentials),
+    querier: Querier = Depends(get_querier),
 ):
     """
     Retrieve samples belonging to a dataset, optionally filtered by sample type.
@@ -330,11 +335,10 @@ def get_dataset_samples(
     Args:
         dataset_uuid (str): The UUID of the dataset. Example: abdc7a8a-33ce-11f1-a982-0242ac120007
         sample_type (str, optional): Filter samples by this sample type (e.g. "ax dyn pre").
-        valid (bool): Ensures valid credentials are provided.
+        querier (Querier): Per-request querier authenticated as the calling user.
 
     Returns:
         dict: A dictionary containing the list of samples under the 'samples' key.
     """
     samples = querier.get_dataset_samples(dataset_uuid=dataset_uuid, sample_type=sample_type)
     return {"samples": samples}
-

@@ -8,7 +8,7 @@ from ..utils.config_loader import is_truthy
 
 class Querier(object):
 
-    def __init__(self):
+    def __init__(self, api_token: str | None = None):
         self._postgres_enabled = is_truthy(os.getenv("POSTGRES_ENABLED"))
         self._seek_enabled = is_truthy(os.getenv("SEEK_ENABLED"))
         self._gen3_enabled = is_truthy(os.getenv("GEN3_ENABLED"))
@@ -31,8 +31,10 @@ class Querier(object):
             self._gen3_querier = None
 
         if self._seek_enabled:
+            if not api_token:
+                raise ValueError("SEEK is enabled but no api_token was provided. Pass the user's Keycloak token.")
             from ..seek.querier import Querier as SeekQuerier
-            self._seek_querier = SeekQuerier()
+            self._seek_querier = SeekQuerier(api_token=api_token)
         else:
             self._seek_querier = None
 

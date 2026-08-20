@@ -20,7 +20,8 @@ from requests import Response
 from sparc_me import Dataset
 
 from .auth import validate_credentials, keycloak_token_url, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
-from .query import get_assay, querier
+from .query import get_querier
+from digitaltwins import Querier
 from digitaltwins.minio.uploader import Uploader
 
 load_dotenv()
@@ -36,6 +37,8 @@ AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")
 JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL")
 DEFAULT_BUCKET = "airflow-workspace"
 WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auckland"))
+AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
+AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
 
 def _workflow_local_timestamp() -> str:
@@ -47,24 +50,25 @@ def _workflow_local_timestamp() -> str:
 
 
 def _get_api_token():
+    url = f"{AIRFLOW_ENDPOINT}/auth/token"
+    headers = {"Content-Type": "application/json"}
     payload = {
-        "client_id": KEYCLOAK_CLIENT_ID,
-        "client_secret": KEYCLOAK_CLIENT_SECRET,
-        "grant_type": "client_credentials"
+        "username": AIRFLOW_USERNAME,
+        "password": AIRFLOW_PASSWORD
     }
     try:
-        response = requests.post(keycloak_token_url, data=payload, timeout=30)
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
         response.raise_for_status()
         access_token = response.json().get("access_token")
     except requests.RequestException as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail=f"Unable to reach Keycloak token endpoint: {exc}",
+            detail=f"Unable to reach Airflow auth endpoint: {exc}",
         ) from exc
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_502_BAD_GATEWAY,
-            detail="Keycloak returned a non-JSON token response.",
+            detail="Airflow returned a non-JSON token response.",
         ) from exc
     return access_token
 
@@ -102,7 +106,7 @@ def _trigger_dag(dag_id: str, conf: dict) -> Response:
     return response
 
 
-def _fetch_assay_configs(assay_id: int) -> dict:
+def _fetch_assay_configs(querier: Querier, assay_id: int) -> dict:
     assay_data = querier.get_assay(assay_id, get_configs=True)
     configs = assay_data.get("configs")
     if not configs:
@@ -117,7 +121,7 @@ def _fetch_assay_configs(assay_id: int) -> dict:
     }
 
 
-def _discover_samples(configs: dict) -> list[dict]:
+def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
     inputs = configs.get("inputs", [])
     if not inputs:
         raise ValueError("No inputs found in assay configs.")
@@ -331,7 +335,7 @@ def _create_sds_output(
 
 
 @router.post("/assays/{assay_id}/run", tags=["assay"])
-def run_assay(assay_id: int, username=Depends(validate_credentials)):
+def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), querier: Querier = Depends(get_querier)):
     """
     Trigger the assay processing.
     For script-based workflows, this handles fetching configs, discovering samples,
@@ -339,24 +343,26 @@ def run_assay(assay_id: int, username=Depends(validate_credentials)):
 
     Args:
         assay_id (int): The ID of the assay to process.
-        valid: Ensures valid credentials are provided.
+        credentials: Authenticated user credentials.
+        querier: Per-request querier authenticated as the calling user.
 
     Returns:
         dict: Information about the triggered workflow runs.
     """
+    username = credentials["username"]
     if not AIRFLOW_ENABLED:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Airflow integration is disabled (AIRFLOW_ENABLED=false).",
         )
 
-    assay = get_assay(assay_id, get_configs=False)
-    tags = assay.get("assay").get("attributes").get("tags")
+    assay = querier.get_assay(assay_id, get_configs=False)
+    tags = assay.get("attributes").get("tags")
 
     if "script" in tags:
         try:
-            configs = _fetch_assay_configs(assay_id)
-            samples = _discover_samples(configs)
+            configs = _fetch_assay_configs(querier, assay_id)
+            samples = _discover_samples(querier, configs)
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
