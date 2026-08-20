@@ -12,7 +12,8 @@ from pydantic import BaseModel, ConfigDict
 
 from src.digitaltwins.core.uploader import Uploader
 from .auth import validate_credentials
-from .query import querier
+from .query import get_querier
+from digitaltwins import Querier
 
 router = APIRouter()
 
@@ -185,7 +186,7 @@ async def upload_workspace_datasets(
     assay_id: int,
     timestamp: Optional[str] = None,
     uploader: Uploader = Depends(get_uploader),
-    _valid: bool = Depends(validate_credentials),
+    querier: Querier = Depends(get_querier),
 ) -> dict[str, Any]:
     """Upload datasets from the workspace bucket to the platform.
 

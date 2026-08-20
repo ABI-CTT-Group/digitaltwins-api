@@ -17,7 +17,6 @@ services:
       # seek
       SEEK_ENABLED: ${SEEK_ENABLED:-true}
       SEEK_BASE_URL: ${SEEK_BASE_URL:-http://seek:3000/seek}
-      SEEK_API_TOKEN: ${SEEK_API_TOKEN:-}
       # postgres
       POSTGRES_ENABLED: ${POSTGRES_ENABLED:-true}
       POSTGRES_HOST: ${POSTGRES_HOST:-database}

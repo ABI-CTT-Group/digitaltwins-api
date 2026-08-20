@@ -10,16 +10,15 @@ load_dotenv()
 
 
 class Querier(object):
-    def __init__(self):
+    def __init__(self, api_token: str):
         """
         Constructor inherited and expanded from AbstractQuerier
         """
         self._base_url = os.getenv("SEEK_BASE_URL")
-        self._api_token = os.getenv("SEEK_API_TOKEN")
+        self._api_token = api_token
 
-        for required in [self._base_url, self._api_token]:
-            if not required:
-                raise ValueError("SEEK configuration is incomplete. Please check your configuration file or environment variables.")
+        if not self._base_url:
+            raise ValueError("SEEK configuration is incomplete. SEEK_BASE_URL is not set.")
 
         self._headers = {
             "Authorization": "Bearer " + self._api_token,
