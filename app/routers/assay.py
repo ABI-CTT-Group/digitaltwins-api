@@ -19,7 +19,7 @@ from requests import Response
 
 from sparc_me import Dataset
 
-from .auth import validate_credentials, keycloak_token_url, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
+from .auth import validate_credentials
 from .query import get_querier
 from digitaltwins import Querier
 from digitaltwins.minio.uploader import Uploader
