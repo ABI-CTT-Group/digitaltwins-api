@@ -20,7 +20,7 @@ def get_downloader() -> Downloader:
     return Downloader()
 
 
-@router.get("/datasets/{dataset_uuid}/download", tags=["download"])
+@router.get("/datasets/{dataset_uuid}/download", tags=["datasets"])
 def download_dataset(
     dataset_uuid: str,
     downloader: Downloader = Depends(get_downloader),

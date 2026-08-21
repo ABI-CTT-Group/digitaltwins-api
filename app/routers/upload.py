@@ -53,7 +53,7 @@ class AssayDataModel(BaseModel):
 # ----------------------------------------
 
 
-@router.post("/dataset", tags=["upload"])
+@router.post("/dataset", tags=["datasets"])
 async def upload_dataset(
     files: List[UploadFile] = File(
         ...,
@@ -151,7 +151,7 @@ async def upload_dataset(
     }
 
 
-@router.post("/assay", tags=["upload"])
+@router.post("/assay", tags=["assays"])
 async def configure_assay(
     assay_data: AssayDataModel,
     uploader: Uploader = Depends(get_uploader),
@@ -181,7 +181,7 @@ async def configure_assay(
         "assay_uuid": assay_uuid,
     }
 
-@router.post("/assays/{assay_id}/workspace/dataset/upload", tags=["upload"])
+@router.post("/assays/{assay_id}/workspace/dataset/upload", tags=["assays"])
 async def upload_workspace_datasets(
     assay_id: int,
     timestamp: Optional[str] = None,

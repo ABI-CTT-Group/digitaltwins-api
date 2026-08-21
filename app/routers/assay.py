@@ -334,7 +334,7 @@ def _create_sds_output(
     return s3_prefix, output_mappings
 
 
-@router.post("/assays/{assay_id}/run", tags=["assay"])
+@router.post("/assays/{assay_id}/run", tags=["assays"])
 def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), querier: Querier = Depends(get_querier)):
     """
     Trigger the assay processing.
@@ -438,7 +438,7 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
         )
 
 
-@router.get("/assays/{assay_id}/workspace/dataset/download", tags=["assay", "download"])
+@router.get("/assays/{assay_id}/workspace/dataset/download", tags=["assays"])
 def download_workspace_dataset(
     assay_id: int,
     timestamp: Optional[str] = None,

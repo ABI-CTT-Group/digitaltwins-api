@@ -15,7 +15,7 @@ def get_deleter() -> Deleter:
     return Deleter()
 
 
-@router.delete("/datasets/{dataset_uuid}", tags=["delete"])
+@router.delete("/datasets/{dataset_uuid}", tags=["datasets"])
 def delete_dataset(
     dataset_uuid: str,
     deleter: Deleter = Depends(get_deleter),

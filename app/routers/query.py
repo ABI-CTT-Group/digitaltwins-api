@@ -21,7 +21,7 @@ def get_querier(credentials: dict = Depends(validate_credentials)) -> Querier:
     return Querier(api_token=credentials["token"])
 
 
-@router.get("/programs", tags=["query"])
+@router.get("/programs", tags=["programs"])
 def get_programs(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of programs.
@@ -37,7 +37,7 @@ def get_programs(get_details: bool = False, querier: Querier = Depends(get_queri
     return {"programs": programs}
 
 
-@router.get("/programs/{program_id}", tags=["query"])
+@router.get("/programs/{program_id}", tags=["programs"])
 def get_program(program_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific program by its ID.
@@ -53,7 +53,7 @@ def get_program(program_id=None, querier: Querier = Depends(get_querier)):
     return {"program": program}
 
 
-@router.get("/projects", tags=["query"])
+@router.get("/projects", tags=["projects"])
 def get_projects(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of projects.
@@ -69,7 +69,7 @@ def get_projects(get_details: bool = False, querier: Querier = Depends(get_queri
     return {"projects": projects}
 
 
-@router.get("/projects/{project_id}", tags=["query"])
+@router.get("/projects/{project_id}", tags=["projects"])
 def get_project(project_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific project by its ID.
@@ -85,7 +85,7 @@ def get_project(project_id=None, querier: Querier = Depends(get_querier)):
     return {"project": project}
 
 
-@router.get("/investigations", tags=["query"])
+@router.get("/investigations", tags=["investigations"])
 def get_investigations(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of investigations.
@@ -101,7 +101,7 @@ def get_investigations(get_details: bool = False, querier: Querier = Depends(get
     return {"investigations": investigations}
 
 
-@router.get("/investigations/{investigation_id}", tags=["query"])
+@router.get("/investigations/{investigation_id}", tags=["investigations"])
 def get_investigation(investigation_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific investigation by its ID.
@@ -117,7 +117,7 @@ def get_investigation(investigation_id=None, querier: Querier = Depends(get_quer
     return {"investigation": investigation}
 
 
-@router.get("/studies", tags=["query"])
+@router.get("/studies", tags=["studies"])
 def get_studies(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of studies.
@@ -133,7 +133,7 @@ def get_studies(get_details: bool = False, querier: Querier = Depends(get_querie
     return {"studies": studies}
 
 
-@router.get("/studies/{study_id}", tags=["query"])
+@router.get("/studies/{study_id}", tags=["studies"])
 def get_study(study_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific study by its ID.
@@ -149,7 +149,7 @@ def get_study(study_id=None, querier: Querier = Depends(get_querier)):
     return {"study": study}
 
 
-@router.get("/assays", tags=["query"])
+@router.get("/assays", tags=["assays"])
 def get_assays(get_details: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of assays.
@@ -165,7 +165,7 @@ def get_assays(get_details: bool = False, querier: Querier = Depends(get_querier
     return {"assays": assays}
 
 
-@router.get("/assays/{assay_id}", tags=["query"])
+@router.get("/assays/{assay_id}", tags=["assays"])
 def get_assay(assay_id=None, get_configs: bool = False, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific assay by its ID, with optional parameters.
@@ -181,7 +181,7 @@ def get_assay(assay_id=None, get_configs: bool = False, querier: Querier = Depen
     assay = querier.get_assay(assay_id, get_configs=get_configs)
     return {"assay": assay}
 
-@router.get("/workflows", tags=["query"])
+@router.get("/workflows", tags=["workflows"])
 def get_workflows(querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of workflows.
@@ -196,7 +196,7 @@ def get_workflows(querier: Querier = Depends(get_querier)):
     return {"workflows": workflows}
 
 
-@router.get("/workflows/{workflow_id}", tags=["query"])
+@router.get("/workflows/{workflow_id}", tags=["workflows"])
 def get_workflow(workflow_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific workflow by its ID.
@@ -211,7 +211,7 @@ def get_workflow(workflow_id=None, querier: Querier = Depends(get_querier)):
     workflow = querier.get_workflow(workflow_id)
     return {"workflow": workflow}
 
-@router.get("/tools", tags=["query"])
+@router.get("/tools", tags=["tools"])
 def get_tools(querier: Querier = Depends(get_querier)):
     """
     Retrieve a list of tools.
@@ -226,7 +226,7 @@ def get_tools(querier: Querier = Depends(get_querier)):
     return {"tools": tools}
 
 
-@router.get("/tools/{tool_id}", tags=["query"])
+@router.get("/tools/{tool_id}", tags=["tools"])
 def get_tool(tool_id=None, querier: Querier = Depends(get_querier)):
     """
     Retrieve a specific tool by its ID.
