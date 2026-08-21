@@ -199,6 +199,7 @@ async def upload_workspace_datasets(
     """
     from digitaltwins.minio.downloader import Downloader as MinioDownloader
     
+    tmp_dir = None
     try:
         # 1. Fetch assay configs to get category mapping
         assay_data = querier.get_assay(assay_id, get_configs=True)
@@ -248,21 +249,21 @@ async def upload_workspace_datasets(
                 })
                 
     except FileNotFoundError as exc:
-        if 'tmp_dir' in locals():
+        if tmp_dir:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=str(exc),
         ) from exc
     except ConnectionError as exc:
-        if 'tmp_dir' in locals():
+        if tmp_dir:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail=f"Storage backend unavailable: {exc}",
         ) from exc
     except Exception as exc:
-        if 'tmp_dir' in locals():
+        if tmp_dir:
             shutil.rmtree(tmp_dir, ignore_errors=True)
         traceback.print_exc()
         raise HTTPException(
@@ -271,7 +272,7 @@ async def upload_workspace_datasets(
         ) from exc
         
     # Cleanup
-    if 'tmp_dir' in locals():
+    if tmp_dir:
         shutil.rmtree(tmp_dir, ignore_errors=True)
 
     return {
