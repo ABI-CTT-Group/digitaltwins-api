@@ -1,14 +1,17 @@
 """
-Workflow Router.
+Assay Router.
 
-This module provides endpoints to trigger Airflow DAG runs for assay processing.
+Consolidates all assay endpoints: list, get, configure, run assay workflows,
+and workspace dataset upload/download.
 """
+
+import logging
 import os
 import shutil
 import tempfile
 import zipfile
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Any, Optional
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import requests
@@ -19,12 +22,15 @@ from requests import Response
 
 from sparc_me import Dataset
 
-from .auth import validate_credentials, keycloak_token_url, KEYCLOAK_CLIENT_ID, KEYCLOAK_CLIENT_SECRET
-from .query import get_querier
-from digitaltwins import Querier
-from digitaltwins.minio.uploader import Uploader
+from digitaltwins import Querier, Uploader
+from digitaltwins.minio.uploader import Uploader as MinioUploader
+from .auth import validate_credentials
+from .dependencies import get_querier, get_uploader
+from ..schemas.assay import AssayDataModel
 
 load_dotenv()
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -39,6 +45,9 @@ DEFAULT_BUCKET = "airflow-workspace"
 WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auckland"))
 AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
 AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
+
+
+# ── Private helpers (workflow orchestration) ──────────────────────────
 
 
 def _workflow_local_timestamp() -> str:
@@ -91,7 +100,7 @@ def _trigger_dag(dag_id: str, conf: dict) -> Response:
     try:
         response = requests.post(url, headers=headers, json=payload, timeout=30)
         response.raise_for_status()
-        print("Triggered DAG Run:", response.json())
+        logger.info("Triggered DAG Run: %s", response.json())
     except requests.RequestException as exc:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -193,7 +202,7 @@ def _create_sds_output(
         meta.clear_values("Name")
         meta.add_values("Name", dataset_name)
     except Exception as e:
-        print(f"Warning: Failed to set dataset Name: {e}")
+        logger.warning("Failed to set dataset Name: %s", e)
 
     try:
         subjects_meta = dataset.get_metadata("subjects")
@@ -202,7 +211,7 @@ def _create_sds_output(
         unique_subjects = list(set([s["subject_id"].replace("sub-", "") for s in samples]))
         subjects_meta.add_values("subject id", unique_subjects)
     except Exception as e:
-        print(f"Warning: Failed to set subjects metadata: {e}")
+        logger.warning("Failed to set subjects metadata: %s", e)
 
     output_mappings: dict[tuple[str, str], dict[str, str]] = {}
 
@@ -244,7 +253,7 @@ def _create_sds_output(
         samples_meta.add_values("sample id", sample_ids)
         samples_meta.add_values("sample type", sample_types)
     except Exception as e:
-        print(f"Warning: Failed to set samples metadata: {e}")
+        logger.warning("Failed to set samples metadata: %s", e)
 
     try:
         manifest_meta = dataset.get_metadata("manifest")
@@ -290,7 +299,7 @@ def _create_sds_output(
             manifest_meta.add_values("description", descriptions)
             manifest_meta.add_values("file type", file_types)
     except Exception as e:
-        print(f"Warning: Failed to set manifest metadata: {e}")
+        logger.warning("Failed to set manifest metadata: %s", e)
 
     dataset.save(save_dir=temp_dir)
     
@@ -306,9 +315,9 @@ def _create_sds_output(
             os.makedirs(sample_dir, exist_ok=True)
 
     # Upload to MinIO
-    uploader = Uploader()
+    uploader = MinioUploader()
     if not uploader.bucket_exists(DEFAULT_BUCKET):
-        print(f"Bucket {DEFAULT_BUCKET} does not exist, upload may fail.")
+        logger.warning("Bucket %s does not exist, upload may fail.", DEFAULT_BUCKET)
         
     uploader.upload_folder(temp_dir, DEFAULT_BUCKET, prefix=s3_prefix, overwrite=True)
 
@@ -329,12 +338,89 @@ def _create_sds_output(
             key = f"{s3_prefix}/{d}"
             uploader.s3_client.put_object(Bucket=DEFAULT_BUCKET, Key=key, Body=b"")
     except Exception as e:
-        print(f"Warning: Failed to create empty S3 directories: {e}")
+        logger.warning("Failed to create empty S3 directories: %s", e)
 
     return s3_prefix, output_mappings
 
 
-@router.post("/assays/{assay_id}/run", tags=["assay"])
+# ── Query endpoints ───────────────────────────────────────────────────
+
+
+@router.get("/assays", tags=["assays"])
+def get_assays(get_details: bool = False, querier: Querier = Depends(get_querier)):
+    """
+    Retrieve a list of assays.
+
+    Args:
+        get_details (bool, optional): If True, returns detailed information about each assay. Defaults to False.
+        querier (Querier): Per-request querier authenticated as the calling user.
+
+    Returns:
+        dict: A dictionary containing the list of assays under the 'assays' key.
+    """
+    assays = querier.get_assays(get_details=get_details)
+    return {"assays": assays}
+
+
+@router.get("/assays/{assay_id}", tags=["assays"])
+def get_assay(assay_id: int, get_configs: bool = False, querier: Querier = Depends(get_querier)):
+    """
+    Retrieve a specific assay by its ID, with optional parameters.
+
+    Args:
+        assay_id (int): The ID of the assay to retrieve.
+        get_configs (bool, optional): If True, retrieves additional parameters related to the assay. Defaults to False.
+        querier (Querier): Per-request querier authenticated as the calling user.
+
+    Returns:
+        dict: A dictionary containing the assay details under the 'assay' key.
+    """
+    assay = querier.get_assay(assay_id, get_configs=get_configs)
+    return {"assay": assay}
+
+
+# ── Configure endpoint ────────────────────────────────────────────────
+
+
+@router.post("/assay", tags=["assays"])
+async def configure_assay(
+    assay_data: AssayDataModel,
+    uploader: Uploader = Depends(get_uploader),
+    _valid: bool = Depends(validate_credentials),
+) -> dict[str, Any]:
+    """Configure an assay through PostgreSQL.
+    
+    Accepts an AssayDataModel JSON payload containing the assay configuration
+    as well as inputs and outputs mapping. Directly invokes
+    `uploader.configure_assay(assay_data.model_dump())` to persist the 
+    configuration in the PostgreSQL database.
+    """
+    try:
+        # Convert Pydantic payload to dictionary string exactly as the DB layer expects
+        payload = assay_data.model_dump()
+        assay_uuid = uploader.configure_assay(payload)
+    except ValueError as exc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(exc),
+        ) from exc
+    except Exception as exc:
+        logger.exception("Failed to configure assay")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to configure assay: {exc}",
+        ) from exc
+
+    return {
+        "message": "Assay configured successfully.",
+        "assay_uuid": assay_uuid,
+    }
+
+
+# ── Run endpoint ──────────────────────────────────────────────────────
+
+
+@router.post("/assays/{assay_id}/run", tags=["assays"])
 def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), querier: Querier = Depends(get_querier)):
     """
     Trigger the assay processing.
@@ -438,7 +524,10 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
         )
 
 
-@router.get("/assays/{assay_id}/workspace/dataset/download", tags=["assay", "download"])
+# ── Workspace dataset endpoints ───────────────────────────────────────
+
+
+@router.get("/assays/{assay_id}/workspace/dataset/download", tags=["assays"])
 def download_workspace_dataset(
     assay_id: int,
     timestamp: Optional[str] = None,
@@ -490,8 +579,7 @@ def download_workspace_dataset(
         ) from exc
     except Exception as exc:
         shutil.rmtree(tmp_dir, ignore_errors=True)
-        import traceback
-        traceback.print_exc()
+        logger.exception("Unexpected error while downloading workspace dataset")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Unexpected error while downloading dataset: {exc}",
@@ -512,3 +600,102 @@ def download_workspace_dataset(
             "Content-Disposition": f'attachment; filename="assay_{assay_id}_{resolved_timestamp}.zip"',
         },
     )
+
+
+@router.post("/assays/{assay_id}/workspace/dataset/upload", tags=["assays"])
+async def upload_workspace_datasets(
+    assay_id: int,
+    timestamp: Optional[str] = None,
+    uploader: Uploader = Depends(get_uploader),
+    querier: Querier = Depends(get_querier),
+) -> dict[str, Any]:
+    """Upload datasets from the workspace bucket to the platform.
+
+    Args:
+        assay_id: The ID of the assay.
+        timestamp: Optional timestamp to specify a historical run. If omitted, the latest is used.
+    
+    Returns:
+        A dictionary containing the uploaded dataset UUIDs.
+    """
+    from digitaltwins.minio.downloader import Downloader as MinioDownloader
+    
+    tmp_dir = None
+    try:
+        # 1. Fetch assay configs to get category mapping
+        assay_data = querier.get_assay(assay_id, get_configs=True)
+        configs = assay_data.get("configs", {})
+        outputs = configs.get("outputs", [])
+        
+        category_map = {}
+        for out in outputs:
+            ds_name = out.get("dataset_name")
+            cat = out.get("category", "workflows")
+            if ds_name:
+                category_map[ds_name] = cat
+                
+        # 2. Get latest timestamp folder if not provided
+        minio_downloader = MinioDownloader()
+        prefix_base = f"assay_{assay_id}/"
+        
+        if not timestamp:
+            timestamp = minio_downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
+            
+        target_prefix = f"{prefix_base}{timestamp}/"
+        
+        # 3. Download the specific folder to a temporary directory
+        tmp_dir = tempfile.mkdtemp()
+        save_dir = os.path.join(tmp_dir, "data")
+        minio_downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
+        
+        # 4. Iterate subdirectories and upload each
+        uploaded_datasets = []
+        
+        for item in os.listdir(save_dir):
+            item_path = os.path.join(save_dir, item)
+            if os.path.isdir(item_path):
+                # determine category
+                category = category_map.get(item, "workflows")
+                
+                # upload
+                dataset_uuid = uploader.upload_dataset(
+                    dataset_path=item_path,
+                    category=category,
+                )
+                uploaded_datasets.append({
+                    "dataset_name": item,
+                    "dataset_uuid": dataset_uuid,
+                    "category": category
+                })
+                
+    except FileNotFoundError as exc:
+        if tmp_dir:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=str(exc),
+        ) from exc
+    except ConnectionError as exc:
+        if tmp_dir:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Storage backend unavailable: {exc}",
+        ) from exc
+    except Exception as exc:
+        if tmp_dir:
+            shutil.rmtree(tmp_dir, ignore_errors=True)
+        logger.exception("Unexpected error while uploading workspace datasets")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Unexpected error while uploading datasets: {exc}",
+        ) from exc
+        
+    # Cleanup
+    if tmp_dir:
+        shutil.rmtree(tmp_dir, ignore_errors=True)
+
+    return {
+        "message": f"Successfully uploaded {len(uploaded_datasets)} datasets.",
+        "datasets": uploaded_datasets,
+    }

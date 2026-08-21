@@ -20,8 +20,10 @@ starlette.requests.Request.form = _patched_form  # type: ignore[method-assign]
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers import health, auth, query, upload, delete, download, assay
-
+from .routers import (
+    health, auth, datasets, assays,
+    programs, projects, investigations, studies, workflows, tools
+)
 def initialise(app):
     origins = [
         # "http://localhost:3000",
@@ -49,11 +51,14 @@ def create_app() -> FastAPI:
     # include routers
     app.include_router(health.router)
     app.include_router(auth.router)
-    app.include_router(query.router)
-    app.include_router(upload.router)
-    app.include_router(delete.router)
-    app.include_router(download.router)
-    app.include_router(assay.router)
+    app.include_router(datasets.router)
+    app.include_router(assays.router)
+    app.include_router(programs.router)
+    app.include_router(projects.router)
+    app.include_router(investigations.router)
+    app.include_router(studies.router)
+    app.include_router(workflows.router)
+    app.include_router(tools.router)
 
     return app
 
