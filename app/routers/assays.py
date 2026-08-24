@@ -39,8 +39,9 @@ AIRFLOW_ENABLED = os.getenv("AIRFLOW_ENABLED", "false").lower() == "true"
 AIRFLOW_ENDPOINT = os.getenv("AIRFLOW_ENDPOINT", "http://airflow-apiserver:8080/airflow")
 
 HOSTNAME = os.getenv("HOSTNAME")
-AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")
-JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL")
+AIRFLOW_BASE_URL = os.getenv("AIRFLOW_BASE_URL", f"http://{HOSTNAME}/airflow")# JupyterHub configs
+JUPYTERHUB_PUBLIC_URL = os.getenv("JUPYTERHUB_PUBLIC_URL", "http://localhost/jupyter")
+JUPYTERHUB_INTERNAL_URL = os.getenv("JUPYTERHUB_INTERNAL_URL", "http://digitaltwins-platform-jupyterhub:8000/jupyter")
 DEFAULT_BUCKET = "airflow-workspace"
 WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auckland"))
 AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
@@ -602,12 +603,44 @@ def download_workspace_dataset(
     )
 
 
+def _download_jupyter_folder(username: str, remote_path: str, local_dir: str):
+    """Recursively download a folder from Jupyter Server."""
+    api_token = os.getenv("JUPYTERHUB_API_TOKEN", "digitaltwins-api-secret-token")
+    headers = {"Authorization": f"token {api_token}"}
+    api_url = f"{JUPYTERHUB_INTERNAL_URL}/user/{username}/api/contents/{remote_path}"
+    
+    response = requests.get(api_url, headers=headers)
+    if response.status_code == 404:
+        raise FileNotFoundError(f"Folder not found in Jupyter workspace: {remote_path}")
+    response.raise_for_status()
+    data = response.json()
+    
+    if data.get("type") == "directory":
+        os.makedirs(local_dir, exist_ok=True)
+        for item in data.get("content", []):
+            item_path = item["path"]
+            item_name = item["name"]
+            item_type = item["type"]
+            local_item_path = os.path.join(local_dir, item_name)
+            
+            if item_type == "directory":
+                _download_jupyter_folder(username, item_path, local_item_path)
+            elif item_type == "file":
+                file_url = f"{JUPYTERHUB_INTERNAL_URL}/user/{username}/files/{item_path}"
+                file_resp = requests.get(file_url, headers=headers, stream=True)
+                file_resp.raise_for_status()
+                with open(local_item_path, 'wb') as f:
+                    for chunk in file_resp.iter_content(chunk_size=8192):
+                        f.write(chunk)
+
+
 @router.post("/assays/{assay_id}/workspace/dataset/upload", tags=["assays"])
 async def upload_workspace_datasets(
     assay_id: int,
     timestamp: Optional[str] = None,
     uploader: Uploader = Depends(get_uploader),
     querier: Querier = Depends(get_querier),
+    credentials: dict = Depends(validate_credentials),
 ) -> dict[str, Any]:
     """Upload datasets from the workspace bucket to the platform.
 
@@ -626,6 +659,8 @@ async def upload_workspace_datasets(
         assay_data = querier.get_assay(assay_id, get_configs=True)
         configs = assay_data.get("configs", {})
         outputs = configs.get("outputs", [])
+        tags = assay_data.get("attributes", {}).get("tags", []) or []
+        is_jupyter = "notebook" in tags
         
         category_map = {}
         for out in outputs:
@@ -634,19 +669,26 @@ async def upload_workspace_datasets(
             if ds_name:
                 category_map[ds_name] = cat
                 
-        # 2. Get latest timestamp folder if not provided
-        minio_downloader = MinioDownloader()
-        prefix_base = f"assay_{assay_id}/"
-        
-        if not timestamp:
-            timestamp = minio_downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
-            
-        target_prefix = f"{prefix_base}{timestamp}/"
-        
-        # 3. Download the specific folder to a temporary directory
         tmp_dir = tempfile.mkdtemp()
         save_dir = os.path.join(tmp_dir, "data")
-        minio_downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
+        
+        if is_jupyter:
+            # Jupyter / Notebook flow
+            username = credentials["username"]
+            remote_path = f"assay_{assay_id}/outputs/datasets"
+            _download_jupyter_folder(username, remote_path, save_dir)
+        else:
+            # Airflow / MinIO flow
+            from digitaltwins.minio.downloader import Downloader as MinioDownloader
+            minio_downloader = MinioDownloader()
+            prefix_base = f"assay_{assay_id}/"
+            
+            if not timestamp:
+                timestamp = minio_downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
+                
+            target_prefix = f"{prefix_base}{timestamp}/"
+            minio_downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
+        
         
         # 4. Iterate subdirectories and upload each
         uploaded_datasets = []

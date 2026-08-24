@@ -10,10 +10,10 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.routers.auth import validate_credentials
-from app.routers.upload import get_uploader
+from app.routers.dependencies import get_uploader, get_querier
 
 # Bypass authentication
-app.dependency_overrides[validate_credentials] = lambda: True
+app.dependency_overrides[validate_credentials] = lambda: {"username": "testuser", "token": "testtoken"}
 
 client = TestClient(app)
 
@@ -24,17 +24,17 @@ def test_upload_workspace_datasets():
     
     app.dependency_overrides[get_uploader] = lambda: mock_uploader
     
-    with patch("app.routers.upload.querier") as mock_querier, \
-         patch("digitaltwins.minio.downloader.Downloader") as MockMinioDownloader:
-         
-        # Mock querier to return some outputs
-        mock_querier.get_assay.return_value = {
-            "configs": {
-                "outputs": [
-                    {"dataset_name": "converted_dataset", "category": "models"}
-                ]
-            }
+    mock_querier = MagicMock()
+    mock_querier.get_assay.return_value = {
+        "configs": {
+            "outputs": [
+                {"dataset_name": "converted_dataset", "category": "models"}
+            ]
         }
+    }
+    app.dependency_overrides[get_querier] = lambda: mock_querier
+    
+    with patch("digitaltwins.minio.downloader.Downloader") as MockMinioDownloader:
         
         # Mock MinioDownloader
         mock_downloader = MagicMock()
@@ -73,3 +73,73 @@ def test_upload_workspace_datasets():
         
         mock_querier.get_assay.assert_called_once_with(1, get_configs=True)
         assert mock_uploader.upload_dataset.call_count == 2
+
+
+def test_upload_workspace_datasets_jupyter():
+    """Test the POST /assays/{assay_id}/workspace/dataset/upload endpoint for Jupyter assays."""
+    mock_uploader = MagicMock()
+    mock_uploader.upload_dataset.return_value = "mocked-uuid-jupyter"
+    
+    app.dependency_overrides[get_uploader] = lambda: mock_uploader
+    
+    mock_querier = MagicMock()
+    mock_querier.get_assay.return_value = {
+        "attributes": {
+            "tags": ["notebook"]
+        },
+        "configs": {
+            "outputs": [
+                {"dataset_name": "jupyter_dataset", "category": "models"}
+            ]
+        }
+    }
+    app.dependency_overrides[get_querier] = lambda: mock_querier
+    
+    with patch("app.routers.assays.requests.get") as mock_requests_get:
+        
+        # Mock Jupyter API responses
+        def side_effect_get(url, headers=None, stream=False, **kwargs):
+            mock_resp = MagicMock()
+            mock_resp.status_code = 200
+            
+            if "api/contents" in url:
+                if "dataset" not in url:
+                    # Root outputs directory
+                    mock_resp.json.return_value = {
+                        "type": "directory",
+                        "content": [
+                            {"name": "jupyter_dataset", "path": "assay_2/outputs/jupyter_dataset", "type": "directory"}
+                        ]
+                    }
+                else:
+                    # jupyter_dataset directory
+                    mock_resp.json.return_value = {
+                        "type": "directory",
+                        "content": [
+                            {"name": "test.txt", "path": "assay_2/outputs/jupyter_dataset/test.txt", "type": "file"}
+                        ]
+                    }
+            elif "files" in url:
+                # File download
+                mock_resp.iter_content.return_value = [b"dummy jupyter content"]
+                
+            return mock_resp
+            
+        mock_requests_get.side_effect = side_effect_get
+        
+        response = client.post("/assays/2/workspace/dataset/upload")
+        
+        assert response.status_code == 200
+        data = response.json()
+        assert "Successfully uploaded 1 datasets." in data["message"]
+        assert len(data["datasets"]) == 1
+        
+        # Find the specific dataset in the response
+        converted_ds = data["datasets"][0]
+        assert converted_ds["dataset_name"] == "jupyter_dataset"
+        assert converted_ds["category"] == "models"
+        assert converted_ds["dataset_uuid"] == "mocked-uuid-jupyter"
+        
+        mock_querier.get_assay.assert_called_once_with(2, get_configs=True)
+        assert mock_uploader.upload_dataset.call_count == 1
+
