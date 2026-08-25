@@ -532,7 +532,8 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
 def download_workspace_dataset(
     assay_id: int,
     timestamp: Optional[str] = None,
-    _valid: bool = Depends(validate_credentials),
+    querier: Querier = Depends(get_querier),
+    credentials: dict = Depends(validate_credentials),
 ) -> StreamingResponse:
     """Download the workspace dataset for an assay.
 
@@ -545,20 +546,30 @@ def download_workspace_dataset(
     """
     from digitaltwins.minio.downloader import Downloader as MinioDownloader
     
-    downloader = MinioDownloader()
-    prefix_base = f"assay_{assay_id}/"
+    assay_data = querier.get_assay(assay_id, get_configs=False)
+    tags = assay_data.get("attributes", {}).get("tags", []) or []
+    is_jupyter = "notebook" in tags
+
     tmp_dir = tempfile.mkdtemp()
     
     try:
-        resolved_timestamp = timestamp or downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
-        target_prefix = f"{prefix_base}{resolved_timestamp}/"
-        zip_path = os.path.join(tmp_dir, f"assay_{assay_id}_{resolved_timestamp}.zip")
-        
         save_dir = os.path.join(tmp_dir, "data")
         
-        # Download the specific folder
-        downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
+        if is_jupyter:
+            username = credentials["username"]
+            remote_path = f"assay_{assay_id}/outputs/datasets"
+            _download_jupyter_folder(username, remote_path, save_dir)
+            resolved_timestamp = None
+        else:
+            downloader = MinioDownloader()
+            prefix_base = f"assay_{assay_id}/"
+            resolved_timestamp = timestamp or downloader.get_latest_timestamp_folder(DEFAULT_BUCKET, prefix_base)
+            target_prefix = f"{prefix_base}{resolved_timestamp}/"
+            # Download the specific folder
+            downloader.download_folder(DEFAULT_BUCKET, target_prefix, save_dir)
         
+        filename_base = f"assay_{assay_id}_results_{resolved_timestamp}" if resolved_timestamp else f"assay_{assay_id}_results"
+        zip_path = os.path.join(tmp_dir, f"{filename_base}.zip")
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zf:
             for root, _, files in os.walk(save_dir):
                 for file in files:
@@ -598,7 +609,7 @@ def download_workspace_dataset(
         _stream_and_cleanup(),
         media_type="application/zip",
         headers={
-            "Content-Disposition": f'attachment; filename="assay_{assay_id}_{resolved_timestamp}.zip"',
+            "Content-Disposition": f'attachment; filename="{filename_base}.zip"',
         },
     )
 
