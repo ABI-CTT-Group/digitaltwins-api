@@ -77,19 +77,12 @@ class Deleter(object):
                 if not objects_to_delete:
                     continue
 
-                # delete_objects accepts up to 1000 keys per call
-                for i in range(0, len(objects_to_delete), 1000):
-                    batch = objects_to_delete[i : i + 1000]
-                    resp = self.s3_client.delete_objects(
+                for obj in objects_to_delete:
+                    self.s3_client.delete_object(
                         Bucket=bucket_name,
-                        Delete={"Objects": batch, "Quiet": True},
+                        Key=obj["Key"],
                     )
-                    errors = resp.get("Errors", [])
-                    if errors:
-                        raise RuntimeError(
-                            f"Failed to delete objects in bucket '{bucket_name}': {errors}"
-                        )
-                    total_deleted += len(batch)
+                    total_deleted += 1
 
                 logger.info(
                     "Deleted %d object(s) from bucket '%s' for dataset %s",
