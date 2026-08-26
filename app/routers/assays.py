@@ -383,7 +383,7 @@ def get_assay(assay_id: int, get_configs: bool = False, querier: Querier = Depen
 # ── Configure endpoint ────────────────────────────────────────────────
 
 
-@router.post("/assay", tags=["assays"])
+@router.post("/assays", tags=["assays"])
 async def configure_assay(
     assay_data: AssayDataModel,
     uploader: Uploader = Depends(get_uploader),
