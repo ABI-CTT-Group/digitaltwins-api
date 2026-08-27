@@ -26,7 +26,7 @@ def test_upload():
             )
     
     print(f"Uploading {len(files)} files...")
-    response = client.post("/dataset", files=files, params={"category": bucket_name})
+    response = client.post("/datasets", files=files, params={"category": bucket_name})
     print("RAW Status:", response.status_code)
     try:
         print("RAW Response:", response.json())
@@ -41,7 +41,7 @@ def test_upload_zip(bucket_name, dataset_path):
     ]
     
     print(f"\nUploading zip file...")
-    response = client.post("/dataset", files=files, params={"category": bucket_name})
+    response = client.post("/datasets", files=files, params={"category": bucket_name})
     print("ZIP Status:", response.status_code)
     try:
         print("ZIP Response:", response.json())

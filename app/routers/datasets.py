@@ -133,7 +133,7 @@ def get_dataset_samples(
 # ── Upload endpoint ───────────────────────────────────────────────────
 
 
-@router.post("/dataset", tags=["datasets"])
+@router.post("/datasets", tags=["datasets"])
 async def upload_dataset(
     files: List[UploadFile] = File(
         ...,

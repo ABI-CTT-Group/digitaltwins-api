@@ -35,7 +35,7 @@ def test_configure_assay():
     print("Testing POST /assay endpoint...")
     
     # Send the first request (INSERT or UPDATE if it already exists)
-    response = client.post("/assay", json=assay_data)
+    response = client.post("/assays", json=assay_data)
     
     if response.status_code == 200:
         data = response.json()
@@ -46,7 +46,7 @@ def test_configure_assay():
             # Let's perform a subsequent request (explicit UPDATE) to test the branch
             assay_data["assay_uuid"] = assay_uuid
             print(f"\nTesting implicit update branch with assay_uuid {assay_uuid}...")
-            response_update = client.post("/assay", json=assay_data)
+            response_update = client.post("/assays", json=assay_data)
             
             if response_update.status_code == 200:
                 print(f"✅ Update Success! Response: {response_update.json()}")
