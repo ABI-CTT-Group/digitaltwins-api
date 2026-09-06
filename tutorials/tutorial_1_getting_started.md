@@ -1,7 +1,7 @@
 # Tutorial 1: Getting started with the 12 LABOURS DigitalTWINS platform
 
 ## Introduction
-This tutorial shows how to get access to and interact with the 12 LABOURS DigitalTWINS Platform and its web portal.
+This tutorial shows how to get access to and interact with the 12 LABOURS Digital Twins Platform and its web portal.
 
 ## Definitions
 - API - Application Programming Interface used to access the features or data of an application or service.
