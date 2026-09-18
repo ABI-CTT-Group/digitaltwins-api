@@ -470,6 +470,7 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
         try:
             configs = _fetch_assay_configs(querier, assay_id)
             samples = _discover_samples(querier, configs)
+            model_conf = _model_conf_overrides(configs.get("inputs", []))
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -513,6 +514,7 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
                 "output_name_by_sample_type": output_name_by_sample_type,
                 "run_id": run_id,
                 "run_index": idx,
+                **model_conf,
             }
             
             try:
