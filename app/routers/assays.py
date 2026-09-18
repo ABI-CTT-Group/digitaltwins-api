@@ -47,6 +47,9 @@ WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auck
 AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
 AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
+# assay_input.category value marking an input as a model dataset.
+MODEL_INPUT_CATEGORY = "models"
+
 
 # ── Private helpers (workflow orchestration) ──────────────────────────
 
@@ -131,6 +134,21 @@ def _fetch_assay_configs(querier: Querier, assay_id: int) -> dict:
     }
 
 
+def _model_conf_overrides(inputs: list[dict]) -> dict[str, str]:
+    """Map model-category assay inputs to their ``{name}_dataset_uuid`` DAG conf keys."""
+    overrides: dict[str, str] = {}
+    for inp in inputs:
+        if inp.get("category") != MODEL_INPUT_CATEGORY:
+            continue
+        name = inp.get("name") or ""
+        dataset_uuid = inp.get("dataset_uuid") or ""
+        if not name:
+            raise ValueError("A model assay input is missing its name.")
+        if not dataset_uuid:
+            raise ValueError(f"Model input '{name}' has no dataset_uuid.")
+        overrides[f"{name}_dataset_uuid"] = dataset_uuid
+    return overrides
+
 def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
     inputs = configs.get("inputs", [])
     if not inputs:
@@ -140,6 +158,8 @@ def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
     seen = set()
 
     for inp in inputs:
+        if inp.get("category") == MODEL_INPUT_CATEGORY:
+            continue
         dataset_uuid = inp.get("dataset_uuid")
         sample_type = inp.get("sample_type")
         input_name = inp.get("name", "input")
