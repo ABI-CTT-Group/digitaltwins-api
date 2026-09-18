@@ -708,8 +708,7 @@ async def upload_workspace_datasets(
     Returns:
         A dictionary containing the uploaded dataset UUIDs.
     """
-    from digitaltwins.minio.downloader import Downloader as MinioDownloader
-    
+
     tmp_dir = None
     try:
         # 1. Fetch assay configs to get category mapping
