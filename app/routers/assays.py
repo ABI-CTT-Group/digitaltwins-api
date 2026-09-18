@@ -128,6 +128,7 @@ def _fetch_assay_configs(querier: Querier, assay_id: int) -> dict:
     return {
         "assay_id": assay_id,
         "workflow_seek_id": configs.get("workflow_seek_id"),
+        "cohort": configs.get("cohort"),
         "inputs": configs.get("inputs", []),
         "outputs": configs.get("outputs", []),
         "bucket": DEFAULT_BUCKET,
@@ -149,10 +150,20 @@ def _model_conf_overrides(inputs: list[dict]) -> dict[str, str]:
         overrides[f"{name}_dataset_uuid"] = dataset_uuid
     return overrides
 
+
+def _normalise_subject(value: str) -> str:
+    """Strip the SDS ``sub-`` prefix so cohort indices and subject ids compare equal."""
+    return str(value).strip().removeprefix("sub-")
+
+
 def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
     inputs = configs.get("inputs", [])
     if not inputs:
         raise ValueError("No inputs found in assay configs.")
+
+    # assay.cohort holds the indices of the subjects to run; empty means all of them.
+    cohort = {_normalise_subject(c) for c in (configs.get("cohort") or [])}
+    matched = set()
 
     samples_list = []
     seen = set()
@@ -174,6 +185,12 @@ def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
             sample_id = row.get("sample_id")
             
             if subject_id and sample_id:
+                subject_key = _normalise_subject(subject_id)
+                if cohort:
+                    if subject_key not in cohort:
+                        continue
+                    matched.add(subject_key)
+
                 key = (subject_id, sample_id)
                 if key not in seen:
                     seen.add(key)
@@ -184,6 +201,13 @@ def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
                         "sample_type": sample_type,
                         "input_name": input_name,
                     })
+
+    unmatched = cohort - matched
+    if unmatched:
+        raise ValueError(
+            "No samples found for cohort subjects: "
+            + ", ".join(f"sub-{s}" for s in sorted(unmatched))
+        )
 
     if not samples_list:
         raise ValueError("No samples found for the given inputs.")
