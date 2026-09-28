@@ -6,6 +6,7 @@ so that either everything succeeds or everything is rolled back.
 
 import os
 import logging
+import shutil
 from typing import Optional
 
 import psycopg2
@@ -56,6 +57,7 @@ class Deleter(object):
         # 2. Open a Postgres transaction
         conn: Optional[psycopg2.extensions.connection] = None
         minio_deleted = 0
+        cleanup = {"fhir_status": "none", "subject_uuids": [], "upload_ids": []}
 
         try:
             if self._postgres_enabled and self._postgres_deleter:
@@ -70,6 +72,7 @@ class Deleter(object):
 
             # 4. Delete Postgres rows
             if conn:
+                cleanup = self._postgres_deleter.get_cleanup_info(cur, dataset_uuid)
                 self._postgres_deleter.delete_dataset(cur, dataset_uuid)
 
             # 5. Commit
@@ -86,7 +89,31 @@ class Deleter(object):
             if conn:
                 conn.close()
 
+        # 6. Outside Postgres, best-effort: FHIR resources and local copies.
+        fhir_deleted = (_delete_fhir_resources(dataset_uuid, cleanup["subject_uuids"])
+                        if cleanup["fhir_status"] != "none" else {})
+        _remove_local_copies(dataset_uuid, cleanup["upload_ids"])
+
         return {
             "dataset_uuid": dataset_uuid,
             "minio_objects_deleted": minio_deleted,
+            "fhir_resources_deleted": fhir_deleted,
         }
+
+
+def _delete_fhir_resources(dataset_uuid: str, subject_uuids: list) -> dict:
+    """Remove the dataset's HAPI FHIR resources; log and carry on if HAPI is unreachable."""
+    from ..measurements import fhir_service
+
+    try:
+        return fhir_service.delete_dataset_fhir_resources(dataset_uuid, subject_uuids, fhir_service.get_fhir_rest())
+    except Exception as exc:
+        logger.warning("FHIR cleanup failed for dataset %s: %s", dataset_uuid, exc)
+        return {}
+
+
+def _remove_local_copies(dataset_uuid: str, upload_ids: list) -> None:
+    from ..measurements.staging import dataset_dir, staging_root
+
+    for path in [dataset_dir(u) for u in upload_ids] + [staging_root() / "downloads" / dataset_uuid]:
+        shutil.rmtree(path, ignore_errors=True)

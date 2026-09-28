@@ -61,7 +61,13 @@ def auth_basic(credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
             detail=result
         )
     else:
-        return {"username": credentials.username, "token": result["access_token"]}
+        claims = jose_jwt.decode(
+            result["access_token"],
+            get_keycloak_public_key(),
+            algorithms=[KEYCLOAK_ALGORITHM],
+            options={"verify_aud": False},
+        )
+        return {"username": credentials.username, "token": result["access_token"], "claims": claims}
 
 
 def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer())):
@@ -82,7 +88,7 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
             options={"verify_aud": False},
         )
         username = payload.get("preferred_username") or payload.get("username") or "unknown"
-        return {"username": username, "token": token}
+        return {"username": username, "token": token, "claims": payload}
     except JWTError as e:
         # Public key may have rotated — clear cache and retry once
         global _cached_public_key
@@ -97,7 +103,7 @@ def auth_bearer(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer()
                 options={"verify_aud": False},
             )
             username = payload.get("preferred_username") or payload.get("username") or "unknown"
-            return {"username": username, "token": token}
+            return {"username": username, "token": token, "claims": payload}
         except JWTError as e2:
             print(f"[auth] Bearer token verification failed: {e2}")
             raise HTTPException(
@@ -132,6 +138,21 @@ def validate_credentials(
             detail="Invalid authentication method",
             headers={"WWW-Authenticate": "Basic or Bearer"},
         )
+
+
+# Keycloak realm roles allowed to upload, approve, delete and write FHIR annotations.
+UPLOAD_ROLES = {"admin", "researcher"}
+
+
+def require_upload_role(credentials: dict = Depends(validate_credentials)) -> dict:
+    """Authenticated caller whose token carries an upload realm role, else 403."""
+    roles = set(credentials.get("claims", {}).get("realm_access", {}).get("roles", []))
+    if not roles & UPLOAD_ROLES:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Requires one of the realm roles: {', '.join(sorted(UPLOAD_ROLES))}",
+        )
+    return credentials
 
 
 @router.post("/login", tags=["auth"])

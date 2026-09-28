@@ -40,10 +40,18 @@ services:
       AIRFLOW_BASE_URL: ${AIRFLOW__API__BASE_URL:-http://localhost/airflow}
       # JupyterHub
       JUPYTERHUB_PUBLIC_URL: ${JUPYTERHUB_PUBLIC_URL:-http://localhost/jupyter}
+      # dataset upload sessions (chunked parts, staged datasets, FHIR build cache)
+      DATASET_STAGING_DIR: /dataset_staging
+      MAX_UPLOAD_MB: ${MAX_UPLOAD_MB:-20480}
+      # FHIR annotation push (HAPI FHIR on the platform network) and the public
+      # base of this API, used for the FHIR endpoint URLs of dataset files
+      FHIR_ENDPOINT: ${FHIR_ENDPOINT:-http://hapi-fhir:8080/fhir}
+      DIGITALTWINS_API_PUBLIC_URL: ${DIGITALTWINS_API_PUBLIC_URL:-http://localhost/digitaltwins-api}
     networks:
       - digitaltwins-platform
     volumes:
       - ./configs.ini:/digitaltwins-api/configs.ini
+      - dataset_staging:/dataset_staging
     healthcheck:
       test: [ "CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/docs')" ]
       interval: 30s
@@ -55,5 +63,10 @@ networks:
   digitaltwins-platform:
     driver: bridge
     name: ${PROJECT_NAME}
+
+volumes:
+  dataset_staging:
+    name: ${PROJECT_NAME}_dataset_staging
+    driver: local
 
 # access api docs: http:localhost:8010/docs

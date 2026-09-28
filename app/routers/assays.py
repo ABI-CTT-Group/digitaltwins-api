@@ -47,6 +47,9 @@ WORKFLOW_TIMEZONE = os.getenv("WORKFLOW_TIMEZONE", os.getenv("TZ", "Pacific/Auck
 AIRFLOW_USERNAME = os.getenv("AIRFLOW_USERNAME", "admin")
 AIRFLOW_PASSWORD = os.getenv("AIRFLOW_PASSWORD", "admin")
 
+# assay_input.category value marking an input as a model dataset.
+MODEL_INPUT_CATEGORY = "models"
+
 
 # ── Private helpers (workflow orchestration) ──────────────────────────
 
@@ -125,10 +128,32 @@ def _fetch_assay_configs(querier: Querier, assay_id: int) -> dict:
     return {
         "assay_id": assay_id,
         "workflow_seek_id": configs.get("workflow_seek_id"),
+        "cohort": configs.get("cohort"),
         "inputs": configs.get("inputs", []),
         "outputs": configs.get("outputs", []),
         "bucket": DEFAULT_BUCKET,
     }
+
+
+def _model_conf_overrides(inputs: list[dict]) -> dict[str, str]:
+    """Map model-category assay inputs to their ``{name}_dataset_uuid`` DAG conf keys."""
+    overrides: dict[str, str] = {}
+    for inp in inputs:
+        if inp.get("category") != MODEL_INPUT_CATEGORY:
+            continue
+        name = inp.get("name") or ""
+        dataset_uuid = inp.get("dataset_uuid") or ""
+        if not name:
+            raise ValueError("A model assay input is missing its name.")
+        if not dataset_uuid:
+            raise ValueError(f"Model input '{name}' has no dataset_uuid.")
+        overrides[f"{name}_dataset_uuid"] = dataset_uuid
+    return overrides
+
+
+def _normalise_subject(value: str) -> str:
+    """Strip the SDS ``sub-`` prefix so cohort indices and subject ids compare equal."""
+    return str(value).strip().removeprefix("sub-")
 
 
 def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
@@ -136,10 +161,16 @@ def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
     if not inputs:
         raise ValueError("No inputs found in assay configs.")
 
+    # assay.cohort holds the indices of the subjects to run; empty means all of them.
+    cohort = {_normalise_subject(c) for c in (configs.get("cohort") or [])}
+    matched = set()
+
     samples_list = []
     seen = set()
 
     for inp in inputs:
+        if inp.get("category") == MODEL_INPUT_CATEGORY:
+            continue
         dataset_uuid = inp.get("dataset_uuid")
         sample_type = inp.get("sample_type")
         input_name = inp.get("name", "input")
@@ -154,6 +185,12 @@ def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
             sample_id = row.get("sample_id")
             
             if subject_id and sample_id:
+                subject_key = _normalise_subject(subject_id)
+                if cohort:
+                    if subject_key not in cohort:
+                        continue
+                    matched.add(subject_key)
+
                 key = (subject_id, sample_id)
                 if key not in seen:
                     seen.add(key)
@@ -164,6 +201,13 @@ def _discover_samples(querier: Querier, configs: dict) -> list[dict]:
                         "sample_type": sample_type,
                         "input_name": input_name,
                     })
+
+    unmatched = cohort - matched
+    if unmatched:
+        raise ValueError(
+            "No samples found for cohort subjects: "
+            + ", ".join(f"sub-{s}" for s in sorted(unmatched))
+        )
 
     if not samples_list:
         raise ValueError("No samples found for the given inputs.")
@@ -450,6 +494,7 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
         try:
             configs = _fetch_assay_configs(querier, assay_id)
             samples = _discover_samples(querier, configs)
+            model_conf = _model_conf_overrides(configs.get("inputs", []))
         except Exception as e:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -493,6 +538,7 @@ def run_assay(assay_id: int, credentials: dict = Depends(validate_credentials), 
                 "output_name_by_sample_type": output_name_by_sample_type,
                 "run_id": run_id,
                 "run_index": idx,
+                **model_conf,
             }
             
             try:
@@ -662,8 +708,7 @@ async def upload_workspace_datasets(
     Returns:
         A dictionary containing the uploaded dataset UUIDs.
     """
-    from digitaltwins.minio.downloader import Downloader as MinioDownloader
-    
+
     tmp_dir = None
     try:
         # 1. Fetch assay configs to get category mapping

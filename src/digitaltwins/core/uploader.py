@@ -1,6 +1,7 @@
 import os
 import json
 import logging
+import uuid
 from pathlib import Path
 from typing import Optional
 
@@ -231,6 +232,8 @@ class Uploader(object):
         dataset_path: str,
         category: str,
         save_json: bool = False,
+        derive_from_primary: bool = False,
+        dataset_name: Optional[str] = None,
     ) -> str:
         """Upload a SPARC SDS dataset to Postgres and MinIO.
 
@@ -249,6 +252,12 @@ class Uploader(object):
                 MinIO bucket name).
             save_json: When ``True``, each parsed ``.xlsx`` file is also
                 saved as a ``.json`` file alongside the original.
+            derive_from_primary: When ``True``, every ``primary/<subject>/<sample>``
+                folder not covered by ``subjects.xlsx`` / ``samples.xlsx`` gets a
+                minimal subject/sample row (named after the folder) and a
+                ``dataset_mapping`` row, so every sample folder has UUIDs.
+            dataset_name: Name recorded on the ``dataset`` row; defaults to the
+                folder name.
 
         Returns:
             The generated ``dataset_uuid`` as a string.
@@ -261,7 +270,7 @@ class Uploader(object):
         dataset_dir = Path(dataset_path).resolve()
         if not dataset_dir.is_dir():
             raise FileNotFoundError(f"Dataset path does not exist: {dataset_dir}")
-        dataset_name = dataset_dir.name
+        dataset_name = dataset_name or dataset_dir.name
 
         # ── 1. Parse all .xlsx metadata files ─────────────────────────
         xlsx_files = sorted(dataset_dir.glob("*.xlsx"))
@@ -290,6 +299,7 @@ class Uploader(object):
 
         # ── 2. Postgres upload (transactional) ────────────────────────
         conn: Optional[psycopg2.extensions.connection] = None
+        dataset_uuid_str: Optional[str] = None
         try:
             if self._postgres_enabled and self._postgres_uploader:
                 conn = psycopg2.connect(
@@ -335,6 +345,9 @@ class Uploader(object):
                         sample_mappings,
                     )
 
+                if derive_from_primary:
+                    _derive_from_primary(cur, dataset_dir, subject_id_to_uuid, sample_mappings)
+
                 # 2c. Insert dataset_mapping rows
                 if subject_id_to_uuid and sample_mappings:
                     self._insert_dataset_mapping(
@@ -346,6 +359,9 @@ class Uploader(object):
 
             # ── 3. MinIO upload ───────────────────────────────────────
             if self._minio_enabled and self._minio_uploader:
+                if dataset_uuid_str is None:
+                    # No metadata service to mint one; still key the upload by a UUID.
+                    dataset_uuid_str = str(uuid.uuid4())
                 bucket_name = category
                 # Create bucket if it doesn't exist
                 if not self._minio_uploader.bucket_exists(bucket_name):
@@ -559,3 +575,31 @@ def _insert_sample(
     sample_uuid = str(cur.fetchone()[0])
     if sample_id and subject_id:
         sample_mappings.append((str(sample_id), str(subject_id), sample_uuid))
+
+
+def _derive_from_primary(cur, dataset_dir: Path, subject_id_to_uuid: dict, sample_mappings: list) -> None:
+    """Register ``primary/<subject>/<sample>`` folders the spreadsheets did not cover.
+
+    Subjects referenced by a sample row or a folder but missing from
+    ``subjects.xlsx`` get a row named after the subject id; sample folders
+    without a ``samples.xlsx`` row get a row named after the folder. Existing
+    spreadsheet rows are reused, never duplicated.
+    """
+    primary = dataset_dir / "primary"
+    folder_pairs = [
+        (subject_dir.name, sample_dir.name)
+        for subject_dir in sorted(p for p in primary.iterdir() if p.is_dir())
+        for sample_dir in sorted(p for p in subject_dir.iterdir() if p.is_dir())
+    ] if primary.is_dir() else []
+
+    referenced = {sub for _, sub, _ in sample_mappings} | {sub for sub, _ in folder_pairs}
+    for subject_id in sorted(referenced - subject_id_to_uuid.keys()):
+        cur.execute("INSERT INTO subject (subject_name) VALUES (%s) RETURNING subject_uuid", (subject_id,))
+        subject_id_to_uuid[subject_id] = str(cur.fetchone()[0])
+
+    covered = {(sub, sam) for sam, sub, _ in sample_mappings}
+    for subject_id, sample_id in folder_pairs:
+        if (subject_id, sample_id) in covered:
+            continue
+        cur.execute("INSERT INTO sample (sample_name) VALUES (%s) RETURNING sample_uuid", (sample_id,))
+        sample_mappings.append((sample_id, subject_id, str(cur.fetchone()[0])))

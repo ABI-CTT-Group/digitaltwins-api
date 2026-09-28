@@ -12,10 +12,12 @@ sys.path.insert(0, str(project_root / "src"))
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.routers.auth import validate_credentials
+from app.routers.auth import require_upload_role, validate_credentials
 
 # Bypass authentication for tests
 app.dependency_overrides[validate_credentials] = lambda: True
+# DELETE /datasets/{uuid} requires an upload realm role.
+app.dependency_overrides[require_upload_role] = lambda: {"username": "test", "claims": {"realm_access": {"roles": ["admin"]}}}
 
 client = TestClient(app)
 

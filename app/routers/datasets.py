@@ -12,14 +12,26 @@ import shutil
 import tempfile
 import traceback
 import zipfile
-from pathlib import Path
-from typing import Any, List, Optional
+from pathlib import Path, PurePosixPath
+from typing import Any, List, Literal, Optional
 
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, Query, UploadFile, status
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 
 from digitaltwins import Querier, Uploader, Downloader, Deleter
-from .auth import validate_credentials
+from digitaltwins.core.connection import Connection
+from digitaltwins.measurements import jobs, sessions
+from digitaltwins.measurements.pipeline import check_descriptions_match
+from digitaltwins.measurements.staging import dataset_dir as staged_dataset_dir, staging_root
+from digitaltwins.measurements.validation import (
+    extract_uploaded_archive,
+    resolve_project_root,
+    validate_sparc_structure,
+)
+from . import dataset_uploads
+from .auth import require_upload_role, validate_credentials
+from .dataset_uploads import _max_upload_bytes
 from .dependencies import get_querier, get_uploader, get_downloader, get_deleter
 
 logger = logging.getLogger(__name__)
@@ -133,8 +145,86 @@ def get_dataset_samples(
 # ── Upload endpoint ───────────────────────────────────────────────────
 
 
+def _safe_rel_path(name: str) -> PurePosixPath:
+    """A part's relative path, rejecting absolute paths and ``..`` components."""
+    rel = PurePosixPath(name.replace("\\", "/"))
+    if not name or rel.is_absolute() or any(part in ("", "..") for part in rel.parts):
+        raise ValueError(f"Unsafe file path in upload: {name!r}")
+    return rel
+
+
+def _receive_upload(files: List[UploadFile], tmp_path: Path) -> Path:
+    """Stream the parts to disk; return the dataset root (the common top-level folder).
+
+    A single ``.zip`` part is extracted with zip-slip and size guards.
+    """
+    if len(files) == 1 and files[0].filename and files[0].filename.lower().endswith(".zip"):
+        zip_path = tmp_path / "upload.zip"
+        with open(zip_path, "wb") as out:
+            shutil.copyfileobj(files[0].file, out)
+        try:
+            extracted = extract_uploaded_archive(tmp_path, zip_path, max_total_bytes=_max_upload_bytes())
+        except zipfile.BadZipFile as exc:
+            raise ValueError("Invalid zip file") from exc
+        zip_path.unlink()
+        items = [item for item in extracted.iterdir() if item.name != "__MACOSX"]
+        return items[0] if len(items) == 1 and items[0].is_dir() else extracted
+
+    received = tmp_path / "files"
+    rels = [_safe_rel_path(upload.filename or "") for upload in files]
+    for upload, rel in zip(files, rels):
+        dest = received / Path(*rel.parts)
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        with open(dest, "wb") as out:
+            shutil.copyfileobj(upload.file, out)
+    # Pass the dataset root, not the tmp root, when every file shares a top-level folder.
+    if all(len(r.parts) > 1 and r.parts[0] == rels[0].parts[0] for r in rels):
+        return received / rels[0].parts[0]
+    return received
+
+
+def _ingest_measurements(dataset_root: Path, category: str, fhir: str, fhir_descriptions: Optional[str]) -> dict:
+    """Validate, then commit synchronously through the upload-session pipeline."""
+    ok, message = validate_sparc_structure(dataset_root)
+    if not ok:
+        raise ValueError(message)
+    name = dataset_root.name
+    root = resolve_project_root(dataset_root)
+    descriptions = None
+    if fhir_descriptions:
+        try:
+            descriptions = json.loads(fhir_descriptions)
+        except json.JSONDecodeError as exc:
+            raise ValueError("'fhir_descriptions' must be a JSON object") from exc
+        check_descriptions_match(descriptions, root)
+
+    conn, _ = Connection().connect()
+    try:
+        upload_id = sessions.create_session(
+            conn, category=category,
+            name=name, description=None, source_kind="folder", commit_mode="on_finalize",
+            fhir_mode="descriptions" if descriptions is not None else fhir, fhir_descriptions=descriptions,
+        )
+        target = staged_dataset_dir(upload_id)
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.move(str(root), str(target))
+        sessions.update_session(conn, upload_id, status="processing")
+        jobs.run_commit_job(upload_id)
+        session = sessions.get_session(conn, upload_id)
+        if session["status"] != "completed":
+            raise RuntimeError(session["failure_message"] or "commit failed")
+        with conn.cursor() as cur:
+            cur.execute("SELECT fhir_status FROM dataset WHERE dataset_uuid = %s", (session["dataset_uuid"],))
+            fhir_status = cur.fetchone()[0]
+        conn.commit()
+    finally:
+        conn.close()
+    return {"dataset_uuid": session["dataset_uuid"], "fhir_status": fhir_status}
+
+
 @router.post("/datasets", tags=["datasets"])
 async def upload_dataset(
+    background: BackgroundTasks,
     files: List[UploadFile] = File(
         ...,
         description=(
@@ -148,64 +238,35 @@ async def upload_dataset(
         ...,
         description="Dataset category including measurements, models, tools & workflows",
     ),
+    fhir: Literal["none", "auto"] = Query(
+        "none", description="measurements only: 'auto' annotates and pushes FHIR after the commit",
+    ),
+    fhir_descriptions: Optional[str] = Form(
+        None, description="measurements only: FHIR descriptions JSON, keyed by folder name (UUIDs are assigned)",
+    ),
     uploader: Uploader = Depends(get_uploader),
-    _valid: bool = Depends(validate_credentials),
+    _creds: dict = Depends(require_upload_role),
 ) -> dict[str, Any]:
-    """Accept a folder upload and ingest it through ``Uploader.upload_dataset``.
+    """Accept a folder (or single ``.zip``) upload and ingest it in one request.
 
     The client must send every file in the dataset folder as a separate
     multipart part, preserving the relative path in each part's
-    ``filename`` field.  The server reconstructs the full directory tree
-    inside a temporary directory, detects the dataset root from the
-    common top-level folder name, then hands the path off to the core
-    uploader.
+    ``filename`` field. Parts are streamed to disk on the staging volume.
+    Measurement datasets are SPARC-validated and committed through the
+    upload-session pipeline (see /datasets/uploads for large, resumable
+    uploads); other categories go straight to ``Uploader.upload_dataset``.
     """
-    # ── 1. Rebuild folder tree in a temp directory and call the uploader ─
+    measurements = category in dataset_uploads.INGEST_CATEGORIES
     try:
-        with tempfile.TemporaryDirectory() as tmp_dir:
-            tmp_path = Path(tmp_dir)
-
-            # Check if this is a single .zip file upload
-            if len(files) == 1 and files[0].filename and files[0].filename.lower().endswith(".zip"):
-                zip_path = tmp_path / files[0].filename
-                zip_path.write_bytes(await files[0].read())
-
-                try:
-                    with zipfile.ZipFile(zip_path, 'r') as zip_ref:
-                        zip_ref.extractall(tmp_path)
-                except zipfile.BadZipFile as exc:
-                    raise HTTPException(
-                        status_code=status.HTTP_400_BAD_REQUEST,
-                        detail="Invalid zip file",
-                    ) from exc
-
-                zip_path.unlink() # remove the zip file itself
-
-                # Detect common top-level directory
-                extracted_items = [item for item in tmp_path.iterdir() if item.name != "__MACOSX"]
-                if len(extracted_items) == 1 and extracted_items[0].is_dir():
-                    dataset_dir = str(extracted_items[0])
-                else:
-                    dataset_dir = str(tmp_path)
+        staging_root().mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory(dir=staging_root()) as tmp_dir:
+            dataset_dir_path = _receive_upload(files, Path(tmp_dir))
+            if measurements:
+                result = await run_in_threadpool(
+                    _ingest_measurements, dataset_dir_path, category, fhir, fhir_descriptions
+                )
             else:
-                for upload in files:
-                    # filename carries the relative path, e.g. "MyDataset/subjects.csv"
-                    dest = tmp_path / (upload.filename or "")
-                    dest.parent.mkdir(parents=True, exist_ok=True)
-                    dest.write_bytes(await upload.read())
-
-                # Detect common top-level directory so we pass the dataset root,
-                # not the tmp root, to upload_dataset.
-                all_parts = [Path(f.filename).parts for f in files if f.filename]
-                if all_parts and all(len(p) > 1 and p[0] == all_parts[0][0] for p in all_parts):
-                    dataset_dir = str(tmp_path / all_parts[0][0])
-                else:
-                    dataset_dir = tmp_dir
-
-            dataset_uuid = uploader.upload_dataset(
-                dataset_path=dataset_dir,
-                category=category,
-            )
+                result = {"dataset_uuid": uploader.upload_dataset(dataset_path=str(dataset_dir_path), category=category)}
 
     except (ValueError, TypeError, FileNotFoundError) as exc:
         raise HTTPException(
@@ -224,10 +285,9 @@ async def upload_dataset(
             detail="Unexpected error while processing dataset upload.",
         ) from exc
 
-    return {
-        "message": "Dataset uploaded successfully.",
-        "dataset_uuid": dataset_uuid,
-    }
+    if result.get("fhir_status") == "pending":
+        background.add_task(jobs.run_fhir_push_job, result["dataset_uuid"])
+    return {"message": "Dataset uploaded successfully.", **result}
 
 
 # ── Download endpoint ─────────────────────────────────────────────────
@@ -324,9 +384,10 @@ def download_dataset(
 def delete_dataset(
     dataset_uuid: str,
     deleter: Deleter = Depends(get_deleter),
-    _valid: bool = Depends(validate_credentials),
+    _creds: dict = Depends(require_upload_role),
 ) -> dict:
-    """Delete a dataset and all associated data from Postgres and MinIO.
+    """Delete a dataset and all associated data: Postgres (incl. its subject /
+    sample rows), MinIO, HAPI FHIR resources and local copies.
 
     Args:
         dataset_uuid: The UUID of the dataset to delete.
@@ -361,4 +422,5 @@ def delete_dataset(
         "message": "Dataset deleted successfully.",
         "dataset_uuid": result["dataset_uuid"],
         "minio_objects_deleted": result["minio_objects_deleted"],
+        "fhir_resources_deleted": result["fhir_resources_deleted"],
     }

@@ -20,3 +20,8 @@ python-jose[cryptography]==3.3.0
 
 # sparc dataset structure (SDS)
 sparc-me
+
+# measurement FHIR annotation (versions match the portal backend's working lock)
+fhir-cda==1.2.5
+digitaltwins-on-fhir==1.4.0
+pydicom==2.4.4

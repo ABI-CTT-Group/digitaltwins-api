@@ -6,9 +6,11 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 from app.main import app
-from app.routers.auth import validate_credentials
+from app.routers.auth import require_upload_role, validate_credentials
 
 app.dependency_overrides[validate_credentials] = lambda: True
+# POST /datasets requires an upload realm role.
+app.dependency_overrides[require_upload_role] = lambda: {"username": "test", "claims": {"realm_access": {"roles": ["admin"]}}}
 
 client = TestClient(app)
 
