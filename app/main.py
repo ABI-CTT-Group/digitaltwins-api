@@ -17,13 +17,29 @@ def _patched_form(self, *, max_files=10_000, max_fields=10_000, max_part_size=10
 
 starlette.requests.Request.form = _patched_form  # type: ignore[method-assign]
 
+import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from digitaltwins.postgres import migrate
+from digitaltwins.utils.config_loader import is_truthy
 
 from .routers import (
     health, auth, datasets, assays,
     programs, projects, investigations, studies, workflows, tools
 )
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Upgrade the platform schema before serving; a failed migration fails startup.
+    if is_truthy(os.getenv("POSTGRES_ENABLED")):
+        migrate.run()
+    yield
+
+
 def initialise(app):
     origins = [
         # "http://localhost:3000",
@@ -43,7 +59,7 @@ def initialise(app):
 
 
 def create_app() -> FastAPI:
-    app = FastAPI()
+    app = FastAPI(lifespan=lifespan)
 
     # initialise app settings
     app = initialise(app)

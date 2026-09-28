@@ -35,7 +35,12 @@ version = { attr = "digitaltwins.__version__.__version__" }
 dependencies = { file = ["requirements-prod.txt"] }
 
 [tool.setuptools.package-data]
-"digitaltwins" = []
+"digitaltwins" = ["postgres/migrations/*.sql"]
+
+[tool.pytest.ini_options]
+markers = [
+    "integration: needs live platform services (Postgres/MinIO/HAPI); skipped when unreachable",
+]
 
 # notes
 # Validating
