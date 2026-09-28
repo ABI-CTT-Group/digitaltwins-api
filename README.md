@@ -133,6 +133,23 @@ The DigitalTWINS platform Python API is called `digitaltwins`. It is designed to
 
 Please see the [documentation for workshop 1](https://github.com/ABI-CTT-Group/digitaltwins-api/blob/main/tutorials/workshop_1_describing_and_storing_data.md), which describes how to use the 12 LABOURS DigitalTWINS platform and its API.
 
+### Uploading a measurement dataset from a script
+
+`UploadClient` uploads a SPARC dataset folder or `.zip` in resumable chunks through `/datasets/uploads`. It then waits for the dataset to be committed to Postgres and MinIO, and, optionally, for the FHIR annotation to be pushed. Uploading requires the Keycloak realm role `admin` or `researcher`.
+
+```python
+from digitaltwins import UploadClient
+
+client = UploadClient.login("https://<platform-host>/digitaltwins-api", "<username>", "<password>")
+session = client.upload_dataset("path/to/my_dataset", category="measurements", fhir="auto")
+print(session["dataset_uuid"], session.get("fhir_status"))
+```
+
+- `fhir="auto"` annotates every sample automatically. Alternatively, pass `fhir_descriptions=` with your own annotation. Refer to subjects and samples by folder name (`primary/<subject>/<sample>`); the server assigns the dataset, subject and sample UUIDs.
+- If the upload is interrupted, call `client.resume(upload_id, "path/to/my_dataset")`. Only the missing parts are sent.
+- A ready-to-run command-line version is at [`examples/upload_measurement_dataset.py`](examples/upload_measurement_dataset.py). It prompts for the password (or reads `DIGITALTWINS_PASSWORD`) and prints a `--resume` command if the upload is interrupted.
+- For small datasets, the one-shot `POST /datasets?category=measurements` (multipart) remains available.
+
 ## Reporting Issues
 To report an issue or suggest a new feature, please use the [issues page](https://github.com/ABI-CTT-Group/digitaltwins-api/issues). Issue templates are provided to allow users to report bugs, and documentation or feature requests. Please check existing issues before submitting a new one.
 
