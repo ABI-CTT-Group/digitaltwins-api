@@ -7,6 +7,7 @@ from fastapi.testclient import TestClient
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from app.main import create_app
+from digitaltwins.measurements import jobs
 from digitaltwins.postgres import migrate
 
 
@@ -14,6 +15,7 @@ def _start(monkeypatch, postgres_enabled):
     calls = []
     monkeypatch.setenv("POSTGRES_ENABLED", postgres_enabled)
     monkeypatch.setattr(migrate, "run", lambda: calls.append("run") or [])
+    monkeypatch.setattr(jobs, "sweep_on_startup", lambda: None)
     with TestClient(create_app()):  # entering the client runs the lifespan
         pass
     return calls

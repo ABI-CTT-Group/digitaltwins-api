@@ -23,11 +23,12 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from digitaltwins.measurements import jobs
 from digitaltwins.postgres import migrate
 from digitaltwins.utils.config_loader import is_truthy
 
 from .routers import (
-    health, auth, datasets, assays,
+    health, auth, datasets, dataset_fhir, dataset_uploads, assays,
     programs, projects, investigations, studies, workflows, tools
 )
 
@@ -35,8 +36,10 @@ from .routers import (
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Upgrade the platform schema before serving; a failed migration fails startup.
+    # Then fail any ingest job a previous process left mid-flight (retryable).
     if is_truthy(os.getenv("POSTGRES_ENABLED")):
         migrate.run()
+        jobs.sweep_on_startup()
     yield
 
 
@@ -67,6 +70,9 @@ def create_app() -> FastAPI:
     # include routers
     app.include_router(health.router)
     app.include_router(auth.router)
+    # Before datasets: its /datasets/{dataset_uuid} would otherwise capture /datasets/uploads.
+    app.include_router(dataset_uploads.router)
+    app.include_router(dataset_fhir.router)
     app.include_router(datasets.router)
     app.include_router(assays.router)
     app.include_router(programs.router)
